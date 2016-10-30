@@ -120,6 +120,7 @@
     <Compile Include="Serialization\QueryParserTests.cs" />
     <Compile Include="Serialization\ResourceParsingTests.cs" />
     <Compile Include="Serialization\RoundtripTest.cs" />
+    <Compile Include="Serialization\DataContractSerializationTests.cs" />
     <Compile Include="Serialization\SerializationTests.cs" />
     <Compile Include="TrainingTests\Z-TrainingUnitTests.cs" />
     <Compile Include="Utils\ZipArchiveEntryExtensions.cs" />
