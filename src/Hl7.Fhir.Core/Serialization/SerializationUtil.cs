@@ -52,12 +52,9 @@ namespace Hl7.Fhir.Serialization
 
         public static XmlReader XmlReaderFromStream(Stream input)
         {
-            if (input.Position != 0)
+            if (input.CanSeek && input.Position != 0)
             {
-                if (input.CanSeek)
-                    input.Seek(0, SeekOrigin.Begin);
-                else
-                    throw Error.InvalidOperation("Stream is not at beginning, and seeking is not supported by this stream");
+                input.Seek(0, SeekOrigin.Begin);
             }
 
             return WrapXmlReader(XmlReader.Create(input));
