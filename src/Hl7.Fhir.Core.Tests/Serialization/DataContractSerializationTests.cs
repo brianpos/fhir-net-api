@@ -83,7 +83,7 @@ namespace Hl7.Fhir.Tests.Serialization
             using (var archive = ZipFile.Open("../../../../Hl7.Fhir.Specification/specification.zip", ZipArchiveMode.Read))
             {
                 string outputfile = @"c:\temp\binary_bindle.fbin";
-                List<Tuple<string, long, long>> items = new List<Tuple<string, long, long>>();
+                List<IndexItem> items = new List<IndexItem>();
                 using (FileStream fs = new FileStream(outputfile, FileMode.Create, FileAccess.Write))
                 {
                     var entries = archive.Entries.Where(e => Regex.IsMatch(e.Name, "^.*\\.xml$", RegexOptions.IgnoreCase));
@@ -96,15 +96,28 @@ namespace Hl7.Fhir.Tests.Serialization
                         {
                             zs.Write(original_xml, 0, original_xml.Length);
                         }
-                        var item = new Tuple<string, long, long>(zipArchiveEntry.ResourceType.ToString(), lastPosition, fs.Position - lastPosition);
+                        var item = new IndexItem(zipArchiveEntry.ResourceType.ToString(), lastPosition, fs.Position - lastPosition);
                         items.Add(item);
                     }
+                    // Now serialize the tuple array
+                    System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(items.GetType());
+                    long posStartIndex = fs.Position;
+                    GZipStream zsIndex = new GZipStream(fs, CompressionMode.Compress, true);
+                    using (zsIndex)
+                    {
+                        xs.Serialize(zsIndex, items);
+                    }
+                    long posEndIndex = fs.Position;
+                    BinaryWriter sw2 = new BinaryWriter(fs);
+                    sw2.Write(posStartIndex);
+                    sw2.Write(posEndIndex);
                 }
 
                 System.Diagnostics.Trace.WriteLine(String.Format("File length: {0}, resources: {1}", new System.IO.FileInfo(outputfile).Length, items.Count));
                 foreach (var item in items)
                 {
-                    System.Diagnostics.Trace.WriteLine(String.Format("{0}\t{1}\t{2}\t{3}", items.IndexOf(item), item.Item1, item.Item2, item.Item3));
+                    System.Diagnostics.Trace.WriteLine(String.Format("{0}\t{1}\t{2}\t{3}",
+                        items.IndexOf(item), item.ResourceType, item.Start, item.Length));
                 }
 
                 // Now randomly read one from the middle somewhere
@@ -112,9 +125,9 @@ namespace Hl7.Fhir.Tests.Serialization
                 sw.Start();
                 System.IO.FileStream fsRead = new FileStream(outputfile, FileMode.Open, FileAccess.Read);
                 var itemRead = items[7082];
-                byte[] contentCompressedContent = new byte[itemRead.Item3];
-                fsRead.Seek(itemRead.Item2, SeekOrigin.Begin);
-                fsRead.Read(contentCompressedContent, 0, (int)itemRead.Item3);
+                byte[] contentCompressedContent = new byte[itemRead.Length];
+                fsRead.Seek(itemRead.Start, SeekOrigin.Begin);
+                fsRead.Read(contentCompressedContent, 0, (int)itemRead.Length);
                 MemoryStream ms = new MemoryStream(contentCompressedContent);
                 GZipStream zs2 = new GZipStream(ms, CompressionMode.Decompress);
                 var rdr = SerializationUtil.XmlReaderFromStream(zs2);
@@ -124,10 +137,43 @@ namespace Hl7.Fhir.Tests.Serialization
             }
         }
 
+        public class IndexItem
+        {
+            public IndexItem()
+            {
+            }
+
+            public IndexItem(string resourceType, long start, long length)
+            {
+                ResourceType = resourceType;
+                Start = start;
+                Length = length;
+            }
+
+            public string ResourceType { get; set; }
+            public long Start { get; set; }
+            public long Length { get; set; }
+        }
+
         [TestMethod]
         public void BinarySerializeBundleStuctureDefsReadOnly()
         {
             string outputfile = @"c:\temp\binary_bindle.fbin";
+            System.IO.FileStream fsRead = new FileStream(outputfile, FileMode.Open, FileAccess.Read);
+
+            // read the index from the file
+            List<IndexItem> items = new List<IndexItem>();
+            System.Xml.Serialization.XmlSerializer xs = new System.Xml.Serialization.XmlSerializer(items.GetType());
+            fsRead.Seek(-2 * sizeof(long), SeekOrigin.End);
+            BinaryReader sr = new BinaryReader(fsRead);
+            long posStartIndex = sr.ReadInt64();
+            long posEndIndex = sr.ReadInt64();
+            fsRead.Seek(posStartIndex, SeekOrigin.Begin);
+            GZipStream zs = new GZipStream(fsRead, CompressionMode.Decompress, true);
+            using (zs)
+            {
+                items = (List<IndexItem>)xs.Deserialize(zs);
+            }
 
             // Now randomly read one from the middle somewhere
             // Test 1
@@ -135,8 +181,7 @@ namespace Hl7.Fhir.Tests.Serialization
 
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                System.IO.FileStream fsRead = new FileStream(outputfile, FileMode.Open, FileAccess.Read);
-                var itemRead = new Tuple<string, long, long>("ValueSet", 6055139, 21491);// 6067564, 21508);
+                var itemRead = items[7082]; // new IndexItem("ValueSet", 6055139, 21491);// 6067564, 21508);
                 Resource result = ReadResourceAtPosition(outputfile, itemRead);
                 System.Diagnostics.Trace.WriteLine(String.Format("SeekAndRead: {0}", sw.Elapsed.TotalSeconds));
             }
@@ -145,7 +190,7 @@ namespace Hl7.Fhir.Tests.Serialization
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                var itemRead = new Tuple<string, long, long>("ValueSet", 6055139, 21491);// 6067564, 21508);
+                var itemRead = items[7082];
                 Resource result = ReadResourceAtPosition(outputfile, itemRead);
                 System.Diagnostics.Trace.WriteLine(String.Format("SeekAndRead: {0} {1}", sw.Elapsed.TotalSeconds, result.ResourceType.ToString()));
             }
@@ -154,7 +199,7 @@ namespace Hl7.Fhir.Tests.Serialization
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                var itemRead = new Tuple<string, long, long>("ValueSet", 6029693, 1108);
+                var itemRead = items[7053];
                 Resource result = ReadResourceAtPosition(outputfile, itemRead);
                 System.Diagnostics.Trace.WriteLine(String.Format("SeekAndRead: {0}", sw.Elapsed.TotalSeconds));
             }
@@ -163,18 +208,18 @@ namespace Hl7.Fhir.Tests.Serialization
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                var itemRead = new Tuple<string, long, long>("ValueSet", 5888987, 30272);
+                var itemRead = items[6932];
                 Resource result = ReadResourceAtPosition(outputfile, itemRead);
                 System.Diagnostics.Trace.WriteLine(String.Format("SeekAndRead: {0}", sw.Elapsed.TotalSeconds));
             }
         }
 
-        private static Resource ReadResourceAtPosition(string outputfile, Tuple<string, long, long> itemRead)
+        private static Resource ReadResourceAtPosition(string outputfile, IndexItem itemRead)
         {
             System.IO.FileStream fsRead = new FileStream(outputfile, FileMode.Open, FileAccess.Read);
-            byte[] contentCompressedContent = new byte[itemRead.Item3];
-            fsRead.Seek(itemRead.Item2, SeekOrigin.Begin);
-            int nRead = fsRead.Read(contentCompressedContent, 0, (int)itemRead.Item3);
+            byte[] contentCompressedContent = new byte[itemRead.Length];
+            fsRead.Seek(itemRead.Start, SeekOrigin.Begin);
+            int nRead = fsRead.Read(contentCompressedContent, 0, (int)itemRead.Length);
             MemoryStream ms = new MemoryStream(contentCompressedContent);
             GZipStream zs2 = new GZipStream(ms, CompressionMode.Decompress);
             var rdr = SerializationUtil.XmlReaderFromStream(zs2);
