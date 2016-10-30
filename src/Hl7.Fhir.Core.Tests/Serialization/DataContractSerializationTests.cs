@@ -210,7 +210,8 @@ namespace Hl7.Fhir.Tests.Serialization
                 sw.Start();
                 var itemRead = items[6932];
                 Resource result = ReadResourceAtPosition(outputfile, itemRead);
-                System.Diagnostics.Trace.WriteLine(String.Format("SeekAndRead: {0}", sw.Elapsed.TotalSeconds));
+                sw.Stop();
+                System.Diagnostics.Trace.WriteLine(String.Format("SeekAndRead: {0}, {1} composed concepts in the resource", sw.Elapsed.TotalSeconds, (result as ValueSet).Compose.Include.First().Concept.Count));
             }
         }
 
