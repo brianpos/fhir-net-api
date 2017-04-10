@@ -1,0 +1,71 @@
+﻿using Hl7.Fhir.Model;
+using Hl7.Fhir.Serialization;
+using Hl7.Fhir.Specification.Snapshot;
+using Hl7.Fhir.Specification.Source;
+using Hl7.Fhir.Specification.Validation;
+using Hl7.Fhir.Validation;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Xunit;
+using Xunit.Abstractions;
+
+namespace Hl7.Fhir.Specification.Tests.Validation
+{
+    [Trait("Category", "Validation")]
+    public class Validator2Tests : IClassFixture<ValidationFixture>
+    {
+        private IResourceResolver _resolver;
+        private Validator _validator;
+        private readonly ITestOutputHelper _output;
+
+        public Validator2Tests(ValidationFixture fixture, ITestOutputHelper output)
+        {
+            _resolver = fixture.Resolver;
+            _validator = fixture.Validator;
+            _output = output;
+            Debug.Listeners.Add(new DefaultTraceListener());
+        }
+
+        // [TestMethod]
+        [Fact(DisplayName = "NewValdation2Tester")]
+        public void NewValdation2Tester()
+        {
+            var sd = _resolver.FindStructureDefinition("http://example.com/StructureDefinition/patient-telecom-slice-ek");
+            Assert.NotNull(sd);
+            var snapgen = new SnapshotGenerator(_resolver);
+            snapgen.Update(sd);
+
+            var jsonPatient = File.ReadAllText(@"TestData\validation\patient-ck.json");
+            var parser = new FhirJsonParser();
+            var patient = parser.Parse<Patient>(jsonPatient);
+            Assert.NotNull(patient);
+
+            QuickValidator v = new QuickValidator();
+            ValidationItem vi = v.CreateValidationTree(sd);
+            DumpValidationItemToDebug(vi, _output, null);
+
+            var outcome = v.Validate(patient, sd);
+            _output.WriteLine("test output");
+        }
+
+        private void DumpValidationItemToDebug(ValidationItem vi, ITestOutputHelper output, string prefix)
+        {
+            if (vi.ed.SliceName != null)
+                _output.WriteLine($"{prefix}{vi.FhirpathExpression} ({vi.Path}) - {vi.ed.SliceName}");
+            else
+                _output.WriteLine($"{prefix}{vi.FhirpathExpression} ({vi.Path})");
+            if (vi.Children != null)
+            {
+                foreach (var item in vi.Children)
+                {
+                    DumpValidationItemToDebug(item, output, "    " + prefix);
+                }
+            }
+        }
+    }
+}
