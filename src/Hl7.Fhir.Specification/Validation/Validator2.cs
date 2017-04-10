@@ -2,6 +2,7 @@
 using Hl7.Fhir.FhirPath;
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Support;
+using Hl7.Fhir.Validation;
 using Hl7.FhirPath;
 using System;
 using System.Collections.Generic;
@@ -58,7 +59,7 @@ namespace Hl7.Fhir.Specification.Validation
                             discriminator.Add(disc.Path, null);
                         }
                     }
-                   //  continue;
+                    //  continue;
                 }
 
                 while (processingItem.Count > 0 && !elem.Path.Contains(processingItem.Peek().Path + "."))
@@ -206,6 +207,18 @@ namespace Hl7.Fhir.Specification.Validation
                         // this is an error (no need to check how many there are without performance of counting them each time)
                         result.AddIssue("Should only have " + rule.Max + " one of these!" + rule.Path,
                             new Issue() { Code = 12, Severity = OperationOutcome.IssueSeverity.Error, Type = OperationOutcome.IssueType.Value },
+                            ParentContext);
+                    }
+                }
+            }
+            if (rule.Fixed != null)
+            {
+                foreach (PocoNavigator item in values)
+                {
+                    if (!item.FhirValue.IsExactly(rule.Fixed))
+                    {
+                        result.AddIssue("Should be a fixed value " + rule.Fixed.ToString() + " !" + rule.Path,
+                            Issue.CONTENT_DOES_NOT_MATCH_FIXED_VALUE,
                             ParentContext);
                     }
                 }
