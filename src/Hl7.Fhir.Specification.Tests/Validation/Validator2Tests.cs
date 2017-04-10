@@ -49,8 +49,24 @@ namespace Hl7.Fhir.Specification.Tests.Validation
             ValidationItem vi = v.CreateValidationTree(sd);
             DumpValidationItemToDebug(vi, _output, null);
 
-            var outcome = v.Validate(patient, sd);
-            _output.WriteLine("test output");
+            var result = v.Validate(patient, sd);
+            DebugDumpOperationOutcome(_output, result);
+            Assert.True(result.Success);
+
+            // force a validation fail! (pat-1)
+            patient.Contact[0].Name = null;
+            patient.Contact[0].Telecom = null;
+            patient.Contact[0].Address = null;
+            patient.Contact[0].Organization = null;
+
+            result = v.Validate(patient, sd);
+            DebugDumpOperationOutcome(_output, result);
+            Assert.False(result.Success);
+        }
+
+        public static void DebugDumpOperationOutcome(ITestOutputHelper output, OperationOutcome result)
+        {
+            output.WriteLine(result.ToString());
         }
 
         private void DumpValidationItemToDebug(ValidationItem vi, ITestOutputHelper output, string prefix)
@@ -59,6 +75,10 @@ namespace Hl7.Fhir.Specification.Tests.Validation
                 _output.WriteLine($"{prefix}{vi.FhirpathExpression} ({vi.Path}) - {vi.ed.SliceName}");
             else
                 _output.WriteLine($"{prefix}{vi.FhirpathExpression} ({vi.Path})");
+            foreach (var expr in vi.ValidationRules.SelectMany(s => s.Constraint))
+            {
+                _output.WriteLine($"{prefix}   ->{expr.Key}: {expr.Expression}");
+            }
             if (vi.Children != null)
             {
                 foreach (var item in vi.Children)

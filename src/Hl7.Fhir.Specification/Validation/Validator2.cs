@@ -43,6 +43,7 @@ namespace Hl7.Fhir.Specification.Validation
                     // this is the root item
                     processingItem.Peek().Path = elem.Path;
                     processingItem.Peek().ed = elem;
+                    processingItem.Peek().ValidationRules.Add(elem);
                     continue;
                 }
 
@@ -81,6 +82,7 @@ namespace Hl7.Fhir.Specification.Validation
                         var item = new ValidationItem() { Path = elem.Path, FhirpathExpression = elem.Path.Replace(processingItem.Peek().Path + ".", "") };
                         processingItem.Peek().Children.Add(item);
                         item.ed = elem;
+                        item.ValidationRules.Add(elem);
                     }
                     else
                     {
@@ -88,6 +90,7 @@ namespace Hl7.Fhir.Specification.Validation
                         var item = new ValidationItem() { Path = elem.Path, FhirpathExpression = elem.Path.Replace(processingItem.Peek().Path + ".", "") };
                         processingItem.Peek().Children.Add(item);
                         item.ed = elem;
+                        item.ValidationRules.Add(elem);
                     }
                 }
             }
@@ -221,10 +224,11 @@ namespace Hl7.Fhir.Specification.Validation
                         {
                             result.AddIssue(new OperationOutcome.IssueComponent()
                             {
-                                Details = new CodeableConcept(null, inv.Key, inv.Human),
+                                Details = new CodeableConcept(null, inv.Key, inv.Human, inv.Human),
                                 Severity = OperationOutcome.IssueSeverity.Error,
                                 Diagnostics = inv.Expression,
-                                Code = OperationOutcome.IssueType.Invariant
+                                Code = OperationOutcome.IssueType.Invariant,
+                                Location = new[] { (item as PocoNavigator).ShortPath }
                             });
                         }
                     }
