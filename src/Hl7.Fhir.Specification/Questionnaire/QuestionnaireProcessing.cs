@@ -11,6 +11,7 @@ using System.Linq;
 using Hl7.Fhir.Utility;
 using Hl7.Fhir.Serialization;
 using Hl7.Fhir.Specification.Navigation;
+using System.Collections;
 
 namespace Hl7.Fhir.Specification
 {
@@ -25,6 +26,46 @@ namespace Hl7.Fhir.Specification
             return parent.Validate(new PocoNavigator(context), new PocoNavigator(context));
         }
 
+        internal void CreateStructureChildren(StructureItem parent, ElementDefinitionNavigator nav)
+        {
+            do
+            {
+                // if this is the extension property, and it has't been sliced, then we will skip them
+                // as we don't want to permit processing items that aren't defined in the structure definition
+                if (!nav.Current.IsExtension() || nav.Current.IsMappedExtension())
+                {
+                    // Process this child item
+                    var item = new StructureItem() { id = nav.Current.ElementId, code = nav.Current.Code?.FirstOrDefault()?.Code, Path = nav.Path, FhirpathExpression = nav.PathName };
+                    System.Diagnostics.Debug.WriteLine($"{item.Path} - {nav.PathName} {nav.HasChildren}");
+                    parent.Children.Add(item);
+                    if (nav.HasChildren)
+                    {
+                        // retrieve the type of this property
+                        var pm = parent.ClassMapping.FindMappedElementByName(nav.PathName);
+                        if (pm != null)
+                        {
+                            // Note that ReturnType would have the type of the collection
+                            // where the ElementType is the type of the item in the collection
+                            // or where not a collection, both are the same value
+                            item.ClassMapping = ClassMapping.Create(pm.ElementType);
+                        }
+
+                        // Now process all the children
+                        var st = nav.CloneSubtree();
+                        st.MoveToFirstChild();
+                        CreateStructureChildren(item, st);
+                    }
+                    else
+                    {
+                        // this is likely a datatype - so check it for children too
+
+
+                    }
+                }
+            }
+            while (nav.MoveToNext());
+        }
+
         /// <summary>
         /// http://hl7.org/fhir/elementdefinition.html#ElementDefinition
         /// </summary>
@@ -36,72 +77,12 @@ namespace Hl7.Fhir.Specification
             Type t = ModelInfo.GetTypeForFhirType(sd.ConstrainedType.HasValue ? sd.ConstrainedType.ToString() : sd.Name);
             parent.ClassMapping = ClassMapping.Create(t);
 
-            // Just run through the snapshot to create all the rules
-            // (yes it depends on the snapshot being complete - Thanks Michel)
-            Stack<StructureItem> processingItem = new Stack<StructureItem>();
-            processingItem.Push(parent);
-            Dictionary<string, string> discriminator = new Dictionary<string, string>();
-            foreach (var elem in sd.Snapshot.Element)
-            {
-                // if this is slicing, create the slicing context
-                Console.WriteLine($"Path: {elem.Path}");
+            // position the Navigator on the first element in the parent's collection of elements
+            var nav = ElementDefinitionNavigator.ForSnapshot(sd);
+            nav.MoveToFirstChild(); // move to root
+            nav.MoveToFirstChild(); // move to first child
+            CreateStructureChildren(parent, nav);
 
-                if (processingItem.Peek().Path == null)
-                {
-                    // this is the root item
-                    processingItem.Peek().Path = elem.Path;
-                    processingItem.Peek().ed = elem;
-                    processingItem.Peek().ValidationRules.Add(elem);
-                    continue;
-                }
-
-                // Handle a slicing introduction element
-                if (!string.IsNullOrEmpty(elem.Name))
-                {
-                    discriminator = new Dictionary<string, string>();
-                    if (elem.Slicing != null)
-                    {
-                        foreach (var disc in elem.Slicing.Discriminator)
-                        {
-                            discriminator.Add(disc, null);
-                        }
-                    }
-                    //  continue;
-                }
-
-                while (processingItem.Count > 0 && !elem.Path.Contains(processingItem.Peek().Path + "."))
-                {
-                    // this is a new item, so pop 
-                    processingItem.Pop();
-                }
-                // there is nothing to process (or SD is corrupt)
-                if (processingItem.Count == 0)
-                    break;
-
-                string parentPath = processingItem.Peek().Path;
-                if (elem.Path.Contains(parentPath + "."))
-                {
-                    string thisPath = elem.Path.Replace(parentPath + ".", "");
-                    if (thisPath.Contains("."))
-                    {
-                        // this is a new child to the previous item
-                        var newParent = processingItem.Peek().Children.Last();
-                        processingItem.Push(newParent);
-                        var item = new StructureItem() { id = elem.ElementId, code = elem.Code?.FirstOrDefault()?.Code, Path = elem.Path, FhirpathExpression = elem.Path.Replace(processingItem.Peek().Path + ".", "") };
-                        processingItem.Peek().Children.Add(item);
-                        item.ed = elem;
-                        item.ValidationRules.Add(elem);
-                    }
-                    else
-                    {
-                        // this is a child element
-                        var item = new StructureItem() { id = elem.ElementId, code = elem.Code?.FirstOrDefault()?.Code, Path = elem.Path, FhirpathExpression = elem.Path.Replace(processingItem.Peek().Path + ".", "") };
-                        processingItem.Peek().Children.Add(item);
-                        item.ed = elem;
-                        item.ValidationRules.Add(elem);
-                    }
-                }
-            }
             return parent;
         }
 
@@ -182,8 +163,6 @@ namespace Hl7.Fhir.Specification
             List<QuestionnaireResponse.GroupComponent> groups = new List<QuestionnaireResponse.GroupComponent>();
             groups.Add(questionnaireResponse.Group);
 
-            var edn = ElementDefinitionNavigator.ForSnapshot(pracSd);
-            edn.MoveToFirstChild();
             PopulateResourceInstance(result, parent, groups);
 
             return result;
@@ -191,6 +170,8 @@ namespace Hl7.Fhir.Specification
 
         internal void PopulateResourceInstance(object instance, StructureItem parent, List<QuestionnaireResponse.GroupComponent> groups)
         {
+            var fac = new DefaultModelFactory();
+
             // walk the structure definition (via the StructureItem)
             foreach (var item in parent.Children)
             {
@@ -200,11 +181,30 @@ namespace Hl7.Fhir.Specification
                 if (item.Children.Count > 0)
                 {
                     var filteredGroups = GetGroups(groups, item);
-                    var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
-                    var fac = new DefaultModelFactory();
-                    object value = fac.Create(pm.ReturnType);
-                    PopulateResourceInstance(value, item, filteredGroups);
-                    pm.SetValue(instance, value);
+                    if (filteredGroups.Count > 0)
+                    {
+                        var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
+                        object value = fac.Create(pm.ReturnType);
+                        pm.SetValue(instance, value);
+                        if (pm.ReturnType != pm.ElementType)
+                        {
+                            // this is a collection
+                            IList list = value as IList;
+                            foreach (var g in filteredGroups)
+                            {
+                                object elementValue = fac.Create(pm.ElementType);
+                                List<QuestionnaireResponse.GroupComponent> g1 = new List<QuestionnaireResponse.GroupComponent>();
+                                g1.Add(g);
+                                PopulateResourceInstance(elementValue, item, g1);
+                                list.Add(elementValue);
+                            }
+                        }
+                        else
+                        {
+                            // backbone element style property, so let it flow in as normal
+                            PopulateResourceInstance(value, item, filteredGroups);
+                        }
+                    }
                 }
                 else
                 {
@@ -217,15 +217,27 @@ namespace Hl7.Fhir.Specification
                         if (answers.First().Value is Coding)
                         {
                             Coding codedValue = answers.First().Value as Coding;
-                            if (pm.RepresentsValueElement && pm.ElementType.IsEnum())
+                            Base prim = (Base)fac.Create(pm.ReturnType);
+                            if (prim is Coding c)
                             {
-                                Primitive prim = (Primitive)pm.GetValue(instance);
-                                if (EnumUtility.ParseLiteral(codedValue.Code, pm.ElementType) == null)
-                                    throw Error.Format("Literal '{0}' is not a valid value for enumeration '{1}'".FormatWith(codedValue.Code, pm.ElementType.Name));
-                                prim.ObjectValue = codedValue.Code;
+                                pm.SetValue(instance, codedValue);
+                            }
+                            else if (prim is CodeableConcept cc)
+                            {
+                                cc.Coding.Add(codedValue);
+                                pm.SetValue(instance, cc);
+                            }
+                            else if (prim is Primitive p)
+                            {
+                                // Still need to validate this content
+                                //if (EnumUtility.ParseLiteral(codedValue.Code, pm.ElementType) == null)
+                                //    throw Error.Format("Literal '{0}' is not a valid value for enumeration '{1}'".FormatWith(codedValue.Code, pm.ElementType.Name));
+                                p.ObjectValue = codedValue.Code;
+                                pm.SetValue(instance, p);
                             }
                             else
                             {
+                                // This is where we may consider that the coding needs to go into
                                 pm.SetValue(instance, answers.First().Value);
                             }
                         }
