@@ -12,6 +12,7 @@ using Hl7.Fhir.Utility;
 using Hl7.Fhir.Serialization;
 using Hl7.Fhir.Specification.Navigation;
 using System.Collections;
+using Hl7.Fhir.Specification.Source;
 
 namespace Hl7.Fhir.Specification
 {
@@ -22,11 +23,11 @@ namespace Hl7.Fhir.Specification
 
         public OperationOutcome Validate(Base context, StructureDefinition sd)
         {
-            StructureItem parent = CreateStructureTree(sd);
+            StructureItem parent = CreateStructureTree(sd, null);
             return parent.Validate(new PocoNavigator(context), new PocoNavigator(context));
         }
 
-        internal void CreateStructureChildren(StructureItem parent, ElementDefinitionNavigator nav)
+        internal void CreateStructureChildren(StructureItem parent, ElementDefinitionNavigator nav, IResourceResolver source, string replaceRoot = null)
         {
             do
             {
@@ -36,6 +37,8 @@ namespace Hl7.Fhir.Specification
                 {
                     // Process this child item
                     var item = new StructureItem() { id = nav.Current.ElementId, code = nav.Current.Code?.FirstOrDefault()?.Code, Path = nav.Path, FhirpathExpression = nav.PathName };
+                    if (replaceRoot != null)
+                        item.Path = replaceRoot + item.Path.Substring(item.Path.IndexOf("."));
                     System.Diagnostics.Debug.WriteLine($"{item.Path} - {nav.PathName} {nav.HasChildren}");
                     parent.Children.Add(item);
                     if (nav.HasChildren)
@@ -53,13 +56,20 @@ namespace Hl7.Fhir.Specification
                         // Now process all the children
                         var st = nav.CloneSubtree();
                         st.MoveToFirstChild();
-                        CreateStructureChildren(item, st);
+                        CreateStructureChildren(item, st, source, replaceRoot);
                     }
                     else
                     {
-                        // this is likely a datatype - so check it for children too
-
-
+                        // this is likely a DataType - so check it for children too
+                        if (nav.Current.PrimaryTypeCode().HasValue
+                            && nav.Current.PrimaryTypeCode() != FHIRDefinedType.Resource
+                            && nav.Current.PrimaryTypeCode() != FHIRDefinedType.Narrative)
+                        {
+                            StructureDefinition sdDataType = source.GetStructureDefinitionForTypeCode(new Code<FHIRDefinedType>(nav.Current.PrimaryTypeCode()));
+                            StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path);
+                            item.Children.AddRange(dataType.Children);
+                            item.ClassMapping = dataType.ClassMapping;
+                        }
                     }
                 }
             }
@@ -71,17 +81,17 @@ namespace Hl7.Fhir.Specification
         /// </summary>
         /// <param name="sd"></param>
         /// <returns></returns>
-        public StructureItem CreateStructureTree(StructureDefinition sd)
+        public StructureItem CreateStructureTree(StructureDefinition sd, IResourceResolver source, string replaceRoot = null)
         {
             StructureItem parent = new StructureItem();
-            Type t = ModelInfo.GetTypeForFhirType(sd.ConstrainedType.HasValue ? sd.ConstrainedType.ToString() : sd.Name);
+            Type t = ModelInfo.GetTypeForFhirType(sd.ConstrainedType.HasValue ? sd.ConstrainedType.GetLiteral() : sd.Name);
             parent.ClassMapping = ClassMapping.Create(t);
 
             // position the Navigator on the first element in the parent's collection of elements
             var nav = ElementDefinitionNavigator.ForSnapshot(sd);
             nav.MoveToFirstChild(); // move to root
             nav.MoveToFirstChild(); // move to first child
-            CreateStructureChildren(parent, nav);
+            CreateStructureChildren(parent, nav, source, replaceRoot);
 
             return parent;
         }
@@ -204,46 +214,78 @@ namespace Hl7.Fhir.Specification
                             // backbone element style property, so let it flow in as normal
                             PopulateResourceInstance(value, item, filteredGroups);
                         }
+                        continue;
                     }
                 }
-                else
+                // else
                 {
                     // maybe there is an answer
                     var answers = GetAnswers(groups, item);
-                    if (answers.Count > 0)
+                    if (answers != null)
                     {
-                        // Also need to handle repeating properties (array primitives)
-                        var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
-                        if (answers.First().Value is Coding)
+                        if (answers.Count > 0)
                         {
-                            Coding codedValue = answers.First().Value as Coding;
-                            Base prim = (Base)fac.Create(pm.ReturnType);
-                            if (prim is Coding c)
+                            // Also need to handle repeating properties (array primitives)
+                            var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
+                            if (answers.First().Value is Coding)
                             {
-                                pm.SetValue(instance, codedValue);
-                            }
-                            else if (prim is CodeableConcept cc)
-                            {
-                                cc.Coding.Add(codedValue);
-                                pm.SetValue(instance, cc);
-                            }
-                            else if (prim is Primitive p)
-                            {
-                                // Still need to validate this content
-                                //if (EnumUtility.ParseLiteral(codedValue.Code, pm.ElementType) == null)
-                                //    throw Error.Format("Literal '{0}' is not a valid value for enumeration '{1}'".FormatWith(codedValue.Code, pm.ElementType.Name));
-                                p.ObjectValue = codedValue.Code;
-                                pm.SetValue(instance, p);
+                                Coding codedValue = answers.First().Value as Coding;
+                                Base prim = (Base)fac.Create(pm.ReturnType);
+                                if (prim is Coding c)
+                                {
+                                    pm.SetValue(instance, codedValue);
+                                }
+                                else if (prim is CodeableConcept cc)
+                                {
+                                    cc.Coding.Add(codedValue);
+                                    pm.SetValue(instance, cc);
+                                }
+                                else if (prim is Primitive p)
+                                {
+                                    // Still need to validate this content
+                                    //if (EnumUtility.ParseLiteral(codedValue.Code, pm.ElementType) == null)
+                                    //    throw Error.Format("Literal '{0}' is not a valid value for enumeration '{1}'".FormatWith(codedValue.Code, pm.ElementType.Name));
+                                    p.ObjectValue = codedValue.Code;
+                                    pm.SetValue(instance, p);
+                                }
+                                else
+                                {
+                                    // This is where we may consider that the coding needs to go into
+                                    pm.SetValue(instance, answers.First().Value);
+                                }
                             }
                             else
                             {
-                                // This is where we may consider that the coding needs to go into
-                                pm.SetValue(instance, answers.First().Value);
+                                // Check for type conversion if needed
+                                if (pm.ElementType == typeof(Code) && answers.First().Value is FhirString valueString)
+                                    pm.SetValue(instance, new Code(((FhirString)answers.First().Value).Value));
+                                else
+                                    pm.SetValue(instance, answers.First().Value);
                             }
                         }
                         else
                         {
-                            pm.SetValue(instance, answers.First().Value);
+                            // This item is on the way to one that DOES have a value, so create it and continue
+                            var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
+                            object value = fac.Create(pm.ReturnType);
+                            pm.SetValue(instance, value);
+                            if (pm.IsCollection)
+                            {
+                                IList list = value as IList;
+                                foreach (var g in groups)
+                                {
+                                    var arrayItem = fac.Create(pm.ElementType);
+                                    List<QuestionnaireResponse.GroupComponent> g1 = new List<QuestionnaireResponse.GroupComponent>();
+                                    g1.Add(g);
+                                    PopulateResourceInstance(arrayItem, item, g1);
+                                    list.Add(arrayItem);
+                                }
+                            }
+                            else
+                            {
+                                // backbone element style property, so let it flow in as normal
+                                PopulateResourceInstance(value, item, groups);
+                            }
                         }
                     }
                 }
@@ -272,22 +314,48 @@ namespace Hl7.Fhir.Specification
             return result;
         }
 
+        /// <summary>
+        /// Retrieve the list of answers relevant to the specified item ()
+        /// </summary>
+        /// <param name="gp"></param>
+        /// <param name="si"></param>
+        /// <returns>
+        /// returns null if there are no answers anywhere down, 
+        /// if the immediate answers are here, returns the items, 
+        /// otherwise returns an empty list
+        /// </returns>
         private List<QuestionnaireResponse.AnswerComponent> GetAnswers(List<QuestionnaireResponse.GroupComponent> gp, StructureItem si)
         {
-            List<QuestionnaireResponse.AnswerComponent> result = new List<QuestionnaireResponse.AnswerComponent>();
+            List<QuestionnaireResponse.AnswerComponent> result = null;
             foreach (var group in gp)
             {
                 if (group.Group.Count > 0)
                 {
-                    result.AddRange(GetAnswers(group.Group, si));
+                    var descendantAnswers = GetAnswers(group.Group, si);
+                    if (descendantAnswers != null)
+                    {
+                        if (result == null)
+                            result = new List<QuestionnaireResponse.AnswerComponent>();
+                        // There is at least 1 answer somewhere in down the line
+                        // (even if the collection is empty, which is different to a null result)
+                        result.AddRange(descendantAnswers);
+                    }
                 }
+
                 foreach (var q in group.Question)
                 {
+                    // Check if THIS is a question on the way to the item
+                    // (need to check if the path approach will always work once we get into the extensions)
                     if (q.LinkId == si.Path)
+                    {
+                        if (result == null)
+                            result = new List<QuestionnaireResponse.AnswerComponent>();
                         result.AddRange(q.Answer);
+                    }
+                    if (q.LinkId.StartsWith(si.Path) && result == null)
+                        result = new List<QuestionnaireResponse.AnswerComponent>();
                 }
             }
-            // support for nesting is still needed here (this only covers 1 level of depth)
             return result;
         }
     }
