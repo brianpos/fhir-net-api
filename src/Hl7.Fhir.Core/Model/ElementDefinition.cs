@@ -32,7 +32,8 @@ namespace Hl7.Fhir.Model
         [NotMapped]
         string DebuggerDisplay
         {
-            get {
+            get
+            {
                 StringBuilder sb = new StringBuilder(128);
                 // sb.AppendFormat("Path='{0}'", Path);
                 // if (Name != null) { sb.AppendFormat(" Name='{0}'", Name); }
@@ -43,6 +44,24 @@ namespace Hl7.Fhir.Model
                     sb.Append(Name);
                 }
                 return sb.ToString();
+            }
+        }
+
+        public partial class ConstraintComponent
+        {
+            [NotMapped]
+            public string Expression
+            {
+                get
+                {
+                    string expression = this.GetStringExtension("http://hl7.org/fhir/StructureDefinition/structuredefinition-expression");
+                    return expression;
+                }
+
+                set
+                {
+                    this.SetStringExtension("http://hl7.org/fhir/StructureDefinition/structuredefinition-expression", value);
+                }
             }
         }
     }
