@@ -37,7 +37,7 @@ namespace Hl7.Fhir.Specification
                 if (!nav.Current.IsExtension() || nav.Current.IsMappedExtension())
                 {
                     // Process this child item
-                    var item = new StructureItem() { id = nav.Current.ElementId, code = nav.Current.Code?.FirstOrDefault()?.Code, Path = nav.Path, FhirpathExpression = nav.PathName };
+                    var item = new StructureItem() { id = nav.Current.ElementId, code = nav.Current.Code?.FirstOrDefault()?.Code, Path = nav.Path, FhirpathExpression = nav.PathName, ed = nav.Current };
                     if (replaceRoot != null)
                         item.Path = replaceRoot + item.Path.Substring(item.Path.IndexOf("."));
                     if (nav.Current.IsMappedExtension())
@@ -320,7 +320,13 @@ namespace Hl7.Fhir.Specification
                         {
                             // This item is on the way to one that DOES have a value, so create it and continue
                             var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
-                            object value = fac.Create(pm.ReturnType);
+                            Type createElementType = pm.ReturnType;
+                            if (pm.ReturnType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
+                            {
+                                // check the element definition for the types
+                                createElementType = ModelInfo.FhirTypeToCsType[item.ed.PrimaryTypeCode().GetLiteral()];
+                            }
+                            object value = fac.Create(createElementType);
                             pm.SetValue(instance, value);
                             if (pm.IsCollection)
                             {
