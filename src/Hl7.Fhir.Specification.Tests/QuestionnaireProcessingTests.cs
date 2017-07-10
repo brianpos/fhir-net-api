@@ -328,7 +328,7 @@ namespace Hl7.Fhir.Specification.Tests
             {
                 Text = "Appointment Required",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.extension:appointment Required.value[x].value"
+                LinkId = "Practitioner.extension:appointment Required.value[x]"
             });
 
             // A collection of Qualifications
@@ -409,7 +409,7 @@ namespace Hl7.Fhir.Specification.Tests
             gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
             {
                 Text = "Appointment Required",
-                LinkId = "Practitioner.extension:appointment Required.value[x].value",
+                LinkId = "Practitioner.extension:appointment Required.value[x]",
                 Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
                     { Value = new FhirString("yes") }
                 }
