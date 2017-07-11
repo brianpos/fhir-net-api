@@ -56,7 +56,19 @@ namespace Hl7.Fhir.Specification
                         System.Diagnostics.Debug.WriteLine($"skipping {item.Path} ({nav.PathName}) {item.ExtensionUrl}");
                         continue;
                     }
-                    System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]");
+                    System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]{(nav.Current.Fixed != null ? " fixed value" : "")}");
+
+                    if (item.ed.Name != null)
+                    {
+                        Debug.WriteLine($"  Name: {item.ed.Name}");
+                        if (!nav.Current.IsMappedExtension()) // as this would already be there
+                            item.Path += ":" + nav.Current.Name; // and add this into the property names
+                    }
+                    if (item.ed.Slicing != null)
+                    {
+                        Debug.WriteLine($"  Discriminator: {String.Join(", ", item.ed.Slicing.Discriminator)}");
+                    }
+
                     parent.Children.Add(item);
                     if (nav.HasChildren)
                     {
@@ -222,6 +234,7 @@ namespace Hl7.Fhir.Specification
         public T CreateResourceInstance<T>(StructureDefinition pracSd, StructureItem parent, Questionnaire questionnaire, QuestionnaireResponse questionnaireResponse)
             where T : Resource, new()
         {
+            System.Diagnostics.Debug.WriteLine("-----------------------------");
             T result = new T();
             List<QuestionnaireResponse.GroupComponent> groups = new List<QuestionnaireResponse.GroupComponent>();
             groups.Add(questionnaireResponse.Group);
@@ -238,7 +251,20 @@ namespace Hl7.Fhir.Specification
             // walk the structure definition (via the StructureItem)
             foreach (var item in parent.Children)
             {
-                Debug.WriteLine($"{item.FhirpathExpression} children: {item.Children.Count}");
+                Debug.WriteLine($"{item.Path}{(item.ed.Fixed != null ? " fixed value" : "")}{(item.ed.Slicing != null ? " sliced:" + String.Join(", ", item.ed.Slicing.Discriminator) : "")}");
+
+                if (item.ed.Slicing != null)
+                {
+                    Debug.WriteLine($"  Slice Name: {String.Join(", ", item.ed.Name)}");
+                    Debug.WriteLine($"  Discriminator{String.Join(", ", item.ed.Slicing.Discriminator)}");
+                }
+
+                if (item.ed.Fixed != null)
+                {
+                    var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
+                    pm.SetValue(instance, item.ed.Fixed);
+                    continue;
+                }
 
                 // Check the QR for this property
                 if (item.Children.Count > 0)
