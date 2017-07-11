@@ -231,6 +231,50 @@ namespace Hl7.Fhir.Specification
             return false;
         }
 
+        internal Bundle CreateResourceInstances(Questionnaire q, QuestionnaireResponse questionnaireResponse, IResourceResolver source)
+        {
+            // Loop through all the groups to locate the items that are marked against a resource type
+            List<QuestionnaireResponse.GroupComponent> qrg = new List<QuestionnaireResponse.GroupComponent>();
+            qrg.Add(questionnaireResponse.Group);
+            var result = CreateResourceInstances(q.Group, qrg, source);
+            return result;
+        }
+
+        internal Bundle CreateResourceInstances(Questionnaire.GroupComponent qg, List<QuestionnaireResponse.GroupComponent> qrg, IResourceResolver source)
+        {
+            var fac = new DefaultModelFactory();
+            Bundle result = new Bundle();
+            result.Type = Bundle.BundleType.Batch;
+
+            if (qg.Definition() != null)
+            {
+                // this item has a definition, so we should process it
+                StructureDefinition sd = source.FindStructureDefinition(qg.Definition().Value);
+                if (sd != null)
+                {
+                    var si = CreateStructureTree(sd, source);
+                    Type t = ModelInfo.FhirTypeToCsType[sd.ConstrainedType.GetLiteral()];
+                    si.ClassMapping = ClassMapping.Create(t);
+                    foreach (var a in qrg)
+                    {
+                        Resource r = fac.Create(t) as Resource;
+                        result.AddResourceEntry(r, null);
+                        List<QuestionnaireResponse.GroupComponent> qrgItem = new List<QuestionnaireResponse.GroupComponent>();
+                        qrgItem.Add(a);
+                        PopulateResourceInstance(r, si, qrgItem);
+                    }
+                }
+            }
+
+            foreach (var qgi in qg.Group)
+            {
+                var items = CreateResourceInstances(qgi, qrg.Where(g => g.LinkId == qgi.LinkId).ToList(), source);
+                result.Entry.AddRange(items.Entry);
+            }
+
+            return result;
+        }
+
         public T CreateResourceInstance<T>(StructureDefinition pracSd, StructureItem parent, Questionnaire questionnaire, QuestionnaireResponse questionnaireResponse)
             where T : Resource, new()
         {
@@ -625,6 +669,29 @@ namespace Hl7.Fhir.Specification
                     }
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Class with properties that would be consistent with STU3 extensions
+    /// </summary>
+    public static class QuestionnaireExtentionsForSTU3
+    {
+        public static FhirUri Definition(this Questionnaire.QuestionComponent me)
+        {
+            return me.GetExtensionValue<FhirUri>("http://hl7.org/fhir/StructureDefinition/extension-Questionnaire.item.definition");
+        }
+        public static void Definition(this Questionnaire.QuestionComponent me, FhirUri value)
+        {
+            me.AddExtension("http://hl7.org/fhir/StructureDefinition/extension-Questionnaire.item.definition", value);
+        }
+        public static FhirUri Definition(this Questionnaire.GroupComponent me)
+        {
+            return me.GetExtensionValue<FhirUri>("http://hl7.org/fhir/StructureDefinition/extension-Questionnaire.item.definition");
+        }
+        public static void Definition(this Questionnaire.GroupComponent me, FhirUri value)
+        {
+            me.AddExtension("http://hl7.org/fhir/StructureDefinition/extension-Questionnaire.item.definition", value);
         }
     }
 }
