@@ -505,9 +505,9 @@ namespace Hl7.Fhir.Specification.Tests
             //sg.Update(pracSd);
             var si = processor.CreateStructureTree(vitalSignsSd, _source);
 
-            var obs = processor.CreateResourceInstance<Observation>(vitalSignsSd, si, GetBloodPressureQuestionnaire(), GetPractitionerQuestionnaireResponse());
+            var obs = processor.CreateResourceInstance<Observation>(vitalSignsSd, si, GetBloodPressureQuestionnaire(), GetBloodPressureQuestionnaireResponse());
             Assert.AreEqual(Observation.ObservationStatus.Preliminary, obs.Status);
-            Assert.AreEqual("2017-07-09", obs.Effective as FhirDateTime);
+            Assert.AreEqual("2017-07-09", (obs.Effective as FhirDateTime).Value);
 
             Assert.IsTrue(obs.Value is Quantity);
             Assert.AreEqual("mm/Hg", (obs.Value as Quantity).Unit);
@@ -530,58 +530,27 @@ namespace Hl7.Fhir.Specification.Tests
             gCoreProps.Repeats = false;
             gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
             {
-                Text = "Active",
-                Type = Questionnaire.AnswerFormat.Boolean,
-                LinkId = "Practitioner.active"
-            });
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
-            {
-                Text = "Gender",
+                Text = "Status",
                 Type = Questionnaire.AnswerFormat.Choice,
-                LinkId = "Practitioner.gender"
+                LinkId = "Observation.status"
             });
             gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
             {
-                Text = "Birth Date",
-                Type = Questionnaire.AnswerFormat.Date,
-                LinkId = "Practitioner.birthDate"
-            });
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
-            {
-                Text = "Name",
-                Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.name.text"
-            });
-
-            // A collection of Qualifications
-            var gCerts = new Questionnaire.GroupComponent();
-            q.Group.Group.Add(gCerts);
-            gCerts.Text = "Qualifications";
-            gCerts.LinkId = "Practitioner.qualification";
-            gCerts.Repeats = true;
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
-            {
-                Text = "Code",
-                Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification.code.coding"
-            });
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
-            {
-                Text = "Display",
-                Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification.code.display"
-            });
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
-            {
-                Text = "Completion Year",
+                Text = "Effective",
                 Type = Questionnaire.AnswerFormat.DateTime,
-                LinkId = "Practitioner.qualification.period.end"
+                LinkId = "Observation.effective[x]"
             });
             gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
             {
-                Text = "Issued by",
+                Text = "Diastolic",
+                Type = Questionnaire.AnswerFormat.Decimal,
+                LinkId = "Observation.valueQuantity.value"
+            });
+            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            {
+                Text = "Reference Range",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification.issuer.display"
+                LinkId = "Observation.referenceRange.text"
             });
 
             return q;
@@ -589,7 +558,46 @@ namespace Hl7.Fhir.Specification.Tests
 
         QuestionnaireResponse GetBloodPressureQuestionnaireResponse()
         {
-            return null;
+            var qr = new QuestionnaireResponse();
+            qr.Questionnaire = new ResourceReference("Questionnaire/bloodpress-demo");
+            qr.Group = new QuestionnaireResponse.GroupComponent();
+
+            // The core properties
+            var gCoreProps = new QuestionnaireResponse.GroupComponent();
+            qr.Group.Group.Add(gCoreProps);
+            gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Status",
+                LinkId = "Observation.status",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new Coding("", "preliminary") }
+                }
+            });
+            gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Effective",
+                LinkId = "Observation.effective[x]",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new FhirDateTime("2017-07-09") }
+                }
+            });
+            gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Diastolic",
+                LinkId = "Observation.valueQuantity.value",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new FhirDecimal(120) }
+                }
+            });
+            gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Reference Range",
+                LinkId = "Observation.referenceRange.text",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new FhirString("Range: <90  >160") }
+                }
+            });
+            return qr;
         }
         #endregion
     }
