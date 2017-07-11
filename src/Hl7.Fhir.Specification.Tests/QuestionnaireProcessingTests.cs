@@ -17,6 +17,7 @@ using System.ComponentModel.DataAnnotations;
 using Hl7.Fhir.Validation;
 using Hl7.Fhir.Specification.Source;
 using static Hl7.Fhir.Validation.BasicValidationTests;
+using Hl7.Fhir.Rest;
 
 namespace Hl7.Fhir.Specification.Tests
 {
@@ -118,25 +119,25 @@ namespace Hl7.Fhir.Specification.Tests
             gCerts.Text = "Qualifications";
             gCerts.LinkId = "Practitioner.qualification";
             gCerts.Repeats = true;
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Code",
                 Type = Questionnaire.AnswerFormat.String,
                 LinkId = "Practitioner.qualification.code.coding"
             });
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Display",
                 Type = Questionnaire.AnswerFormat.String,
                 LinkId = "Practitioner.qualification.code.display"
             });
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Completion Year",
                 Type = Questionnaire.AnswerFormat.DateTime,
                 LinkId = "Practitioner.qualification.period.end"
             });
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Issued by",
                 Type = Questionnaire.AnswerFormat.String,
@@ -149,6 +150,7 @@ namespace Hl7.Fhir.Specification.Tests
         QuestionnaireResponse GetPractitionerQuestionnaireResponse()
         {
             var qr = new QuestionnaireResponse();
+            qr.Id = "prac-demo-qr";
             qr.Questionnaire = new ResourceReference("Questionnaire/prac-demo");
             qr.Group = new QuestionnaireResponse.GroupComponent();
 
@@ -293,7 +295,7 @@ namespace Hl7.Fhir.Specification.Tests
         Questionnaire GetExtendedPractitionerQuestionnaire()
         {
             var q = new Questionnaire();
-            q.Id = "prac-demo";
+            q.Id = "prac-ext-demo";
             q.Group = new Questionnaire.GroupComponent();
 
             // The core properties
@@ -337,29 +339,60 @@ namespace Hl7.Fhir.Specification.Tests
             gCerts.Text = "Qualifications";
             gCerts.LinkId = "Practitioner.qualification";
             gCerts.Repeats = true;
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Code",
                 Type = Questionnaire.AnswerFormat.String,
                 LinkId = "Practitioner.qualification.code.coding"
             });
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Display",
                 Type = Questionnaire.AnswerFormat.String,
                 LinkId = "Practitioner.qualification.code.display"
             });
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Completion Year",
                 Type = Questionnaire.AnswerFormat.DateTime,
                 LinkId = "Practitioner.qualification.period.end"
             });
-            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Issued by",
                 Type = Questionnaire.AnswerFormat.String,
                 LinkId = "Practitioner.qualification.issuer.display"
+            });
+
+            // A collection of Qualifications
+            gCerts = new Questionnaire.GroupComponent();
+            q.Group.Group.Add(gCerts);
+            gCerts.Text = "Qualifications - Community cert 3";
+            gCerts.LinkId = "Practitioner.qualification:certificate3-agedcare";
+            gCerts.Repeats = false;
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
+            {
+                Text = "Code",
+                Type = Questionnaire.AnswerFormat.String,
+                LinkId = "Practitioner.qualification:certificate3-agedcare.code.coding"
+            });
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
+            {
+                Text = "Display",
+                Type = Questionnaire.AnswerFormat.String,
+                LinkId = "Practitioner.qualification:certificate3-agedcare.code.display"
+            });
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
+            {
+                Text = "Completion Year",
+                Type = Questionnaire.AnswerFormat.DateTime,
+                LinkId = "Practitioner.qualification:certificate3-agedcare.period.end"
+            });
+            gCerts.Question.Add(new Questionnaire.QuestionComponent()
+            {
+                Text = "Issued by",
+                Type = Questionnaire.AnswerFormat.String,
+                LinkId = "Practitioner.qualification:certificate3-agedcare.issuer.display"
             });
 
             return q;
@@ -368,6 +401,7 @@ namespace Hl7.Fhir.Specification.Tests
         QuestionnaireResponse GetExtendedPractitionerQuestionnaireResponse()
         {
             var qr = new QuestionnaireResponse();
+            qr.Id = "prac-ext-demo-qr";
             qr.Questionnaire = new ResourceReference("Questionnaire/prac-demo");
             qr.Group = new QuestionnaireResponse.GroupComponent();
 
@@ -559,6 +593,7 @@ namespace Hl7.Fhir.Specification.Tests
         QuestionnaireResponse GetBloodPressureQuestionnaireResponse()
         {
             var qr = new QuestionnaireResponse();
+            qr.Id = "bloodpress-demo-qr";
             qr.Questionnaire = new ResourceReference("Questionnaire/bloodpress-demo");
             qr.Group = new QuestionnaireResponse.GroupComponent();
 
@@ -600,5 +635,17 @@ namespace Hl7.Fhir.Specification.Tests
             return qr;
         }
         #endregion
+
+        [TestMethod, Ignore]
+        public void QuestionnaireCreatePublishToAzure()
+        {
+            FhirClient server = new FhirClient("http://sqlonfhir-ci2.azurewebsites.net/fhir");
+            server.Update(GetPractitionerQuestionnaire());
+            server.Update(GetExtendedPractitionerQuestionnaire());
+            server.Update(GetBloodPressureQuestionnaireResponse());
+            server.Update(GetPractitionerQuestionnaireResponse());
+            server.Update(GetExtendedPractitionerQuestionnaireResponse());
+            server.Update(GetBloodPressureQuestionnaireResponse());
+        }
     }
 }
