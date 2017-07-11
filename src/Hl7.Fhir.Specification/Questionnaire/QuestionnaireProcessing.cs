@@ -56,14 +56,14 @@ namespace Hl7.Fhir.Specification
                         System.Diagnostics.Debug.WriteLine($"skipping {item.Path} ({nav.PathName}) {item.ExtensionUrl}");
                         continue;
                     }
-                    System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]{(nav.Current.Fixed != null ? " fixed value" : "")}");
-
                     if (item.ed.Name != null)
                     {
                         Debug.WriteLine($"  Name: {item.ed.Name}");
                         if (!nav.Current.IsMappedExtension()) // as this would already be there
                             item.Path += ":" + nav.Current.Name; // and add this into the property names
                     }
+                    System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]{(nav.Current.Fixed != null ? " fixed value" : "")}");
+
                     if (item.ed.Slicing != null)
                     {
                         Debug.WriteLine($"  Discriminator: {String.Join(", ", item.ed.Slicing.Discriminator)}");
@@ -481,6 +481,8 @@ namespace Hl7.Fhir.Specification
         string bindingReference { get; set; }
         string bindingUri { get; set; }
     }
+
+    [System.Diagnostics.DebuggerDisplay(@"Path = {Path}")] // http://blogs.msdn.com/b/jaredpar/archive/2011/03/18/debuggerdisplay-attribute-best-practices.aspx
 
     public class StructureItem
     {
