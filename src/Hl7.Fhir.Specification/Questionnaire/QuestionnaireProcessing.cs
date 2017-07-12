@@ -32,7 +32,7 @@ namespace Hl7.Fhir.Specification
         {
             do
             {
-                // if this is the extension property, and it has't been sliced, then we will skip them
+                // if this is the extension property, and it hasn't been sliced, then we will skip them
                 // as we don't want to permit processing items that aren't defined in the structure definition
                 if (!nav.Current.IsExtension() || nav.Current.IsMappedExtension())
                 {
