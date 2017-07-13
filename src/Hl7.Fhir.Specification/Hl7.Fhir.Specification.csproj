@@ -46,6 +46,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Questionnaire\QuestionnaireProcessing.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Include="install.ps1">
       <Pack>true</Pack>
       <PackagePath>tools</PackagePath>
@@ -55,6 +59,10 @@
       <Pack>true</Pack>
       <PackagePath>content</PackagePath>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Questionnaire\" />
   </ItemGroup>
  
   <Target Name="CreateSpecZip" Inputs="@(FhirConformance)" Outputs="specification.zip" BeforeTargets="Compile">
