@@ -32,7 +32,6 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
 
             _source = new CachedResolver(
                 new MultiResolver(
-                    new DirectorySource(@"TestData\validation"),
                     new ZipSource("specification.zip"),
                     new DirectorySource(@"C:\git\EHPD\Hcx.Directory.FhirApi\App_Data")
                 ));
@@ -62,7 +61,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             //Snapshot.SnapshotGenerator sg = new Snapshot.SnapshotGenerator(_source, 
             //    new Snapshot.SnapshotGeneratorSettings() { GenerateElementIds = true, ForceRegenerateSnapshots = true });
             //sg.Update(pracSd);
-            var si = processor.CreateStructureTree(pracSd, _source);
+            var si = StructureItemTree.CreateStructureTree(pracSd, _source);
 
             var prac = processor.CreateResourceInstance<Practitioner>(pracSd, si, GetPractitionerQuestionnaire(), GetPractitionerQuestionnaireResponse());
             Assert.AreEqual(true, prac.Active);
@@ -275,7 +274,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
 
             var pracSd = new Serialization.FhirXmlParser().Parse<StructureDefinition>(xml);
             QuestionnaireProcessing processor = new QuestionnaireProcessing();
-            var si = processor.CreateStructureTree(pracSd, _source);
+            var si = StructureItemTree.CreateStructureTree(pracSd, _source);
 
             var prac = processor.CreateResourceInstance<Practitioner>(pracSd, si, GetExtendedPractitionerQuestionnaire(), GetExtendedPractitionerQuestionnaireResponse());
             Assert.AreEqual(true, prac.Active);
@@ -535,7 +534,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             //Snapshot.SnapshotGenerator sg = new Snapshot.SnapshotGenerator(_source, 
             //    new Snapshot.SnapshotGeneratorSettings() { GenerateElementIds = true, ForceRegenerateSnapshots = true });
             //sg.Update(pracSd);
-            var si = processor.CreateStructureTree(vitalSignsSd, _source);
+            var si = StructureItemTree.CreateStructureTree(vitalSignsSd, _source);
 
             var obs = processor.CreateResourceInstance<Observation>(vitalSignsSd, si, GetBloodPressureQuestionnaire(), GetBloodPressureQuestionnaireResponse());
             Assert.AreEqual(Observation.ObservationStatus.Preliminary, obs.Status);
