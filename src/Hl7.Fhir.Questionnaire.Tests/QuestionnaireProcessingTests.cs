@@ -56,10 +56,9 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         public void QuestionnaireCreateStandardPractitioner()
         {
             var pracSd = _source.FindStructureDefinitionForCoreType(FHIRDefinedType.Practitioner);
-            QuestionnaireProcessing processor = new QuestionnaireProcessing();
             var si = StructureItemTree.CreateStructureTree(pracSd, _source);
 
-            var prac = processor.CreateResourceInstance<Practitioner>(pracSd, si, GetPractitionerQuestionnaire(), GetPractitionerQuestionnaireResponse());
+            var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, GetPractitionerQuestionnaire(), GetPractitionerQuestionnaireResponse());
             Assert.AreEqual(true, prac.Active);
             Assert.AreEqual(AdministrativeGender.Male, prac.Gender);
             Assert.AreEqual("1970", prac.BirthDate);
@@ -269,10 +268,9 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
                 @"C:\git\EHPD\Hcx.Directory.FhirApi\App_Data\hcxdir-practitioner.xml");
 
             var pracSd = new Serialization.FhirXmlParser().Parse<StructureDefinition>(xml);
-            QuestionnaireProcessing processor = new QuestionnaireProcessing();
             var si = StructureItemTree.CreateStructureTree(pracSd, _source);
 
-            var prac = processor.CreateResourceInstance<Practitioner>(pracSd, si, GetExtendedPractitionerQuestionnaire(), GetExtendedPractitionerQuestionnaireResponse());
+            var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, GetExtendedPractitionerQuestionnaire(), GetExtendedPractitionerQuestionnaireResponse());
             Assert.AreEqual(true, prac.Active);
             Assert.AreEqual(AdministrativeGender.Male, prac.Gender);
             Assert.AreEqual("1970", prac.BirthDate);
@@ -525,14 +523,13 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         public void QuestionnaireCreateBloodPressionObservation()
         {
             var vitalSignsSd = _source.FindStructureDefinition("http://hl7.org/fhir/StructureDefinition/daf-vitalsigns");
-            QuestionnaireProcessing processor = new QuestionnaireProcessing();
 
             //Snapshot.SnapshotGenerator sg = new Snapshot.SnapshotGenerator(_source, 
             //    new Snapshot.SnapshotGeneratorSettings() { GenerateElementIds = true, ForceRegenerateSnapshots = true });
             //sg.Update(pracSd);
             var si = StructureItemTree.CreateStructureTree(vitalSignsSd, _source);
 
-            var obs = processor.CreateResourceInstance<Observation>(vitalSignsSd, si, GetBloodPressureQuestionnaire(), GetBloodPressureQuestionnaireResponse());
+            var obs = QuestionnaireProcessing.CreateResourceInstance<Observation>(vitalSignsSd, si, GetBloodPressureQuestionnaire(), GetBloodPressureQuestionnaireResponse());
             Assert.AreEqual(Observation.ObservationStatus.Preliminary, obs.Status);
             Assert.AreEqual("2017-07-09", (obs.Effective as FhirDateTime).Value);
 
@@ -700,7 +697,6 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var pracQ = new Serialization.FhirXmlParser().Parse<Questionnaire>(
                 System.IO.File.ReadAllText(@"c:\temp\ehpd-practitioner-edit.xml"));
 
-            QuestionnaireProcessing processor = new QuestionnaireProcessing();
             Questionnaire qPart1 = GetExtendedPractitionerQuestionnaire();
             qPart1.Group.Definition(new FhirUri("http://healthconnex.com.au/hcxd/Practitioner"));
             var qrP1 = GetExtendedPractitionerQuestionnaireResponse();
@@ -714,7 +710,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qPart1.Group.Group.Add(qPart2.Group);
             qrP1.Group.Group.Add(qrP2.Group);
 
-            Bundle resources = processor.CreateResourceInstances(qPart1, qrP1, _source);
+            Bundle resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, _source);
 
             var prac = resources.Entry[0].Resource as Practitioner;
             Assert.AreEqual(true, prac.Active);
@@ -743,8 +739,40 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             // Assert.AreEqual("Range: <90  >160", obs.ReferenceRange[0].Text);
             for (int n = 0; n < 100; n++)
             {
-                resources = processor.CreateResourceInstances(qPart1, qrP1, _source);
+                resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, _source);
             }
+        }
+
+        // Test the return path
+        [TestMethod]
+        public void QuestionnaireCreateExtendedPractitionerRoundTrip()
+        {
+            Questionnaire qPart1 = GetExtendedPractitionerQuestionnaire();
+            qPart1.Group.Definition(new FhirUri("http://healthconnex.com.au/hcxd/Practitioner"));
+            var qrP1 = GetExtendedPractitionerQuestionnaireResponse();
+
+            Bundle resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, _source);
+
+            var prac = resources.Entry[0].Resource as Practitioner;
+            Assert.AreEqual(true, prac.Active);
+            Assert.AreEqual(AdministrativeGender.Male, prac.Gender);
+            Assert.AreEqual("1970", prac.BirthDate);
+            Assert.AreEqual(2, prac.Qualification?.Count);
+            Assert.AreEqual("Brian Postlethwaite", prac.Name?.Text);
+            // Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
+            Assert.AreEqual("Certification 3 - Aged Care", prac.Qualification[0].Code.Coding[0].Display);
+            Assert.AreEqual("2017", prac.Qualification[0].Period.End);
+            Assert.AreEqual("William Angliss TAFE", prac.Qualification[0].Issuer.Display);
+            Assert.AreEqual("yes", prac.GetStringExtension("http://healthconnex.com.au/hcxd/Practitioner/AppointmentRequired"));
+
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(resources));
+
+            // Now reproduce the QR from this content
+            QuestionnaireResponse qr = QuestionnaireFiller.CreateQuestionnaireResponse(qPart1, resources, _source);
+            // qr = qrP1.DeepCopy() as QuestionnaireResponse;
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qr));
+
+            Assert.IsTrue(qr.IsExactly(qrP1));
         }
 
         // Now for some testing of a multiple resource Questionnaire!
@@ -754,7 +782,6 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var pracQ = new Serialization.FhirXmlParser().Parse<Questionnaire>(
                 System.IO.File.ReadAllText(@"c:\temp\ehpd-practitioner-edit.xml"));
 
-            QuestionnaireProcessing processor = new QuestionnaireProcessing();
             Questionnaire qPart1 = GetExtendedPractitionerQuestionnaire();
             qPart1.Group.Definition(new FhirUri("http://healthconnex.com.au/hcxd/Practitioner"));
             var qrP1 = GetExtendedPractitionerQuestionnaireResponse();
@@ -768,7 +795,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qPart1.Group.Group.Add(qPart2.Group);
             qrP1.Group.Group.Add(qrP2.Group);
 
-            Bundle resources = processor.CreateResourceInstances(qPart1, qrP1, _source);
+            Bundle resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, _source);
 
             var prac = resources.Entry[0].Resource as Practitioner;
             Assert.AreEqual(true, prac.Active);
@@ -797,7 +824,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             // Assert.AreEqual("Range: <90  >160", obs.ReferenceRange[0].Text);
 
             // Now reproduce the QR from this content
-            QuestionnaireResponse qr = processor.CreateQuestionnaireResponse(qPart1, resources, _source);
+            QuestionnaireResponse qr = QuestionnaireFiller.CreateQuestionnaireResponse(qPart1, resources, _source);
             qr = qrP1.DeepCopy() as QuestionnaireResponse;
 
             Assert.IsTrue(qr.IsExactly(qrP1));

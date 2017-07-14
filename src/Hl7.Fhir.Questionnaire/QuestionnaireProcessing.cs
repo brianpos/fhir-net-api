@@ -18,9 +18,9 @@ using Hl7.Fhir.Specification.Snapshot;
 
 namespace Hl7.Fhir.QuestionnaireServices
 {
-    public class QuestionnaireProcessing
+    public static class QuestionnaireProcessing
     {
-        internal Bundle CreateResourceInstances(Questionnaire q, QuestionnaireResponse questionnaireResponse, IResourceResolver source)
+        internal static Bundle CreateResourceInstances(Questionnaire q, QuestionnaireResponse questionnaireResponse, IResourceResolver source)
         {
             // Loop through all the groups to locate the items that are marked against a resource type
             List<QuestionnaireResponse.GroupComponent> qrg = new List<QuestionnaireResponse.GroupComponent>();
@@ -29,7 +29,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             return result;
         }
 
-        internal Bundle CreateResourceInstances(Questionnaire q, Model.Questionnaire.GroupComponent qg, List<QuestionnaireResponse.GroupComponent> qrg, IResourceResolver source)
+        internal static Bundle CreateResourceInstances(Questionnaire q, Model.Questionnaire.GroupComponent qg, List<QuestionnaireResponse.GroupComponent> qrg, IResourceResolver source)
         {
             var fac = new DefaultModelFactory();
             Bundle result = new Bundle();
@@ -61,7 +61,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             return result;
         }
 
-        public T CreateResourceInstance<T>(StructureDefinition pracSd, StructureItem parent, Model.Questionnaire questionnaire, QuestionnaireResponse questionnaireResponse)
+        public static T CreateResourceInstance<T>(StructureDefinition pracSd, StructureItem parent, Model.Questionnaire questionnaire, QuestionnaireResponse questionnaireResponse)
             where T : Resource, new()
         {
             System.Diagnostics.Debug.WriteLine("-----------------------------");
@@ -74,7 +74,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             return result;
         }
 
-        internal void PopulateResourceInstance(object instance, StructureItem parent, List<QuestionnaireResponse.GroupComponent> groups)
+        internal static void PopulateResourceInstance(object instance, StructureItem parent, List<QuestionnaireResponse.GroupComponent> groups)
         {
             var fac = new DefaultModelFactory();
 
@@ -212,7 +212,7 @@ namespace Hl7.Fhir.QuestionnaireServices
         }
 
         // this is used for repeating elements
-        private List<QuestionnaireResponse.GroupComponent> GetGroups(List<QuestionnaireResponse.GroupComponent> groups, StructureItem si)
+        static private List<QuestionnaireResponse.GroupComponent> GetGroups(List<QuestionnaireResponse.GroupComponent> groups, StructureItem si)
         {
             List<QuestionnaireResponse.GroupComponent> result = new List<QuestionnaireResponse.GroupComponent>();
             foreach (var g in groups)
@@ -243,7 +243,7 @@ namespace Hl7.Fhir.QuestionnaireServices
         /// if the immediate answers are here, returns the items, 
         /// otherwise returns an empty list
         /// </returns>
-        private List<QuestionnaireResponse.AnswerComponent> GetAnswers(List<QuestionnaireResponse.GroupComponent> gp, StructureItem si)
+        static private List<QuestionnaireResponse.AnswerComponent> GetAnswers(List<QuestionnaireResponse.GroupComponent> gp, StructureItem si)
         {
             List<QuestionnaireResponse.AnswerComponent> result = null;
             foreach (var group in gp)
@@ -276,18 +276,6 @@ namespace Hl7.Fhir.QuestionnaireServices
                 }
             }
             return result;
-        }
-
-        /// <summary>
-        /// This is effectively a variation on the $populate operation
-        /// </summary>
-        /// <param name="qPart1"></param>
-        /// <param name="resources"></param>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public QuestionnaireResponse CreateQuestionnaireResponse(Model.Questionnaire qPart1, Bundle resources, IResourceResolver source)
-        {
-            return null;
         }
     }
 }
