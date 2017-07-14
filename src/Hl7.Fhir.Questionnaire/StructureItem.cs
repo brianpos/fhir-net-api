@@ -14,24 +14,6 @@ namespace Hl7.Fhir.QuestionnaireServices
 
     public class StructureItem
     {
-        public StructureItem ShallowClone()
-        {
-            StructureItem item = new StructureItem()
-            {
-                ClassMapping = this.ClassMapping,
-                code = this.code,
-                ed = this.ed,
-                FhirpathExpression = this.FhirpathExpression,
-                id = this.id,
-                IsArray = this.IsArray,
-                Path = this.Path,
-                ValidationRules = this.ValidationRules,
-                ExtensionUrl = this.ExtensionUrl,
-                LinkId = this.LinkId
-            };
-            return item;
-        }
-
         public string id { get; set; }
 
         /// <summary>
