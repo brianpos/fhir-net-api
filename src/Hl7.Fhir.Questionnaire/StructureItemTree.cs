@@ -48,6 +48,53 @@ namespace Hl7.Fhir.QuestionnaireServices
             return null;
         }
 
+        public static IEnumerable<Base> GetValues(StructureItem item, Base data, string path, string linkId)
+        {
+            List<Base> results = new List<Base>();
+            if (item.Path == path)
+            {
+                results.Add(data);
+                return results;
+            }
+            foreach (var child in item.Children)
+            {
+                if (ContainsPath(child, path))
+                {
+                    var pm = item.ClassMapping.FindMappedElementByName(child.FhirpathExpression);
+                    if (pm.ReturnType != pm.ElementType)
+                    {
+                        // this is a collection
+                        IEnumerable<Base> result = (IEnumerable<Base>)pm.GetValue(data);
+                        foreach (var itemInCol in result)
+                        {
+                            var moreData = GetValues(child, itemInCol, path, linkId);
+                            results.AddRange(moreData);
+                        }
+                    }
+                    else
+                    {
+                        Base result = (Base)pm.GetValue(data);
+                        var moreData = GetValues(child, result, path, linkId);
+                        results.AddRange(moreData);
+                    }
+                    break;
+                }
+            }
+            return results;
+        }
+
+        public static bool ContainsPath(StructureItem item, string path)
+        {
+            if (item.Path == path)
+                return true;
+            foreach (var child in item.Children)
+            {
+                if (ContainsPath(child, path))
+                    return true;
+            }
+            return false;
+        }
+
         private static void PopulateBindings(StructureItem item, Dictionary<string, string> mapPathsToLinkIds)
         {
             if (mapPathsToLinkIds.ContainsKey(item.Path))

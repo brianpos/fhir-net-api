@@ -409,18 +409,18 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             });
             gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
             {
-                Text = "Active",
-                LinkId = "Practitioner.birthDate",
-                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
-                    { Value = new Date("1970") }
-                }
-            });
-            gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
-            {
                 Text = "Gender",
                 LinkId = "Practitioner.gender",
                 Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
                     { Value = new Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male") }
+                }
+            });
+            gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Birth Date",
+                LinkId = "Practitioner.birthDate",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new Date("1970") }
                 }
             });
             gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
