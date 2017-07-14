@@ -117,12 +117,12 @@ namespace Hl7.Fhir.QuestionnaireServices
                     }
                     if (nav.Current.Max == "0")
                     {
-                        System.Diagnostics.Debug.WriteLine($"skipping {item.Path} ({nav.PathName}) {item.ExtensionUrl}");
+                        // System.Diagnostics.Debug.WriteLine($"skipping {item.Path} ({nav.PathName}) {item.ExtensionUrl}");
                         continue;
                     }
                     if (item.ed.Name != null)
                     {
-                        Debug.WriteLine($"  Name: {item.ed.Name}");
+                        // Debug.WriteLine($"  Name: {item.ed.Name}");
                         if (!nav.Current.IsMappedExtension()) // as this would already be there
                             item.Path += ":" + nav.Current.Name; // and add this into the property names
                     }

@@ -644,18 +644,15 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         [TestMethod]
         public void QuestionnaireCreatePruneStructureItem()
         {
-            QuestionnaireProcessing processor = new QuestionnaireProcessing();
             Questionnaire qPart1 = GetExtendedPractitionerQuestionnaire();
             qPart1.Group.Definition(new FhirUri("http://healthconnex.com.au/hcxd/Practitioner"));
-            var qrP1 = GetExtendedPractitionerQuestionnaireResponse();
 
             Questionnaire qPart2 = GetBloodPressureQuestionnaire();
             qPart2.Group.Definition(new FhirUri("http://hl7.org/fhir/StructureDefinition/daf-vitalsigns"));
-            var qrP2 = GetBloodPressureQuestionnaireResponse();
 
             // Merge the part2 group into the part1 questionnaire
+            qPart1.Id = "merged";
             qPart1.Group.Group.Add(qPart2.Group);
-            qrP1.Group.Group.Add(qrP2.Group);
 
             System.Diagnostics.Debug.WriteLine("------------------");
             var fullTree = StructureItemTree.GetStructureTree(qPart1.Group.Definition().Value, qPart1, _source, false);
