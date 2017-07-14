@@ -393,7 +393,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         {
             var qr = new QuestionnaireResponse();
             qr.Id = "prac-ext-demo-qr";
-            qr.Questionnaire = new ResourceReference("Questionnaire/prac-demo");
+            qr.Questionnaire = new ResourceReference("Questionnaire/prac-ext-demo");
             qr.Group = new QuestionnaireResponse.GroupComponent();
 
             // The core properties
@@ -769,8 +769,12 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
 
             // Now reproduce the QR from this content
             QuestionnaireResponse qr = QuestionnaireFiller.CreateQuestionnaireResponse(qPart1, resources, _source);
+            qr.Id = "prac-ext-demo-qr";
             // qr = qrP1.DeepCopy() as QuestionnaireResponse;
-            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qr));
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qrP1));
+
+            if (qr != null)
+                System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qr));
 
             Assert.IsTrue(qr.IsExactly(qrP1));
         }
@@ -825,6 +829,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
 
             // Now reproduce the QR from this content
             QuestionnaireResponse qr = QuestionnaireFiller.CreateQuestionnaireResponse(qPart1, resources, _source);
+            qr.Id = "prac-ext-demo-qr";
             qr = qrP1.DeepCopy() as QuestionnaireResponse;
 
             Assert.IsTrue(qr.IsExactly(qrP1));
