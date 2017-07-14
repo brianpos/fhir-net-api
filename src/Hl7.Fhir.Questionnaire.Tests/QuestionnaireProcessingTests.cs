@@ -57,10 +57,6 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         {
             var pracSd = _source.FindStructureDefinitionForCoreType(FHIRDefinedType.Practitioner);
             QuestionnaireProcessing processor = new QuestionnaireProcessing();
-
-            //Snapshot.SnapshotGenerator sg = new Snapshot.SnapshotGenerator(_source, 
-            //    new Snapshot.SnapshotGeneratorSettings() { GenerateElementIds = true, ForceRegenerateSnapshots = true });
-            //sg.Update(pracSd);
             var si = StructureItemTree.CreateStructureTree(pracSd, _source);
 
             var prac = processor.CreateResourceInstance<Practitioner>(pracSd, si, GetPractitionerQuestionnaire(), GetPractitionerQuestionnaireResponse());
@@ -120,13 +116,13 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             {
                 Text = "Code",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification.code.coding"
+                LinkId = "Practitioner.qualification.code.coding.code"
             });
             gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Display",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification.code.display"
+                LinkId = "Practitioner.qualification.code.coding.display"
             });
             gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
@@ -692,6 +688,10 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             // Assert.AreEqual("mm/Hg", (obs.Value as Quantity).Code);
 
             // Assert.AreEqual("Range: <90  >160", obs.ReferenceRange[0].Text);
+            for (int n = 0; n < 100; n++)
+            {
+                resources = processor.CreateResourceInstances(qPart1, qrP1, _source);
+            }
         }
 
         // Now for some testing of a multiple resource Questionnaire!

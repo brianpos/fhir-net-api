@@ -20,86 +20,16 @@ namespace Hl7.Fhir.QuestionnaireServices
 {
     public class QuestionnaireProcessing
     {
-        /// <summary>
-        /// Prune the StructureTree based on a questionnaire definition.
-        /// </summary>
-        /// <param name="si"></param>
-        /// <param name="questionnaire"></param>
-        /// <remarks>
-        /// This will remove all nodes in the tree that don't either contribute to 
-        /// fixed values, or potential answers in the questionnaire
-        /// </remarks>
-        /// <returns></returns>
-        public StructureItem PruneTree(StructureItem si, Model.Questionnaire questionnaire)
-        {
-            StructureItem item = new StructureItem()
-            {
-                ClassMapping = si.ClassMapping,
-                code = si.code,
-                ed = si.ed,
-                FhirpathExpression = si.FhirpathExpression,
-                id = si.id,
-                Path = si.Path,
-                ValidationRules = si.ValidationRules
-            };
-            foreach (var child in si.Children)
-            {
-                var newChild = PruneTree(child, questionnaire.Group);
-                if (newChild != null)
-                    item.Children.Add(newChild);
-            }
-            return item;
-        }
-
-        private StructureItem PruneTree(StructureItem si, Model.Questionnaire.GroupComponent group)
-        {
-            if (HasFixedValueInChild(si))
-            {
-                StructureItem item = new StructureItem()
-                {
-                    ClassMapping = si.ClassMapping,
-                    code = si.code,
-                    ed = si.ed,
-                    FhirpathExpression = si.FhirpathExpression,
-                    id = si.id,
-                    Path = si.Path,
-                    ValidationRules = si.ValidationRules
-                };
-                foreach (var child in si.Children)
-                {
-                    var newChild = PruneTree(child, group);
-                    if (newChild != null)
-                        item.Children.Add(newChild);
-                }
-                return item;
-            }
-
-            // check to see if this item is used the questionnaire
-            return null;
-        }
-
-        private bool HasFixedValueInChild(StructureItem si)
-        {
-            if (si.ed.Fixed != null)
-                return true;
-            foreach (var item in si.Children)
-            {
-                if (HasFixedValueInChild(item))
-                    return true;
-            }
-            return false;
-        }
-
         internal Bundle CreateResourceInstances(Model.Questionnaire q, QuestionnaireResponse questionnaireResponse, IResourceResolver source)
         {
             // Loop through all the groups to locate the items that are marked against a resource type
             List<QuestionnaireResponse.GroupComponent> qrg = new List<QuestionnaireResponse.GroupComponent>();
             qrg.Add(questionnaireResponse.Group);
-            var result = CreateResourceInstances(q.Group, qrg, source);
+            var result = CreateResourceInstances(q.Id, q.Group, qrg, source);
             return result;
         }
 
-        internal Bundle CreateResourceInstances(Model.Questionnaire.GroupComponent qg, List<QuestionnaireResponse.GroupComponent> qrg, IResourceResolver source)
+        internal Bundle CreateResourceInstances(string QuestionnaireUrl, Model.Questionnaire.GroupComponent qg, List<QuestionnaireResponse.GroupComponent> qrg, IResourceResolver source)
         {
             var fac = new DefaultModelFactory();
             Bundle result = new Bundle();
@@ -108,15 +38,12 @@ namespace Hl7.Fhir.QuestionnaireServices
             if (qg.Definition() != null)
             {
                 // this item has a definition, so we should process it
-                StructureDefinition sd = source.FindStructureDefinition(qg.Definition().Value);
-                if (sd != null)
+                var si = StructureItemTree.GetStructureTree(qg.Definition().Value, QuestionnaireUrl, source);
+                if (si != null)
                 {
-                    var si = StructureItemTree.CreateStructureTree(sd, source);
-                    Type t = ModelInfo.FhirTypeToCsType[sd.ConstrainedType.GetLiteral()];
-                    si.ClassMapping = ClassMapping.Create(t);
                     foreach (var a in qrg)
                     {
-                        Resource r = fac.Create(t) as Resource;
+                        Resource r = fac.Create(si.ClassMapping.NativeType) as Resource;
                         result.AddResourceEntry(r, null);
                         List<QuestionnaireResponse.GroupComponent> qrgItem = new List<QuestionnaireResponse.GroupComponent>();
                         qrgItem.Add(a);
@@ -127,7 +54,7 @@ namespace Hl7.Fhir.QuestionnaireServices
 
             foreach (var qgi in qg.Group)
             {
-                var items = CreateResourceInstances(qgi, qrg.Where(g => g.LinkId == qgi.LinkId).ToList(), source);
+                var items = CreateResourceInstances(QuestionnaireUrl, qgi, qrg.Where(g => g.LinkId == qgi.LinkId).ToList(), source);
                 result.Entry.AddRange(items.Entry);
             }
 

@@ -7,18 +7,47 @@ using Hl7.Fhir.Utility;
 using Hl7.Fhir.Specification.Navigation;
 using Hl7.Fhir.Specification.Source;
 using Hl7.Fhir.Specification.Snapshot;
+using System.Collections.Generic;
 
 namespace Hl7.Fhir.QuestionnaireServices
 {
     public class StructureItemTree
     {
+        static Dictionary<string, StructureItem> _cache = new Dictionary<string, StructureItem>();
+        static public void FlushCache()
+        {
+            _cache.Clear();
+        }
+
+        public static StructureItem GetStructureTree(string StructureDefinitionUrl, string QuestionnaireUrl, IResourceResolver source)
+        {
+            string key = QuestionnaireUrl + "###" + StructureDefinitionUrl;
+            if (_cache.ContainsKey(key))
+                return _cache[key];
+            StructureDefinition sd = source.FindStructureDefinition(StructureDefinitionUrl);
+            if (sd != null)
+            {
+                var si = StructureItemTree.CreateStructureTree(sd, source, null, true);
+                Type t = ModelInfo.FhirTypeToCsType[sd.ConstrainedType.GetLiteral()];
+                si.ClassMapping = ClassMapping.Create(t);
+
+                if (!_cache.ContainsKey(key))
+                    _cache.Add(key, si);
+                return si;
+            }
+            return null;
+        }
+
         /// <summary>
         /// http://hl7.org/fhir/elementdefinition.html#ElementDefinition
         /// </summary>
         /// <param name="sd"></param>
         /// <returns></returns>
-        public static StructureItem CreateStructureTree(StructureDefinition sd, IResourceResolver source, string replaceRoot = null)
+        public static StructureItem CreateStructureTree(StructureDefinition sd, IResourceResolver source, string replaceRoot = null, bool skipCache = false)
         {
+            if (_cache.ContainsKey(sd.Url) && !skipCache && replaceRoot == null)
+                return _cache[sd.Url];
+
             StructureItem parent = new StructureItem();
             Type t = ModelInfo.GetTypeForFhirType(sd.ConstrainedType.HasValue ? sd.ConstrainedType.GetLiteral() : sd.Name);
             parent.ClassMapping = ClassMapping.Create(t);
@@ -36,6 +65,8 @@ namespace Hl7.Fhir.QuestionnaireServices
             nav.MoveToFirstChild(); // move to first child
             CreateStructureChildren(parent, nav, source, replaceRoot);
 
+            if (!_cache.ContainsKey(sd.Url) && replaceRoot == null)
+                _cache.Add(sd.Url, parent);
             return parent;
         }
 
@@ -135,6 +166,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                             else
                             {
                                 StructureDefinition sdDataType = source.FindStructureDefinitionForCoreType(nav.Current.PrimaryTypeCode().Value);
+                                // do not look at the cache, as the item path could be different
                                 StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path);
                                 item.Children.AddRange(dataType.Children);
                                 item.ClassMapping = dataType.ClassMapping;
@@ -144,6 +176,76 @@ namespace Hl7.Fhir.QuestionnaireServices
                 }
             }
             while (nav.MoveToNext());
+        }
+
+        /// <summary>
+        /// Prune the StructureTree based on a questionnaire definition.
+        /// </summary>
+        /// <param name="si"></param>
+        /// <param name="questionnaire"></param>
+        /// <remarks>
+        /// This will remove all nodes in the tree that don't either contribute to 
+        /// fixed values, or potential answers in the questionnaire
+        /// </remarks>
+        /// <returns></returns>
+        public StructureItem PruneTree(StructureItem si, Model.Questionnaire questionnaire)
+        {
+            StructureItem item = new StructureItem()
+            {
+                ClassMapping = si.ClassMapping,
+                code = si.code,
+                ed = si.ed,
+                FhirpathExpression = si.FhirpathExpression,
+                id = si.id,
+                Path = si.Path,
+                ValidationRules = si.ValidationRules
+            };
+            foreach (var child in si.Children)
+            {
+                var newChild = PruneTree(child, questionnaire.Group);
+                if (newChild != null)
+                    item.Children.Add(newChild);
+            }
+            return item;
+        }
+
+        private StructureItem PruneTree(StructureItem si, Model.Questionnaire.GroupComponent group)
+        {
+            if (HasFixedValueInChild(si))
+            {
+                StructureItem item = new StructureItem()
+                {
+                    ClassMapping = si.ClassMapping,
+                    code = si.code,
+                    ed = si.ed,
+                    FhirpathExpression = si.FhirpathExpression,
+                    id = si.id,
+                    Path = si.Path,
+                    ValidationRules = si.ValidationRules
+                };
+                foreach (var child in si.Children)
+                {
+                    var newChild = PruneTree(child, group);
+                    if (newChild != null)
+                        item.Children.Add(newChild);
+                }
+                return item;
+            }
+
+            // check to see if this item is used the questionnaire
+            return null;
+        }
+
+        private bool HasFixedValueInChild(StructureItem si)
+        {
+            if (si.ed.Fixed != null)
+                return true;
+            foreach (var item in si.Children)
+            {
+                if (HasFixedValueInChild(item))
+                    return true;
+            }
+            return false;
         }
 
     }
