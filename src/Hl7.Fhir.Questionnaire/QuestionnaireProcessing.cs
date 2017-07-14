@@ -20,16 +20,16 @@ namespace Hl7.Fhir.QuestionnaireServices
 {
     public class QuestionnaireProcessing
     {
-        internal Bundle CreateResourceInstances(Model.Questionnaire q, QuestionnaireResponse questionnaireResponse, IResourceResolver source)
+        internal Bundle CreateResourceInstances(Questionnaire q, QuestionnaireResponse questionnaireResponse, IResourceResolver source)
         {
             // Loop through all the groups to locate the items that are marked against a resource type
             List<QuestionnaireResponse.GroupComponent> qrg = new List<QuestionnaireResponse.GroupComponent>();
             qrg.Add(questionnaireResponse.Group);
-            var result = CreateResourceInstances(q.Id, q.Group, qrg, source);
+            var result = CreateResourceInstances(q, q.Group, qrg, source);
             return result;
         }
 
-        internal Bundle CreateResourceInstances(string QuestionnaireUrl, Model.Questionnaire.GroupComponent qg, List<QuestionnaireResponse.GroupComponent> qrg, IResourceResolver source)
+        internal Bundle CreateResourceInstances(Questionnaire q, Model.Questionnaire.GroupComponent qg, List<QuestionnaireResponse.GroupComponent> qrg, IResourceResolver source)
         {
             var fac = new DefaultModelFactory();
             Bundle result = new Bundle();
@@ -38,7 +38,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             if (qg.Definition() != null)
             {
                 // this item has a definition, so we should process it
-                var si = StructureItemTree.GetStructureTree(qg.Definition().Value, QuestionnaireUrl, source);
+                var si = StructureItemTree.GetStructureTree(qg.Definition().Value, q, source);
                 if (si != null)
                 {
                     foreach (var a in qrg)
@@ -54,7 +54,7 @@ namespace Hl7.Fhir.QuestionnaireServices
 
             foreach (var qgi in qg.Group)
             {
-                var items = CreateResourceInstances(QuestionnaireUrl, qgi, qrg.Where(g => g.LinkId == qgi.LinkId).ToList(), source);
+                var items = CreateResourceInstances(q, qgi, qrg.Where(g => g.LinkId == qgi.LinkId).ToList(), source);
                 result.Entry.AddRange(items.Entry);
             }
 
@@ -81,12 +81,12 @@ namespace Hl7.Fhir.QuestionnaireServices
             // walk the structure definition (via the StructureItem)
             foreach (var item in parent.Children)
             {
-                Debug.WriteLine($"{item.Path}{(item.ed.Fixed != null ? " fixed value" : "")}{(item.ed.Slicing != null ? " sliced:" + String.Join(", ", item.ed.Slicing.Discriminator) : "")}");
+                Debug.WriteLine($"{item.Path}{(item.ed.Fixed != null ? " fixed value" : "")}{(item.ed.Slicing != null ? " sliced: " + String.Join(", ", item.ed.Slicing.Discriminator) : "")}");
 
                 if (item.ed.Slicing != null)
                 {
                     Debug.WriteLine($"  Slice Name: {String.Join(", ", item.ed.Name)}");
-                    Debug.WriteLine($"  Discriminator{String.Join(", ", item.ed.Slicing.Discriminator)}");
+                    Debug.WriteLine($"  Discriminator: {String.Join(", ", item.ed.Slicing.Discriminator)}");
                 }
 
                 if (item.ed.Fixed != null)

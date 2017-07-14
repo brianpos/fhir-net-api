@@ -14,6 +14,24 @@ namespace Hl7.Fhir.QuestionnaireServices
 
     public class StructureItem
     {
+        public StructureItem ShallowClone()
+        {
+            StructureItem item = new StructureItem()
+            {
+                ClassMapping = this.ClassMapping,
+                code = this.code,
+                ed = this.ed,
+                FhirpathExpression = this.FhirpathExpression,
+                id = this.id,
+                IsArray = this.IsArray,
+                Path = this.Path,
+                ValidationRules = this.ValidationRules,
+                ExtensionUrl = this.ExtensionUrl,
+                LinkId = this.LinkId
+            };
+            return item;
+        }
+
         public string id { get; set; }
 
         /// <summary>
@@ -21,10 +39,19 @@ namespace Hl7.Fhir.QuestionnaireServices
         /// </summary>
         public string code { get; set; }
 
+        public bool IsArray { get; set; }
+
         /// <summary>
         /// The URL for the extension (where this property represents an extension)
         /// </summary>
         public string ExtensionUrl { get; set; }
+
+        /// <summary>
+        /// This does not come from the StructureDefinition, but is populated from 
+        /// the Questionnaire when it is mapped to speed the efficiency of processing
+        /// the content into the resource (permits iteration over the resource, not the questionnaire)
+        /// </summary>
+        public string LinkId { get; set; }
 
         public ClassMapping ClassMapping { get; set; }
 

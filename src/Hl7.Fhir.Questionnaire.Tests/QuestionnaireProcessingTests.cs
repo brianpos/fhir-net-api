@@ -336,13 +336,13 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             {
                 Text = "Code",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification.code.coding"
+                LinkId = "Practitioner.qualification.code.coding.code"
             });
             gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Display",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification.code.display"
+                LinkId = "Practitioner.qualification.code.coding.display"
             });
             gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
@@ -367,13 +367,13 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             {
                 Text = "Code",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification:certificate3-agedcare.code.coding"
+                LinkId = "Practitioner.qualification:certificate3-agedcare.code.coding.code"
             });
             gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Display",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification:certificate3-agedcare.code.display"
+                LinkId = "Practitioner.qualification:certificate3-agedcare.code.coding.display"
             });
             gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
@@ -641,6 +641,61 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             server.Update(GetBloodPressureQuestionnaireResponse());
         }
 
+        [TestMethod]
+        public void QuestionnaireCreatePruneStructureItem()
+        {
+            QuestionnaireProcessing processor = new QuestionnaireProcessing();
+            Questionnaire qPart1 = GetExtendedPractitionerQuestionnaire();
+            qPart1.Group.Definition(new FhirUri("http://healthconnex.com.au/hcxd/Practitioner"));
+            var qrP1 = GetExtendedPractitionerQuestionnaireResponse();
+
+            Questionnaire qPart2 = GetBloodPressureQuestionnaire();
+            qPart2.Group.Definition(new FhirUri("http://hl7.org/fhir/StructureDefinition/daf-vitalsigns"));
+            var qrP2 = GetBloodPressureQuestionnaireResponse();
+
+            // Merge the part2 group into the part1 questionnaire
+            qPart1.Group.Group.Add(qPart2.Group);
+            qrP1.Group.Group.Add(qrP2.Group);
+
+            System.Diagnostics.Debug.WriteLine("------------------");
+            var fullTree = StructureItemTree.GetStructureTree(qPart1.Group.Definition().Value, qPart1, _source, false);
+            var prunedTree = StructureItemTree.GetStructureTree(qPart1.Group.Definition().Value, qPart1, _source, true);
+
+            System.Diagnostics.Debug.WriteLine("------------------");
+            var fullTree2 = StructureItemTree.GetStructureTree(qPart2.Group.Definition().Value, qPart1, _source, false);
+            var prunedTree2 = StructureItemTree.GetStructureTree(qPart2.Group.Definition().Value, qPart1, _source, true);
+
+            System.Diagnostics.Debug.WriteLine("======================================");
+            int countFullTree = DumpTree(fullTree);
+            System.Diagnostics.Debug.WriteLine("------------------");
+            int countPrunedTree = DumpTree(prunedTree);
+            Assert.AreEqual(761, countFullTree);
+            Assert.AreEqual(51, countPrunedTree);
+
+            System.Diagnostics.Debug.WriteLine("======================================");
+
+            int countFullTree2 = DumpTree(fullTree2);
+            System.Diagnostics.Debug.WriteLine("------------------");
+            int countPrunedTree2 = DumpTree(prunedTree2);
+            Assert.AreEqual(585, countFullTree2);
+            Assert.AreEqual(11, countPrunedTree2);
+
+            Dictionary<string, string> mapPathsToLinkIds = new Dictionary<string, string>();
+            StructureItemTree.BuildMapping(mapPathsToLinkIds, qPart1.Group);
+            StructureItemTree.PruneTree(prunedTree, mapPathsToLinkIds);
+        }
+
+        private int DumpTree(StructureItem tree)
+        {
+            int count = 1;
+            System.Diagnostics.Debug.WriteLine($"{tree.Path}");
+            foreach (var item in tree.Children)
+            {
+                count += DumpTree(item);
+            }
+            return count;
+        }
+
         // Now for some testing of a multiple resource Questionnaire!
         [TestMethod]
         public void QuestionnaireCreateMultipleResources()
@@ -658,6 +713,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var qrP2 = GetBloodPressureQuestionnaireResponse();
 
             // Merge the part2 group into the part1 questionnaire
+            qPart1.Id = "merged";
             qPart1.Group.Group.Add(qPart2.Group);
             qrP1.Group.Group.Add(qrP2.Group);
 
@@ -711,6 +767,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var qrP2 = GetBloodPressureQuestionnaireResponse();
 
             // Merge the part2 group into the part1 questionnaire
+            qPart1.Id = "merged";
             qPart1.Group.Group.Add(qPart2.Group);
             qrP1.Group.Group.Add(qrP2.Group);
 

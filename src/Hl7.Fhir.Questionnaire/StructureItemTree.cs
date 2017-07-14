@@ -19,10 +19,10 @@ namespace Hl7.Fhir.QuestionnaireServices
             _cache.Clear();
         }
 
-        public static StructureItem GetStructureTree(string StructureDefinitionUrl, string QuestionnaireUrl, IResourceResolver source)
+        public static StructureItem GetStructureTree(string StructureDefinitionUrl, Questionnaire q, IResourceResolver source, bool pruneTree = true)
         {
-            string key = QuestionnaireUrl + "###" + StructureDefinitionUrl;
-            if (_cache.ContainsKey(key))
+            string key = q.Id + "###" + StructureDefinitionUrl;
+            if (_cache.ContainsKey(key) && pruneTree)
                 return _cache[key];
             StructureDefinition sd = source.FindStructureDefinition(StructureDefinitionUrl);
             if (sd != null)
@@ -31,11 +31,31 @@ namespace Hl7.Fhir.QuestionnaireServices
                 Type t = ModelInfo.FhirTypeToCsType[sd.ConstrainedType.GetLiteral()];
                 si.ClassMapping = ClassMapping.Create(t);
 
-                if (!_cache.ContainsKey(key))
+                // Populate all the bindings
+                Dictionary<string, string> mapPathsToLinkIds = new Dictionary<string, string>();
+                BuildMapping(mapPathsToLinkIds, q.Group);
+                PopulateBindings(si, mapPathsToLinkIds);
+
+                // Now that we have the content, we can prune the content down too
+                if (pruneTree)
+                    PruneTree(si, mapPathsToLinkIds);
+
+                // Add it into the cache for later usage
+                if (!_cache.ContainsKey(key) && pruneTree)
                     _cache.Add(key, si);
                 return si;
             }
             return null;
+        }
+
+        private static void PopulateBindings(StructureItem item, Dictionary<string, string> mapPathsToLinkIds)
+        {
+            if (mapPathsToLinkIds.ContainsKey(item.Path))
+                item.LinkId = mapPathsToLinkIds[item.Path];
+            foreach (var child in item.Children)
+            {
+                PopulateBindings(child, mapPathsToLinkIds);
+            }
         }
 
         /// <summary>
@@ -62,6 +82,8 @@ namespace Hl7.Fhir.QuestionnaireServices
             // position the Navigator on the first element in the parent's collection of elements
             var nav = ElementDefinitionNavigator.ForSnapshot(sd);
             nav.MoveToFirstChild(); // move to root
+            parent.Path = nav.Current.Path;
+
             nav.MoveToFirstChild(); // move to first child
             CreateStructureChildren(parent, nav, source, replaceRoot);
 
@@ -104,7 +126,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                         if (!nav.Current.IsMappedExtension()) // as this would already be there
                             item.Path += ":" + nav.Current.Name; // and add this into the property names
                     }
-                    System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]{(nav.Current.Fixed != null ? " fixed value" : "")}");
+                    // System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]{(nav.Current.Fixed != null ? " fixed value" : "")}");
 
                     if (item.ed.Slicing != null)
                     {
@@ -139,6 +161,9 @@ namespace Hl7.Fhir.QuestionnaireServices
                                 // or where not a collection, both are the same value
                                 item.ClassMapping = ClassMapping.Create(pm.ElementType);
                             }
+
+                            if (pm.ReturnType != pm.ElementType)
+                                item.IsArray = true;
                         }
 
                         // Now process all the children
@@ -159,7 +184,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                             if (!string.IsNullOrEmpty(profile) && nav.Current.PrimaryTypeCode() != FHIRDefinedType.Reference && nav.Current.PrimaryTypeCode() != FHIRDefinedType.Uri)
                             {
                                 StructureDefinition sdDataType = source.FindStructureDefinition(profile);
-                                StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path);
+                                StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path, true);
                                 item.Children.AddRange(dataType.Children);
                                 item.ClassMapping = dataType.ClassMapping;
                             }
@@ -167,7 +192,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                             {
                                 StructureDefinition sdDataType = source.FindStructureDefinitionForCoreType(nav.Current.PrimaryTypeCode().Value);
                                 // do not look at the cache, as the item path could be different
-                                StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path);
+                                StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path, true);
                                 item.Children.AddRange(dataType.Children);
                                 item.ClassMapping = dataType.ClassMapping;
                             }
@@ -178,75 +203,148 @@ namespace Hl7.Fhir.QuestionnaireServices
             while (nav.MoveToNext());
         }
 
+        internal static void BuildMapping(Dictionary<string, string> mapPathsToLinkIds, Questionnaire.GroupComponent group)
+        {
+            string path = group.Definition()?.Value;
+            if (String.IsNullOrEmpty(path))
+                path = group.LinkId;
+            if (!String.IsNullOrEmpty(path))
+            {
+                if (mapPathsToLinkIds.ContainsKey(path))
+                {
+                    System.Diagnostics.Debug.WriteLine("Duplicate LinkId/Path mapping");
+                }
+                else
+                {
+                    mapPathsToLinkIds.Add(path, group.LinkId);
+                }
+            }
+            foreach (var g in group.Group)
+            {
+                BuildMapping(mapPathsToLinkIds, g);
+            }
+            foreach (var q in group.Question)
+            {
+                BuildMapping(mapPathsToLinkIds, q);
+            }
+        }
+
+        private static void BuildMapping(Dictionary<string, string> mapPathsToLinkIds, Questionnaire.QuestionComponent question)
+        {
+            string path = question.Definition()?.Value;
+            if (String.IsNullOrEmpty(path))
+                path = question.LinkId;
+            if (!String.IsNullOrEmpty(path))
+            {
+                if (mapPathsToLinkIds.ContainsKey(path))
+                {
+                    System.Diagnostics.Debug.WriteLine("Duplicate LinkId/Path mapping");
+                }
+                else
+                {
+                    mapPathsToLinkIds.Add(path, question.LinkId);
+                }
+            }
+            foreach (var g in question.Group)
+            {
+                BuildMapping(mapPathsToLinkIds, g);
+            }
+        }
+
+        enum RetainDueTo { Binding, FixedValue, MandatoryProperty, Discard };
+
         /// <summary>
-        /// Prune the StructureTree based on a questionnaire definition.
+        /// Check to see if this child should be retained in the collection
         /// </summary>
         /// <param name="si"></param>
-        /// <param name="questionnaire"></param>
-        /// <remarks>
-        /// This will remove all nodes in the tree that don't either contribute to 
-        /// fixed values, or potential answers in the questionnaire
-        /// </remarks>
+        /// <param name="group"></param>
         /// <returns></returns>
-        public StructureItem PruneTree(StructureItem si, Model.Questionnaire questionnaire)
+        internal static void PruneTree(StructureItem item, Dictionary<string, string> mapPathsToLinkIds)
         {
-            StructureItem item = new StructureItem()
+            // do any of "my" properties have values bound as children
+            bool hasBoundChild = false;
+            foreach (var child in item.Children)
             {
-                ClassMapping = si.ClassMapping,
-                code = si.code,
-                ed = si.ed,
-                FhirpathExpression = si.FhirpathExpression,
-                id = si.id,
-                Path = si.Path,
-                ValidationRules = si.ValidationRules
-            };
-            foreach (var child in si.Children)
-            {
-                var newChild = PruneTree(child, questionnaire.Group);
-                if (newChild != null)
-                    item.Children.Add(newChild);
-            }
-            return item;
-        }
-
-        private StructureItem PruneTree(StructureItem si, Model.Questionnaire.GroupComponent group)
-        {
-            if (HasFixedValueInChild(si))
-            {
-                StructureItem item = new StructureItem()
+                if (HasBoundValueInChild(child))
                 {
-                    ClassMapping = si.ClassMapping,
-                    code = si.code,
-                    ed = si.ed,
-                    FhirpathExpression = si.FhirpathExpression,
-                    id = si.id,
-                    Path = si.Path,
-                    ValidationRules = si.ValidationRules
-                };
-                foreach (var child in si.Children)
-                {
-                    var newChild = PruneTree(child, group);
-                    if (newChild != null)
-                        item.Children.Add(newChild);
+                    hasBoundChild = true;
+                    break;
                 }
-                return item;
             }
 
-            // check to see if this item is used the questionnaire
-            return null;
+            if (hasBoundChild)
+            {
+                List<StructureItem> newSet = new List<StructureItem>();
+                foreach (var child in item.Children)
+                {
+                    if (HasBoundValueInChild(child))
+                        newSet.Add(child);
+                    else if (IsMandatory(child))
+                        newSet.Add(child);
+                    else if (HasFixedValueInChild(child))
+                        newSet.Add(child);
+                }
+                item.Children = newSet;
+            }
+            else if (IsMandatory(item))
+            {
+                List<StructureItem> newSet = new List<StructureItem>();
+                foreach (var child in item.Children)
+                {
+                    if (IsMandatory(child))
+                        newSet.Add(child);
+                    else if (HasFixedValueInChild(child))
+                        newSet.Add(child);
+                }
+                item.Children = newSet;
+            }
+            else
+            {
+                item.Children.Clear();
+            }
+
+            // Re-Process all the remaining children
+            foreach (var child in item.Children)
+            {
+                PruneTree(child, mapPathsToLinkIds);
+            }
         }
 
-        private bool HasFixedValueInChild(StructureItem si)
+        private static bool HasBoundValueInChild(StructureItem si)
         {
-            if (si.ed.Fixed != null)
+            if (!string.IsNullOrEmpty(si.LinkId))
                 return true;
             foreach (var item in si.Children)
             {
-                if (HasFixedValueInChild(item))
+                if (HasBoundValueInChild(item))
                     return true;
             }
             return false;
         }
 
+        private static bool IsMandatory(StructureItem si)
+        {
+            if (si.ed.Min > 0)
+                return true;
+            return false;
+        }
+
+        private static bool HasFixedValueInChild(StructureItem si)
+        {
+            if (si.ed.Fixed != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"    <-- fixed ({si.Path})");
+                return true;
+            }
+            if (!si.IsArray && IsMandatory(si))
+            {
+                foreach (var item in si.Children)
+                {
+                    if (HasFixedValueInChild(item))
+                        return true;
+                }
+            }
+            return false;
+        }
     }
 }
