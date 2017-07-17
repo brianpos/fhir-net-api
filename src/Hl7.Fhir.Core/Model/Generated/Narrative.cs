@@ -60,22 +60,22 @@ namespace Hl7.Fhir.Model
             /// <summary>
             /// The contents of the narrative are entirely generated from the structured data in the content.
             /// </summary>
-            [EnumLiteral("generated")]
+            [EnumLiteral("generated", "http://hl7.org/fhir/narrative-status")]
             Generated,
             /// <summary>
             /// The contents of the narrative are entirely generated from the structured data in the content and some of the content is generated from extensions
             /// </summary>
-            [EnumLiteral("extensions")]
+            [EnumLiteral("extensions", "http://hl7.org/fhir/narrative-status")]
             Extensions,
             /// <summary>
             /// The contents of the narrative contain additional information not found in the structured data
             /// </summary>
-            [EnumLiteral("additional")]
+            [EnumLiteral("additional", "http://hl7.org/fhir/narrative-status")]
             Additional,
             /// <summary>
             /// The contents of the narrative are some equivalent of "No human-readable text provided in this case"
             /// </summary>
-            [EnumLiteral("empty")]
+            [EnumLiteral("empty", "http://hl7.org/fhir/narrative-status")]
             Empty,
         }
         
