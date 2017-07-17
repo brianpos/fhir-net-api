@@ -180,38 +180,42 @@ namespace Hl7.Fhir.QuestionnaireServices
                         Debug.WriteLine($"  Discriminator: {String.Join(", ", item.ed.Slicing.Discriminator)}");
                     }
 
+                    // retrieve the type of this property
+                    var pm = parent.ClassMapping.FindMappedElementByName(nav.PathName);
+                    if (pm != null)
+                    {
+                        // skip over the raw values
+                        if (pm.ReturnType == pm.ElementType && !pm.ElementType.CanBeTreatedAsType(typeof(Base)))
+                            continue;
+                    }
+
                     parent.Children.Add(item);
                     if (nav.HasChildren)
                     {
-                        // retrieve the type of this property
-                        var pm = parent.ClassMapping.FindMappedElementByName(nav.PathName);
-                        if (pm != null)
+                        // Check for the available type(s)
+                        if (pm.Choice == ChoiceType.DatatypeChoice)
                         {
-                            // Check for the available type(s)
-                            if (pm.Choice == ChoiceType.DatatypeChoice)
-                            {
-                                Type t = ModelInfo.FhirTypeToCsType[nav.Current.PrimaryTypeCode().GetLiteral()];
-                                item.ClassMapping = ClassMapping.Create(t);
-                            }
-                            else if (pm.Choice == ChoiceType.ResourceChoice)
-                            {
-                                if (pm.ElementType == typeof(Resource))
-                                {
-                                    // This is not a constrained set of choices
-                                    continue;
-                                }
-                            }
-                            else
-                            {
-                                // Note that ReturnType would have the type of the collection
-                                // where the ElementType is the type of the item in the collection
-                                // or where not a collection, both are the same value
-                                item.ClassMapping = ClassMapping.Create(pm.ElementType);
-                            }
-
-                            if (pm.ReturnType != pm.ElementType)
-                                item.IsArray = true;
+                            Type t = ModelInfo.FhirTypeToCsType[nav.Current.PrimaryTypeCode().GetLiteral()];
+                            item.ClassMapping = ClassMapping.Create(t);
                         }
+                        else if (pm.Choice == ChoiceType.ResourceChoice)
+                        {
+                            if (pm.ElementType == typeof(Resource))
+                            {
+                                // This is not a constrained set of choices
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            // Note that ReturnType would have the type of the collection
+                            // where the ElementType is the type of the item in the collection
+                            // or where not a collection, both are the same value
+                            item.ClassMapping = ClassMapping.Create(pm.ElementType);
+                        }
+
+                        if (pm.ReturnType != pm.ElementType)
+                            item.IsArray = true;
 
                         // Now process all the children
                         Bookmark bm = nav.Bookmark();

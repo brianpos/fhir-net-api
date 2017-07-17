@@ -663,15 +663,15 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             int countFullTree = DumpTree(fullTree);
             System.Diagnostics.Debug.WriteLine("------------------");
             int countPrunedTree = DumpTree(prunedTree);
-            Assert.AreEqual(761, countFullTree);
-            Assert.AreEqual(51, countPrunedTree);
+            Assert.AreEqual(226, countFullTree);
+            Assert.AreEqual(45, countPrunedTree);
 
             System.Diagnostics.Debug.WriteLine("======================================");
 
             int countFullTree2 = DumpTree(fullTree2);
             System.Diagnostics.Debug.WriteLine("------------------");
             int countPrunedTree2 = DumpTree(prunedTree2);
-            Assert.AreEqual(585, countFullTree2);
+            Assert.AreEqual(192, countFullTree2);
             Assert.AreEqual(11, countPrunedTree2);
 
             Dictionary<string, string> mapPathsToLinkIds = new Dictionary<string, string>();
