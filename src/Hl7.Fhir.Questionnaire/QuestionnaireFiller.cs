@@ -21,6 +21,13 @@ namespace Hl7.Fhir.QuestionnaireServices
 {
     public static class QuestionnaireFiller
     {
+        class ItemContext
+        {
+            internal IEnumerable<Base> Data;
+            internal StructureItem Item;
+            internal Bundle Resources;
+        }
+
         /// <summary>
         /// This is effectively a variation on the $populate operation
         /// </summary>
@@ -36,15 +43,15 @@ namespace Hl7.Fhir.QuestionnaireServices
             qa.Questionnaire.Reference = "Questionnaire/" + questionnaire.Id;
 
             // Get the top level data context
-            StructureItem item = null;
-            Base data = RetrieveContextContent(questionnaire.Group, resources, ref item, questionnaire, source);
+            ItemContext data = RetrieveContextContent(questionnaire.Group, new ItemContext { Resources = resources }, questionnaire, source);
 
-            CreateAndPopulateGroup(questionnaire.Group, qa.Group, data, ref item, questionnaire, source);
+            CreateAndPopulateGroup(questionnaire.Group, qa.Group, data, questionnaire, source);
             return qa;
         }
 
-        private static Base RetrieveContextContent(IExtendable scopedNode, Base context, ref StructureItem item, Model.Questionnaire questionnaire, IResourceResolver source)
+        private static ItemContext RetrieveContextContent(IExtendable scopedNode, ItemContext item, Model.Questionnaire questionnaire, IResourceResolver source)
         {
+            string path = null;
             string definition = null;
             string linkId = null;
             if (scopedNode is Questionnaire.GroupComponent group)
@@ -65,18 +72,46 @@ namespace Hl7.Fhir.QuestionnaireServices
                     var si = StructureItemTree.GetStructureTree(definition, questionnaire, source);
                     if (si != null)
                     {
-                        item = si;
                         // now locate the resource of this type in the bundle
-                        if (context is Bundle bundle)
+                        var resource = item.Resources.GetResources().Where(i => i.GetType() == si.ClassMapping.NativeType).FirstOrDefault();
+                        if (resource != null)
                         {
-                            var resource = bundle.GetResources().Where(i => i.GetType() == si.ClassMapping.NativeType).FirstOrDefault();
-                            if (resource != null)
-                                return resource;
+                            ItemContext newContext = new ItemContext() { Item = si, Data = new List<Base> { resource } ,Resources = item.Resources };
+                            return newContext;
                         }
                     }
+                    // just pass through the provided context - no successful change was made
+                    return item;
+                }
+                // retrieve the referenced path
+                path = definition.Substring(definition.IndexOf("#") + 1);
+            }
+            else
+            {
+                path = linkId;
+            }
+
+            // Check to see if we need to navigate into a child part of the resource itself
+            if (!string.IsNullOrEmpty(path))
+            {
+                if (StructureItemTree.ContainsPath(item.Item, path))
+                {
+                    ItemContext newChildContext = new ItemContext() { Item = item.Item, Resources = item.Resources };
+                    List<Base> data = new List<Base>();
+                    foreach (var dataItem in item.Data)
+                    {
+                        StructureItem extra;
+                        IEnumerable<Base> prepopulatedValues = StructureItemTree.GetValues(item.Item, dataItem, path, linkId, out extra);
+                        data.AddRange(prepopulatedValues);
+                        newChildContext.Item = extra;
+                    }
+                    newChildContext.Data = data;
+                    return newChildContext;
                 }
             }
-            return context;
+
+            // just pass through the provided context - no change was made
+            return item; 
         }
         /*
         private static IElementNavigator RetrieveContextContent(IExtendable scopedNode, IElementNavigator parentContext)
@@ -149,7 +184,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             return parentContext;
         }
         */
-        private static List<QuestionnaireResponse.AnswerComponent> ExtractValue(Base contextData, Questionnaire.QuestionComponent qsource, ref StructureItem structureItem, IResourceResolver source)
+        private static List<QuestionnaireResponse.AnswerComponent> ExtractValue(ItemContext contextData, Questionnaire.QuestionComponent qsource, IResourceResolver source)
         {
             string definition = qsource.Definition()?.Value;
             string linkId = qsource.LinkId;
@@ -169,7 +204,12 @@ namespace Hl7.Fhir.QuestionnaireServices
                 // Nothing to process, so bail fast
                 return null;
             }
-            IEnumerable<Base> prepopulatedValues = StructureItemTree.GetValues(structureItem, contextData, path, linkId);
+            List<Base> prepopulatedValues = new List<Base>();
+            StructureItem extra = null;
+            foreach (var itemData in contextData.Data)
+            {
+                prepopulatedValues.AddRange(StructureItemTree.GetValues(contextData.Item, itemData, path, linkId, out extra));
+            }
 
             if (prepopulatedValues.Count() == 0)
                 return null; // no content to extract
@@ -342,6 +382,14 @@ namespace Hl7.Fhir.QuestionnaireServices
                             if (!qsource.Repeats.HasValue || !qsource.Repeats.Value)
                                 break;
                         }
+                        else if (item is ISystemAndCode primitive)
+                        {
+                            var a = new QuestionnaireResponse.AnswerComponent();
+                            results.Add(a);
+                            a.Value = new Coding(primitive.System, primitive.Code);
+                            if (!qsource.Repeats.HasValue || !qsource.Repeats.Value)
+                                break;
+                        }
                     }
                     break;
                 case Questionnaire.AnswerFormat.OpenChoice:
@@ -355,7 +403,15 @@ namespace Hl7.Fhir.QuestionnaireServices
                             if (!qsource.Repeats.HasValue || !qsource.Repeats.Value)
                                 break;
                         }
-                        if (item is FhirString)
+                        else if (item is ISystemAndCode primitive)
+                        {
+                            var a = new QuestionnaireResponse.AnswerComponent();
+                            results.Add(a);
+                            a.Value = new Coding(primitive.System, primitive.Code);
+                            if (!qsource.Repeats.HasValue || !qsource.Repeats.Value)
+                                break;
+                        }
+                        else if (item is FhirString)
                         {
                             var a = new QuestionnaireResponse.AnswerComponent();
                             results.Add(a);
@@ -411,7 +467,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             return results;
         }
         
-        private static void CreateAndPopulateGroup(Questionnaire.GroupComponent qg, QuestionnaireResponse.GroupComponent answer_group, Base contextData, ref StructureItem item, Model.Questionnaire questionnaire, IResourceResolver source)
+        private static void CreateAndPopulateGroup(Questionnaire.GroupComponent qg, QuestionnaireResponse.GroupComponent answer_group, ItemContext contextData, Model.Questionnaire questionnaire, IResourceResolver source)
         {
             // Initialize the base Group values
             answer_group.LinkId = qg.LinkId;
@@ -427,9 +483,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     var a = new QuestionnaireResponse.QuestionComponent();
                     a.LinkId = sq.LinkId;
                     a.Text = sq.Text;
-                    var newItem = item;
-                    a.Answer = ExtractValue(contextData, sq, ref newItem, source);
-                    answer_group.Question.Add(a);
+                    a.Answer = ExtractValue(contextData, sq, source);
 
                     // TODO: Check for a default value
                     if (a.Answer == null || a.Answer.Count == 0)
@@ -442,6 +496,8 @@ namespace Hl7.Fhir.QuestionnaireServices
                             // should we actually validate the default value is of the correct type?
                         }
                     }
+                    if (a.Answer != null && a.Answer.Count > 0)
+                        answer_group.Question.Add(a);
 
                     // Process any group items that this question has attached
                 }
@@ -454,16 +510,25 @@ namespace Hl7.Fhir.QuestionnaireServices
                 foreach (var sg in qg.Group)
                 {
                     // TODO: Source content from DataElements if required
-                    StructureItem item2 = item;
-                    Base dataForGroup = RetrieveContextContent(sg, contextData, ref item2, questionnaire, source);
+                    ItemContext dataForGroup = RetrieveContextContent(sg, contextData, questionnaire, source);
 
-                    // Check if this is a required group and no content was pre-populated.
-                    // if (sg.Required.HasValue && sg.Required.Value && answer_group.Group.Count == 0)
+                    if (dataForGroup.Data.Any())
+                    {
+                        if (sg.Repeats.Value == false)
+                            dataForGroup.Data = dataForGroup.Data.Take(1);
+                        foreach (var data in dataForGroup.Data)
+                        {
+                            var newg = new QuestionnaireResponse.GroupComponent();
+                            answer_group.Group.Add(newg);
+                            CreateAndPopulateGroup(sg, newg, new ItemContext { Data = new []{ data }, Item = dataForGroup.Item, Resources = dataForGroup.Resources }, questionnaire, source);
+                        }
+                    }
+                    else
                     {
                         // There must be at least 1 group, so lets create one.
                         var newg = new QuestionnaireResponse.GroupComponent();
                         answer_group.Group.Add(newg);
-                        CreateAndPopulateGroup(sg, newg, dataForGroup, ref item2, questionnaire, source);
+                        CreateAndPopulateGroup(sg, newg, dataForGroup, questionnaire, source);
                     }
                 }
             }

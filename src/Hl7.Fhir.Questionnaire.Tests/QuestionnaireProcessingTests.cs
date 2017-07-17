@@ -412,7 +412,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
                 Text = "Gender",
                 LinkId = "Practitioner.gender",
                 Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
-                    { Value = new Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male") }
+                    { Value = new Coding("http://hl7.org/fhir/administrative-gender", "male") }
                 }
             });
             gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
@@ -674,9 +674,9 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual(192, countFullTree2);
             Assert.AreEqual(11, countPrunedTree2);
 
-            Dictionary<string, string> mapPathsToLinkIds = new Dictionary<string, string>();
-            StructureItemTree.BuildMapping(mapPathsToLinkIds, qPart1.Group);
-            StructureItemTree.PruneTree(prunedTree, mapPathsToLinkIds);
+            //Dictionary<string, string> mapPathsToLinkIds = new Dictionary<string, string>();
+            //StructureItemTree.BuildMapping(mapPathsToLinkIds, qPart1.Group);
+            //StructureItemTree.PruneTree(prunedTree, mapPathsToLinkIds);
         }
 
         private int DumpTree(StructureItem tree)
@@ -833,6 +833,19 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qr = qrP1.DeepCopy() as QuestionnaireResponse;
 
             Assert.IsTrue(qr.IsExactly(qrP1));
+        }
+
+
+        
+        [TestMethod]
+        public void QuestionnaireCreateCustomSlotDefinition()
+        {
+            string xml = System.IO.File.ReadAllText(
+                @"C:\git\EHPD\Hcx.Directory.FhirApi\App_Data\customslot.structuredefinition.xml");
+
+            var pracSd = new Serialization.FhirXmlParser().Parse<StructureDefinition>(xml);
+            var si = StructureItemTree.CreateStructureTree(pracSd, _source);
+            DumpTree(si);
         }
     }
 }

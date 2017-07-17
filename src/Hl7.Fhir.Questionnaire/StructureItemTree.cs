@@ -48,14 +48,16 @@ namespace Hl7.Fhir.QuestionnaireServices
             return null;
         }
 
-        public static IEnumerable<Base> GetValues(StructureItem item, Base data, string path, string linkId)
+        public static IEnumerable<Base> GetValues(StructureItem item, Base data, string path, string linkId, out StructureItem resultItem)
         {
             List<Base> results = new List<Base>();
             if (item.Path == path)
             {
                 results.Add(data);
+                resultItem = item;
                 return results;
             }
+            resultItem = null;
             foreach (var child in item.Children)
             {
                 if (ContainsPath(child, path))
@@ -67,14 +69,14 @@ namespace Hl7.Fhir.QuestionnaireServices
                         IEnumerable<Base> result = (IEnumerable<Base>)pm.GetValue(data);
                         foreach (var itemInCol in result)
                         {
-                            var moreData = GetValues(child, itemInCol, path, linkId);
+                            var moreData = GetValues(child, itemInCol, path, linkId, out resultItem);
                             results.AddRange(moreData);
                         }
                     }
                     else
                     {
                         Base result = (Base)pm.GetValue(data);
-                        var moreData = GetValues(child, result, path, linkId);
+                        var moreData = GetValues(child, result, path, linkId, out resultItem);
                         results.AddRange(moreData);
                     }
                     break;
@@ -394,6 +396,19 @@ namespace Hl7.Fhir.QuestionnaireServices
                     if (HasFixedValueInChild(item))
                         return true;
                 }
+            }
+            return false;
+        }
+
+        private static bool IsChildOf(StructureItem potentialChild, StructureItem parent)
+        {
+            if (parent.Children.Contains(potentialChild))
+                return true;
+            foreach(var child in parent.Children)
+            {
+                // check the other children to see if its there too
+                if (IsChildOf(potentialChild, child))
+                    return true;
             }
             return false;
         }
