@@ -103,8 +103,12 @@ namespace Hl7.Fhir.QuestionnaireServices
                     if (filteredGroups.Count > 0)
                     {
                         var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
-                        object value = fac.Create(pm.ReturnType);
-                        pm.SetValue(instance, value);
+                        object value = pm.GetValue(instance);
+                        if (value == null)
+                        {
+                            value = fac.Create(pm.ReturnType);
+                            pm.SetValue(instance, value);
+                        }
                         if (pm.ReturnType != pm.ElementType)
                         {
                             // this is a collection
