@@ -528,7 +528,7 @@ namespace Hl7.Fhir.QuestionnaireServices
 
                     if (dataForGroup.Data.Any())
                     {
-                        if (sg.Repeats.Value == false)
+                        if (!sg.Repeats.HasValue || sg.Repeats.Value == false)
                             dataForGroup.Data = dataForGroup.Data.Take(1);
                         foreach (var data in dataForGroup.Data)
                         {
