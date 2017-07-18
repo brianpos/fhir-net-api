@@ -102,11 +102,17 @@ namespace Hl7.Fhir.QuestionnaireServices
                     {
                         StructureItem extra;
                         IEnumerable<Base> prepopulatedValues = StructureItemTree.GetValues(item.Item, dataItem, path, linkId, out extra);
-                        data.AddRange(prepopulatedValues);
-                        newChildContext.Item = extra;
+                        if (prepopulatedValues.Any())
+                        {
+                            data.AddRange(prepopulatedValues);
+                            newChildContext.Item = extra;
+                        }
                     }
-                    newChildContext.Data = data;
-                    return newChildContext;
+                    if (data.Any())
+                    {
+                        newChildContext.Data = data;
+                        return newChildContext;
+                    }
                 }
             }
 

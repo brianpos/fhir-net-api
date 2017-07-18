@@ -51,6 +51,58 @@ namespace Hl7.Fhir.QuestionnaireServices
         public static IEnumerable<Base> GetValues(StructureItem item, Base data, string path, string linkId, out StructureItem resultItem)
         {
             List<Base> results = new List<Base>();
+
+            // Consider if slicing impacts the content here
+            if (item?.ed?.Slicing?.Discriminator.FirstOrDefault() != null)
+            {
+                string pathForSlice = item.ed.Slicing?.Discriminator.FirstOrDefault();
+                if (!path.EndsWith(pathForSlice))
+                {
+                    StructureItem itemAtValue;
+                    var valuesAtSlice = GetValues(item, data, path + "." + pathForSlice, null, out itemAtValue);
+                    // check this value with those in the slice definition
+                    foreach (var thisValue in valuesAtSlice)
+                    {
+                        foreach (var fixedValue in item.FixedValuesInSlices)
+                        {
+                            if (thisValue.IsExactly(fixedValue))
+                            {
+                                resultItem = null;
+                                return results;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (!string.IsNullOrEmpty(item.SlicedPath) && item.FixedValuesInSlices.Count > 0)
+            {
+                // Is this a slice that needs a fixed value
+                if (path != item.ed.Path + "." + item.SlicedPath)
+                {
+                    StructureItem itemAtValue;
+                    var valuesAtSlice = GetValues(item, data, item.ed.Path + "." + item.SlicedPath, null, out itemAtValue);
+                    bool sliceFixedValueFound = false;
+                    foreach (var thisValue in valuesAtSlice)
+                    {
+                        foreach (var fixedValue in item.FixedValuesInSlices)
+                        {
+                            if (thisValue.IsExactly(fixedValue))
+                            {
+                                sliceFixedValueFound = true;
+                                break;
+                            }
+                        }
+                        if (sliceFixedValueFound)
+                            break;
+                    }
+                    if (!sliceFixedValueFound)
+                    {
+                        resultItem = null;
+                        return results;
+                    }
+                }
+            }
+
             if (item.Path == path)
             {
                 results.Add(data);
@@ -69,15 +121,28 @@ namespace Hl7.Fhir.QuestionnaireServices
                         IEnumerable<Base> result = (IEnumerable<Base>)pm.GetValue(data);
                         foreach (var itemInCol in result)
                         {
-                            var moreData = GetValues(child, itemInCol, path, linkId, out resultItem);
-                            results.AddRange(moreData);
+                            StructureItem itemAtValue;
+                            var moreData = GetValues(child, itemInCol, path, linkId, out itemAtValue);
+                            if (moreData.Any())
+                            {
+                                resultItem = itemAtValue;
+                                results.AddRange(moreData);
+                            }
                         }
                     }
                     else
                     {
                         Base result = (Base)pm.GetValue(data);
-                        var moreData = GetValues(child, result, path, linkId, out resultItem);
-                        results.AddRange(moreData);
+                        if (result != null)
+                        {
+                            StructureItem itemAtValue;
+                            var moreData = GetValues(child, result, path, linkId, out itemAtValue);
+                            if (moreData.Any())
+                            {
+                                resultItem = itemAtValue;
+                                results.AddRange(moreData);
+                            }
+                        }
                     }
                     break;
                 }
@@ -143,6 +208,7 @@ namespace Hl7.Fhir.QuestionnaireServices
 
         private static void CreateStructureChildren(StructureItem parent, ElementDefinitionNavigator nav, IResourceResolver source, string replaceRoot = null)
         {
+            StructureItem slicingItem = null;
             do
             {
                 // if this is the extension property, and it hasn't been sliced, then we will skip them
@@ -169,17 +235,28 @@ namespace Hl7.Fhir.QuestionnaireServices
                         // System.Diagnostics.Debug.WriteLine($"skipping {item.Path} ({nav.PathName}) {item.ExtensionUrl}");
                         continue;
                     }
+                    if (slicingItem != null && nav.Path != slicingItem.Path)
+                    {
+                        slicingItem = null;
+                    }
+
                     if (item.ed.Name != null)
                     {
                         // Debug.WriteLine($"  Name: {item.ed.Name}");
                         if (!nav.Current.IsMappedExtension()) // as this would already be there
                             item.Path += ":" + nav.Current.Name; // and add this into the property names
                     }
-                    // System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]{(nav.Current.Fixed != null ? " fixed value" : "")}");
+                    System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]{(nav.Current.Fixed != null ? " fixed value" : "")}");
 
                     if (item.ed.Slicing != null)
                     {
                         Debug.WriteLine($"  Discriminator: {String.Join(", ", item.ed.Slicing.Discriminator)}");
+                        slicingItem = item;
+                    }
+
+                    if (item?.ed?.Fixed != null)
+                    {
+                        Debug.WriteLine($"Fixed Value for {item.Path}: {item?.ed?.Fixed}");
                     }
 
                     // retrieve the type of this property
@@ -251,9 +328,34 @@ namespace Hl7.Fhir.QuestionnaireServices
                             }
                         }
                     }
+                    // Check for fixed values to put back into the slice parent
+                    if (slicingItem != null && slicingItem != item)
+                    {
+                        string path = slicingItem.Path + "." + slicingItem.ed.Slicing.Discriminator.FirstOrDefault();
+                        Element fixedValue = GetFixedValue(item, path);
+                        if (fixedValue != null)
+                        {
+                            slicingItem.FixedValuesInSlices.Add(fixedValue);
+                            item.FixedValuesInSlices.Add(fixedValue);
+                        }
+                        item.SlicedPath = slicingItem.ed.Slicing.Discriminator.FirstOrDefault();
+                    }
                 }
             }
             while (nav.MoveToNext());
+        }
+
+        private static Element GetFixedValue(StructureItem item, string path)
+        {
+            if (item.Path == path)
+                return item.ed.Fixed;
+            foreach (var child in item.Children)
+            {
+                var result = GetFixedValue(child, path);
+                if (result != null)
+                    return result;
+            }
+            return null;
         }
 
         internal static void BuildMapping(Dictionary<string, string> mapPathsToLinkIds, Questionnaire.GroupComponent group)
@@ -404,7 +506,7 @@ namespace Hl7.Fhir.QuestionnaireServices
         {
             if (parent.Children.Contains(potentialChild))
                 return true;
-            foreach(var child in parent.Children)
+            foreach (var child in parent.Children)
             {
                 // check the other children to see if its there too
                 if (IsChildOf(potentialChild, child))

@@ -59,15 +59,24 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var si = StructureItemTree.CreateStructureTree(pracSd, _source);
 
             var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, GetPractitionerQuestionnaire(), GetPractitionerQuestionnaireResponse());
+
+            if (prac != null)
+                System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(prac));
+
             Assert.AreEqual(true, prac.Active);
             Assert.AreEqual(AdministrativeGender.Male, prac.Gender);
             Assert.AreEqual("1970", prac.BirthDate);
             Assert.AreEqual(2, prac.Qualification?.Count);
             Assert.AreEqual("Brian Postlethwaite", prac.Name?.Text);
-            // Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
+            Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
             Assert.AreEqual("Certification 3 - Aged Care", prac.Qualification[0].Code.Coding[0].Display);
             Assert.AreEqual("2017", prac.Qualification[0].Period.End);
             Assert.AreEqual("William Angliss TAFE", prac.Qualification[0].Issuer.Display);
+
+            Assert.AreEqual("cert3-specialistcare", prac.Qualification[1].Code.Coding[0].Code);
+            Assert.AreEqual("Certification 3 - Specialist Care", prac.Qualification[1].Code.Coding[0].Display);
+            Assert.AreEqual("2013", prac.Qualification[1].Period.End);
+            Assert.AreEqual("St Vincents Private Medical School", prac.Qualification[1].Issuer.Display);
         }
 
         Questionnaire GetPractitionerQuestionnaire()
@@ -187,14 +196,14 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qr.Group.Group.Add(gCerts);
             gCerts.Text = "Qualifications";
             gCerts.LinkId = "Practitioner.qualification";
-            //gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
-            //{
-            //    Text = "Code",
-            //    LinkId = "Practitioner.qualification.code.coding.code",
-            //    Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
-            //        { Value = new FhirString("cert3-agedcare") }
-            //    }
-            //});
+            gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Code",
+                LinkId = "Practitioner.qualification.code.coding.code",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new FhirString("cert3-agedcare") }
+                }
+            });
             gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
             {
                 Text = "Display",
@@ -224,20 +233,20 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qr.Group.Group.Add(gCerts);
             gCerts.Text = "Qualifications";
             gCerts.LinkId = "Practitioner.qualification";
-            //gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
-            //{
-            //    Text = "Code",
-            //    LinkId = "Practitioner.qualification.code.coding.code",
-            //    Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
-            //        { Value = new FhirString("cert3-communitycare") }
-            //    }
-            //});
+            gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Code",
+                LinkId = "Practitioner.qualification.code.coding.code",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new FhirString("cert3-specialistcare") }
+                }
+            });
             gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
             {
                 Text = "Display",
-                LinkId = "Practitioner.qualification.code.display",
+                LinkId = "Practitioner.qualification.code.coding.display",
                 Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
-                    { Value = new FhirString("Certification 3 - Community Care") }
+                    { Value = new FhirString("Certification 3 - Specialist Care") }
                 }
             });
             gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
@@ -253,7 +262,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
                 Text = "Issued by",
                 LinkId = "Practitioner.qualification.issuer.display",
                 Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
-                    { Value = new FhirString("Murray Goulburn TAFE") }
+                    { Value = new FhirString("St Vincents Private Medical School") }
                 }
             });
 
@@ -276,7 +285,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual("1970", prac.BirthDate);
             Assert.AreEqual(2, prac.Qualification?.Count);
             Assert.AreEqual("Brian Postlethwaite", prac.Name?.Text);
-            // Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
+            Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
             Assert.AreEqual("Certification 3 - Aged Care", prac.Qualification[0].Code.Coding[0].Display);
             Assert.AreEqual("2017", prac.Qualification[0].Period.End);
             Assert.AreEqual("William Angliss TAFE", prac.Qualification[0].Issuer.Display);
@@ -445,14 +454,14 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qr.Group.Group.Add(gCerts);
             gCerts.Text = "Qualifications";
             gCerts.LinkId = "Practitioner.qualification";
-            //gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
-            //{
-            //    Text = "Code",
-            //    LinkId = "Practitioner.qualification.code.coding.code",
-            //    Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
-            //        { Value = new FhirString("cert3-agedcare") }
-            //    }
-            //});
+            gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Code",
+                LinkId = "Practitioner.qualification.code.coding.code",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new FhirString("cert3-agedcare") }
+                }
+            });
             gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
             {
                 Text = "Display",
@@ -482,14 +491,14 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qr.Group.Group.Add(gCerts);
             gCerts.Text = "Qualifications";
             gCerts.LinkId = "Practitioner.qualification";
-            //gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
-            //{
-            //    Text = "Code",
-            //    LinkId = "Practitioner.qualification.code.coding.code",
-            //    Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
-            //        { Value = new FhirString("cert3-communitycare") }
-            //    }
-            //});
+            gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Code",
+                LinkId = "Practitioner.qualification.code.coding.code",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new FhirString("cert3-communitycare") }
+                }
+            });
             gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
             {
                 Text = "Display",
@@ -759,7 +768,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual("1970", prac.BirthDate);
             Assert.AreEqual(2, prac.Qualification?.Count);
             Assert.AreEqual("Brian Postlethwaite", prac.Name?.Text);
-            // Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
+            Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
             Assert.AreEqual("Certification 3 - Aged Care", prac.Qualification[0].Code.Coding[0].Display);
             Assert.AreEqual("2017", prac.Qualification[0].Period.End);
             Assert.AreEqual("William Angliss TAFE", prac.Qualification[0].Issuer.Display);
@@ -807,7 +816,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual("1970", prac.BirthDate);
             Assert.AreEqual(2, prac.Qualification?.Count);
             Assert.AreEqual("Brian Postlethwaite", prac.Name?.Text);
-            // Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
+            Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
             Assert.AreEqual("Certification 3 - Aged Care", prac.Qualification[0].Code.Coding[0].Display);
             Assert.AreEqual("2017", prac.Qualification[0].Period.End);
             Assert.AreEqual("William Angliss TAFE", prac.Qualification[0].Issuer.Display);

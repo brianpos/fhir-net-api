@@ -46,6 +46,10 @@ namespace Hl7.Fhir.QuestionnaireServices
 
         public ElementDefinition ed { get; set; }
 
+        // the bits to support the slicing
+        public List<Element> FixedValuesInSlices { get; set; } = new List<Element>();
+        public string SlicedPath { get; set; }
+
         public List<StructureItem> Children { get; set; } = new List<StructureItem>();
 
         public List<ElementDefinition> ValidationRules { get; set; } = new List<ElementDefinition>();
