@@ -349,6 +349,14 @@ namespace Hl7.Fhir.QuestionnaireServices
                             if (!qsource.Repeats.HasValue || !qsource.Repeats.Value)
                                 break;
                         }
+                        if (item is Primitive primitive)
+                        {
+                            var a = new QuestionnaireResponse.AnswerComponent();
+                            results.Add(a);
+                            a.Value = new FhirString(primitive.ObjectValue as string);
+                            if (!qsource.Repeats.HasValue || !qsource.Repeats.Value)
+                                break;
+                        }
                     }
                     break;
                 case Questionnaire.AnswerFormat.Text:
