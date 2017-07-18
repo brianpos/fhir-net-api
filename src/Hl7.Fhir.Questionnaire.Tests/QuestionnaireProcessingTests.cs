@@ -280,16 +280,26 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var si = StructureItemTree.CreateStructureTree(pracSd, _source);
 
             var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, GetExtendedPractitionerQuestionnaire(), GetExtendedPractitionerQuestionnaireResponse());
+
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(prac));
+
             Assert.AreEqual(true, prac.Active);
             Assert.AreEqual(AdministrativeGender.Male, prac.Gender);
             Assert.AreEqual("1970", prac.BirthDate);
             Assert.AreEqual(2, prac.Qualification?.Count);
             Assert.AreEqual("Brian Postlethwaite", prac.Name?.Text);
+            Assert.AreEqual("yes", prac.GetStringExtension("http://healthconnex.com.au/hcxd/Practitioner/AppointmentRequired"));
+
             Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
             Assert.AreEqual("Certification 3 - Aged Care", prac.Qualification[0].Code.Coding[0].Display);
             Assert.AreEqual("2017", prac.Qualification[0].Period.End);
             Assert.AreEqual("William Angliss TAFE", prac.Qualification[0].Issuer.Display);
-            Assert.AreEqual("yes", prac.GetStringExtension("http://healthconnex.com.au/hcxd/Practitioner/AppointmentRequired"));
+
+            Assert.AreEqual("cert3-communitycare", prac.Qualification[1].Code.Coding[0].Code);
+            Assert.AreNotEqual("Certification 3 - Community Care", prac.Qualification[1].Code.Coding[0].Display); // from the Questionniare
+            Assert.AreEqual("Certificate 3 - Community Care", prac.Qualification[1].Code.Coding[0].Display); // from the fixed value
+            Assert.AreEqual("2013", prac.Qualification[1].Period.End);
+            Assert.AreEqual("Murray Goulburn TAFE", prac.Qualification[1].Issuer.Display);
         }
 
         Model.Questionnaire GetExtendedPractitionerQuestionnaire()
@@ -368,31 +378,31 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             gCerts = new Questionnaire.GroupComponent();
             q.Group.Group.Add(gCerts);
             gCerts.Text = "Qualifications - Community cert 3";
-            gCerts.LinkId = "Practitioner.qualification:certificate3-agedcare";
+            gCerts.LinkId = "Practitioner.qualification:certificate3-community";
             gCerts.Repeats = false;
             gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Code",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification:certificate3-agedcare.code.coding.code"
+                LinkId = "Practitioner.qualification:certificate3-community.code.coding.code"
             });
             gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Display",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification:certificate3-agedcare.code.coding.display"
+                LinkId = "Practitioner.qualification:certificate3-community.code.coding.display"
             });
             gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Completion Year",
                 Type = Questionnaire.AnswerFormat.DateTime,
-                LinkId = "Practitioner.qualification:certificate3-agedcare.period.end"
+                LinkId = "Practitioner.qualification:certificate3-community.period.end"
             });
             gCerts.Question.Add(new Questionnaire.QuestionComponent()
             {
                 Text = "Issued by",
                 Type = Questionnaire.AnswerFormat.String,
-                LinkId = "Practitioner.qualification:certificate3-agedcare.issuer.display"
+                LinkId = "Practitioner.qualification:certificate3-community.issuer.display"
             });
 
             return q;
@@ -489,12 +499,12 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
 
             gCerts = new QuestionnaireResponse.GroupComponent();
             qr.Group.Group.Add(gCerts);
-            gCerts.Text = "Qualifications";
-            gCerts.LinkId = "Practitioner.qualification";
+            gCerts.Text = "Qualifications - Community cert 3";
+            gCerts.LinkId = "Practitioner.qualification:certificate3-community";
             gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
             {
                 Text = "Code",
-                LinkId = "Practitioner.qualification.code.coding.code",
+                LinkId = "Practitioner.qualification:certificate3-community.code.coding.code",
                 Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
                     { Value = new FhirString("cert3-communitycare") }
                 }
@@ -502,7 +512,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
             {
                 Text = "Display",
-                LinkId = "Practitioner.qualification.code.display",
+                LinkId = "Practitioner.qualification:certificate3-community.code.coding.display",
                 Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
                     { Value = new FhirString("Certification 3 - Community Care") }
                 }
@@ -510,7 +520,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
             {
                 Text = "Completion Year",
-                LinkId = "Practitioner.qualification.period.end",
+                LinkId = "Practitioner.qualification:certificate3-community.period.end",
                 Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
                     { Value = new FhirDateTime("2013") }
                 }
@@ -518,7 +528,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             gCerts.Question.Add(new QuestionnaireResponse.QuestionComponent()
             {
                 Text = "Issued by",
-                LinkId = "Practitioner.qualification.issuer.display",
+                LinkId = "Practitioner.qualification:certificate3-community.issuer.display",
                 Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
                     { Value = new FhirString("Murray Goulburn TAFE") }
                 }
@@ -673,7 +683,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             System.Diagnostics.Debug.WriteLine("------------------");
             int countPrunedTree = DumpTree(prunedTree);
             Assert.AreEqual(226, countFullTree);
-            Assert.AreEqual(45, countPrunedTree);
+            Assert.AreEqual(36, countPrunedTree);
 
             System.Diagnostics.Debug.WriteLine("======================================");
 
@@ -691,7 +701,10 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         private int DumpTree(StructureItem tree)
         {
             int count = 1;
-            System.Diagnostics.Debug.WriteLine($"{tree.Path}");
+            if (!string.IsNullOrEmpty(tree.SlicedPath))
+                System.Diagnostics.Debug.WriteLine($"{tree.Path}\t\t{tree.FixedValuesInSlices?.Count}");
+            else
+                System.Diagnostics.Debug.WriteLine($"{tree.Path}\t\t-->{tree.SlicedPath}\t{tree.FixedValuesInSlices?.Count}");
             foreach (var item in tree.Children)
             {
                 count += DumpTree(item);
@@ -781,6 +794,14 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qr.Id = "prac-ext-demo-qr";
             // qr = qrP1.DeepCopy() as QuestionnaireResponse;
             System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qrP1));
+
+            // 1 property should be intentionally different (diff in Questionnaire than in structure def)
+            // so check for this in the output, then correct it before comparing that are the same
+            Assert.AreNotEqual("Certification 3 - Community Care", qr.Group.Group[2].Question[1].Answer[0].Value.ToString());// from the Questionniare
+            Assert.AreEqual("Certificate 3 - Community Care", qr.Group.Group[2].Question[1].Answer[0].Value.ToString()); // from the fixed value in SD
+
+            // now reset to the expected value in the source (which was wrong)
+            qr.Group.Group[2].Question[1].Answer[0].Value = new FhirString("Certification 3 - Community Care");
 
             if (qr != null)
                 System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qr));

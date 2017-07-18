@@ -77,10 +77,10 @@ namespace Hl7.Fhir.QuestionnaireServices
             else if (!string.IsNullOrEmpty(item.SlicedPath) && item.FixedValuesInSlices.Count > 0)
             {
                 // Is this a slice that needs a fixed value
-                if (path != item.ed.Path + "." + item.SlicedPath)
+                if (path != item.Path + "." + item.SlicedPath)
                 {
                     StructureItem itemAtValue;
-                    var valuesAtSlice = GetValues(item, data, item.ed.Path + "." + item.SlicedPath, null, out itemAtValue);
+                    var valuesAtSlice = GetValues(item, data, item.Path + "." + item.SlicedPath, null, out itemAtValue);
                     bool sliceFixedValueFound = false;
                     foreach (var thisValue in valuesAtSlice)
                     {
@@ -219,6 +219,14 @@ namespace Hl7.Fhir.QuestionnaireServices
                     var item = new StructureItem() { id = nav.Current.ElementId, code = nav.Current.Code?.FirstOrDefault()?.Code, Path = nav.Path, FhirpathExpression = nav.PathName, ed = nav.Current };
                     if (replaceRoot != null)
                         item.Path = replaceRoot + item.Path.Substring(item.Path.IndexOf("."));
+
+                    if (parent.ed != null && parent.Path != parent.ed.Path)
+                    {
+                        if (nav.Path.StartsWith(parent.ed.Path))
+                        {
+                            item.Path = item.Path.Replace(parent.ed.Path, parent.Path);
+                        }
+                    }
                     if (nav.Current.IsMappedExtension())
                     {
                         item.ExtensionUrl = nav.Current.PrimaryTypeProfile();
@@ -240,12 +248,12 @@ namespace Hl7.Fhir.QuestionnaireServices
                         slicingItem = null;
                     }
 
-                    if (item.ed.Name != null)
-                    {
-                        // Debug.WriteLine($"  Name: {item.ed.Name}");
-                        if (!nav.Current.IsMappedExtension()) // as this would already be there
-                            item.Path += ":" + nav.Current.Name; // and add this into the property names
-                    }
+                    //if (item.ed.Name != null)
+                    //{
+                    //    // Debug.WriteLine($"  Name: {item.ed.Name}");
+                    //    if (!nav.Current.IsMappedExtension()) // as this would already be there
+                    //        item.Path += ":" + nav.Current.Name; // and add this into the property names
+                    //}
                     System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]{(nav.Current.Fixed != null ? " fixed value" : "")}");
 
                     if (item.ed.Slicing != null)
@@ -266,6 +274,15 @@ namespace Hl7.Fhir.QuestionnaireServices
                         // skip over the raw values
                         if (pm.ReturnType == pm.ElementType && !pm.ElementType.CanBeTreatedAsType(typeof(Base)))
                             continue;
+                    }
+                    if (slicingItem != null && slicingItem != item)
+                    {
+                        if (item.ed.Name != null)
+                        {
+                            // Debug.WriteLine($"  Name: {item.ed.Name}");
+                            if (!nav.Current.IsMappedExtension()) // as this would already be there
+                                item.Path += ":" + nav.Current.Name; // and add this into the property names
+                        }
                     }
 
                     parent.Children.Add(item);
@@ -331,7 +348,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     // Check for fixed values to put back into the slice parent
                     if (slicingItem != null && slicingItem != item)
                     {
-                        string path = slicingItem.Path + "." + slicingItem.ed.Slicing.Discriminator.FirstOrDefault();
+                        string path = item.Path + "." + slicingItem.ed.Slicing.Discriminator.FirstOrDefault();
                         Element fixedValue = GetFixedValue(item, path);
                         if (fixedValue != null)
                         {
