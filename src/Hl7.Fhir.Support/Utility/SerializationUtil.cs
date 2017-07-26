@@ -49,7 +49,16 @@ namespace Hl7.Fhir.Utility
             return WrapXmlReader(XmlReader.Create(new StringReader(SerializationUtil.SanitizeXml(xml))));
         }
 
-        public static JsonWriter CreateJsonTextWriter(TextWriter writer)
+        /// <summary>
+        /// Create the JsonTextWriter to stream the content too
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This returns the JsonTextWriter instead of just the JsonWriter so that you may have control
+        /// over some of its properties, such as the ArrayPool to optimize memory usage and reduce garbage collection
+        /// </remarks>
+        public static JsonTextWriter CreateJsonTextWriter(TextWriter writer)
         {
             return new BetterDecimalJsonTextWriter(writer);
         }
