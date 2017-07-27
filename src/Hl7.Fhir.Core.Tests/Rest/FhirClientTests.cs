@@ -446,6 +446,7 @@ namespace Hl7.Fhir.Tests.Rest
             pat.Id = null;
             pat.Identifier.Clear();
             pat.Identifier.Add(new Identifier("http://hl7.org/test/2", "99999"));
+            pat.Meta.Profile = null;
 
             System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(pat));
 
