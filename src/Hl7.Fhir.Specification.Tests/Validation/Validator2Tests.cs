@@ -35,6 +35,7 @@ namespace Hl7.Fhir.Specification.Tests.Validation
         [Fact(DisplayName = "NewValdation2Tester")]
         public void NewValdation2Tester()
         {
+            FhirPath.ElementNavFhirExtensions.PrepareFhirSymbolTableFunctions();
             var sd = _resolver.FindStructureDefinition("http://example.com/StructureDefinition/patient-telecom-slice-ek");
             Assert.NotNull(sd);
             var snapgen = new SnapshotGenerator(_resolver);
