@@ -897,7 +897,10 @@ namespace Hl7.Fhir.Rest
             //        I would imagine that a null parameters object is different to an empty one?
             // EK: What else could we do?  POST an empty body?  We cannot use GET unless the caller indicates this is an
             // idempotent call....
-            if (parameters == null) parameters = new Parameters();
+            // Brian: when useGet = true (as with the [base]/$Meta operation - MetaAsync) it should be null
+            //        as otherwise it will try and post that empty parameters resource
+            //        This is picked up in the ManipulateMeta unit test
+            if (parameters == null && !useGet) parameters = new Parameters();
 
             Bundle tx;
 
