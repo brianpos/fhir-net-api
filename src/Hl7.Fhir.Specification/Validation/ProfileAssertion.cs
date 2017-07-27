@@ -224,7 +224,7 @@ namespace Hl7.Fhir.Validation
         }
 
         /// <summary>
-        /// Validates the instance, declared and stated profiles for consistenty.
+        /// Validates the instance type, declared and stated profiles for consistenty.
         /// </summary>
         /// <returns></returns>
         public OperationOutcome Validate()
@@ -245,14 +245,14 @@ namespace Hl7.Fhir.Validation
             {
                 if (DeclaredType != null)
                 {
-                    if (!ModelInfo.IsInstanceTypeFor(DeclaredType.BaseType(), InstanceType.BaseType()))
+                    if (!ModelInfo.IsInstanceTypeFor(DeclaredType.Type, InstanceType.Type))
                         outcome.AddIssue($"The declared type of the element ({DeclaredType.ReadableName()}) is incompatible with that of the instance ('{InstanceType.ReadableName()}')", 
                             Issue.CONTENT_ELEMENT_HAS_INCORRECT_TYPE, _path);
                 }
 
                 foreach (var type in StatedProfiles)
                 {
-                    if (!ModelInfo.IsInstanceTypeFor(type.BaseType(), InstanceType.BaseType()))
+                    if (!ModelInfo.IsInstanceTypeFor(type.Type, InstanceType.Type))
                         outcome.AddIssue($"Instance of type '{InstanceType.ReadableName()}' is incompatible with the stated profile '{type.Url}' which is constraining constrained type '{type.ReadableName()}'", 
                             Issue.CONTENT_ELEMENT_HAS_INCORRECT_TYPE, _path);
                 }
@@ -261,11 +261,11 @@ namespace Hl7.Fhir.Validation
             // All stated profiles should be profiling the same core type
             if (StatedProfiles.Any())
             {
-                var baseTypes = StatedProfiles.Select(p => p.BaseType()).Distinct().ToList();
+                var baseTypes = StatedProfiles.Select(p => p.Type).Distinct().ToList();
 
                 if (baseTypes.Count > 1)
                 {
-                    var combinedNames = String.Join(" and ", baseTypes.Select(bt => bt.GetLiteral()));
+                    var combinedNames = String.Join(" and ", baseTypes);
                     outcome.AddIssue($"The stated profiles are constraints on multiple different core types ({combinedNames}), which can never be satisfied.", 
                         Issue.CONTENT_MISMATCHING_PROFILES, _path);
                 }
@@ -274,7 +274,7 @@ namespace Hl7.Fhir.Validation
                     // The stated profiles should be compatible with the declared type of the element
                     if (DeclaredType != null)
                     {
-                        if (!ModelInfo.IsInstanceTypeFor(DeclaredType.BaseType(), baseTypes.Single()))
+                        if (!ModelInfo.IsInstanceTypeFor(DeclaredType.Type, baseTypes.Single()))
                             outcome.AddIssue($"The stated profiles are all constraints on '{baseTypes.Single()}', which is incompatible with the declared type '{DeclaredType.ReadableName()}' of the element",
                                 Issue.CONTENT_MISMATCHING_PROFILES, _path);
                     }
@@ -299,12 +299,10 @@ namespace Hl7.Fhir.Validation
                     // Remove redundant bases, since the snapshots will contain their constraints anyway.
                     // Note: we're not doing a full closure by resolving all bases for performance sake 
                     var result = StatedProfiles.ToList();
-                    var bases = StatedProfiles.Where(sp => sp.BaseDefinition != null && sp.Derivation == StructureDefinition.TypeDerivationRule.Specialization).Select(sp => sp.BaseDefinition).Distinct().ToList();
-                    // var bases = StatedProfiles.Where(sp => sp.BaseDefinition != null).Select(sp => sp.BaseDefinition).Distinct().ToList();
-                    bases.AddRange(StatedProfiles.Where(sp => sp.Type != null)
+                    var bases = StatedProfiles.Where(sp => sp.BaseDefinition != null).Select(sp => sp.BaseDefinition).Distinct().ToList();
+                    bases.AddRange(StatedProfiles.Where(sp => sp.Type != null && sp.Derivation == StructureDefinition.TypeDerivationRule.Constraint)
                         .Select(sp => ModelInfo.CanonicalUriForFhirCoreType(sp.Type)).Distinct());
-
-                    // result.RemoveAll(r => bases.Contains(r.Url));
+                    result.RemoveAll(r => bases.Contains(r.Url));
                     _lastMinimalSet = result;
                 }
 
@@ -312,7 +310,9 @@ namespace Hl7.Fhir.Validation
                 //  * If the declared type is a profile, it is more specific than the instance
                 //  * If the declared type is a concrete core type, it is as specific as the instance
                 // In both cases return the declared type.
-                else if (DeclaredType?.Derivation == StructureDefinition.TypeDerivationRule.Constraint)
+                else if (DeclaredType != null &&
+                            ( DeclaredType.IsConstraint ||
+                              (DeclaredType.IsCoreDefinition && DeclaredType.Abstract==false) ))
                     _lastMinimalSet = new[] { DeclaredType };
 
                 // Else, all we have left is the instance type

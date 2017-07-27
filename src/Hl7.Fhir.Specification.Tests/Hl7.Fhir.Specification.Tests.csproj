@@ -13,13 +13,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Hl7.Fhir.Core\Hl7.Fhir.STU3.csproj" />
+    <ProjectReference Include="..\Hl7.Fhir.Core\Hl7.Fhir.Core.csproj" />
     <ProjectReference Include="..\Hl7.Fhir.Specification\Hl7.Fhir.Specification.csproj" />
     <ProjectReference Include="..\Hl7.Fhir.Support\Hl7.Fhir.Support.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-      <PackageReference Include="Hl7.Fhir.Support" Version="0.4.2-alpha4" />
       <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
       <PackageReference Include="MSTest.TestAdapter" Version="1.1.14" />
       <PackageReference Include="MSTest.TestFramework" Version="1.1.14" />
@@ -51,8 +50,6 @@
     <Content Include="..\Hl7.Fhir.Specification\data\profiles-types.xml" Link="TestData\snapshot-test\profiles-types.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestData\snapshot-test\Vadim\structure.cdstools-basecancer.xml.dstu2" />
-    <Content Include="TestData\snapshot-test\Vadim\structure.cdstools-typedstage.xml.dstu2" />
   </ItemGroup>
 
   <!-- Necessary to make the Test Explorer find the tests in this assembly 

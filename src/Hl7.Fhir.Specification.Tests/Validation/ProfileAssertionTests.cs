@@ -16,14 +16,12 @@ namespace Hl7.Fhir.Validation
         public Validator Validator { get; }
         public ValidationFixture()
         {
-            var zip = ZipSource.CreateValidationSource();
-
             Resolver = new CachedResolver(
-                new MultiResolver(
-                    new TestProfileArtifactSource(),
-                    new DirectorySource(@"TestData\validation"),
-                    zip
-                    ));
+                    new MultiResolver(
+                        new BasicValidationTests.BundleExampleResolver(@"TestData\validation"),
+                        new DirectorySource(@"TestData\validation"),
+                        new TestProfileArtifactSource(),
+                        new ZipSource("specification.zip")));
 
             var ctx = new ValidationSettings()
             {
@@ -33,6 +31,7 @@ namespace Hl7.Fhir.Validation
                 Trace = false,
                 ResolveExteralReferences = true
             };
+
 
             Validator = new Validator(ctx);
         }
@@ -108,12 +107,12 @@ namespace Hl7.Fhir.Validation
             Assert.Contains("is incompatible with that of the instance", report.ToString());
         }
 
-        [Fact(Skip = "Need to adapt for STU3")]
+        [Fact]
         public void QuantityElement()
         {
             var assertion = new ProfileAssertion("Patient.name[0]", resolve);
-            assertion.SetInstanceType(FHIRAllTypes.Quantity);
-            assertion.SetDeclaredType(FHIRAllTypes.Age);
+            assertion.SetInstanceType(FHIRAllTypes.Age);
+            assertion.SetDeclaredType(FHIRAllTypes.Quantity);
 
             Assert.True(assertion.Validate().Success);
             Assert.Single(assertion.MinimalProfiles, assertion.DeclaredType);
@@ -124,7 +123,7 @@ namespace Hl7.Fhir.Validation
             Assert.Contains("is incompatible with that of the instance", report.ToString());
         }
 
-        [Fact(Skip = "Need to adapt for STU3")]
+        [Fact]
         public void ProfiledElement()
         {
             var assertion = new ProfileAssertion("Patient.identifier[0]", resolve);
@@ -163,7 +162,7 @@ namespace Hl7.Fhir.Validation
         }
 
 
-        [Fact(Skip = "Need to adapt for STU3")]
+        [Fact]
         public void ResourceWithStatedProfiles()
         {
             var assertion = new ProfileAssertion("Observation", resolve);

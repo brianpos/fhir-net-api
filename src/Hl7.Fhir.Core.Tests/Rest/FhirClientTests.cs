@@ -25,11 +25,13 @@ namespace Hl7.Fhir.Tests.Rest
         //public static Uri testEndpoint = new Uri("http://localhost.fiddler:1396/fhir");
         //public static Uri testEndpoint = new Uri("https://localhost:44346/fhir");
         //public static Uri testEndpoint = new Uri("http://localhost:1396/fhir");
-        public static Uri testEndpoint = new Uri("http://fhir3.healthintersections.com.au/open");
+        public static Uri testEndpoint = new Uri("http://test.fhir.org/r3");
         //public static Uri testEndpoint = new Uri("https://api.fhir.me");
         //public static Uri testEndpoint = new Uri("http://fhirtest.uhn.ca/baseDstu3");
         //public static Uri testEndpoint = new Uri("http://localhost:49911/fhir");
         //public static Uri testEndpoint = new Uri("http://sqlonfhir-stu3.azurewebsites.net/fhir");
+
+        public static Uri TerminologyEndpoint = new Uri("http://ontoserver.csiro.au/stu3-latest");
 
         [TestInitialize]
         public void TestInitialize()
@@ -393,7 +395,7 @@ namespace Hl7.Fhir.Tests.Rest
         public void CreateAndFullRepresentation()
         {
             FhirClient client = new FhirClient(testEndpoint);
-            client.ReturnFullResource = true;       // which is also the default
+            client.PreferredReturn = Prefer.ReturnRepresentation;       // which is also the default
 
             var pat = client.Read<Patient>("Patient/glossy");
             ResourceIdentity ri = pat.ResourceIdentity().WithBase(client.Endpoint);
@@ -402,7 +404,7 @@ namespace Hl7.Fhir.Tests.Rest
             var patC = client.Create<Patient>(pat);
             Assert.IsNotNull(patC);
 
-            client.ReturnFullResource = false;
+            client.PreferredReturn = Prefer.ReturnMinimal;
             patC = client.Create<Patient>(pat);
 
             Assert.IsNull(patC);
@@ -414,7 +416,7 @@ namespace Hl7.Fhir.Tests.Rest
             }
 
             // Now validate this resource
-            client.ReturnFullResource = true;       // which is also the default
+            client.PreferredReturn = Prefer.ReturnRepresentation;      // which is also the default
             Parameters p = new Parameters();
           //  p.Add("mode", new FhirString("create"));
             p.Add("resource", pat);
@@ -444,6 +446,7 @@ namespace Hl7.Fhir.Tests.Rest
             pat.Id = null;
             pat.Identifier.Clear();
             pat.Identifier.Add(new Identifier("http://hl7.org/test/2", "99999"));
+            pat.Meta.Profile = null;
 
             System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(pat));
 
@@ -855,7 +858,7 @@ namespace Hl7.Fhir.Tests.Rest
             result.Id = null;
             result.Meta = null;
 
-            client.ReturnFullResource = true;
+            client.PreferredReturn = Prefer.ReturnRepresentation;
             minimal = false;
             var posted = client.Create(result);
             Assert.IsNotNull(posted, "Patient example not found");
@@ -864,7 +867,7 @@ namespace Hl7.Fhir.Tests.Rest
             posted = client.Create(result);
             Assert.IsNotNull(posted, "Did not return a resource, even when ReturnFullResource=true");
 
-            client.ReturnFullResource = false;
+            client.PreferredReturn = Prefer.ReturnMinimal;
             minimal = true;
             posted = client.Create(result);
             Assert.IsNull(posted);
@@ -893,7 +896,7 @@ namespace Hl7.Fhir.Tests.Rest
             }
 
 
-        [TestMethod]
+        [TestMethod, TestCategory("FhirClient"), TestCategory("IntegrationTest")]
         public void TestRefresh()
         {
             var client = new FhirClient(testEndpoint);
@@ -954,10 +957,10 @@ namespace Hl7.Fhir.Tests.Rest
 
 
         [TestMethod]
-        [TestCategory("FhirClient")]
+        [TestCategory("FhirClient"), TestCategory("IntegrationTest")]
         public void TestReceiveErrorStatusWithOperationOutcomeIsHandled()
         {
-            var client = new FhirClient("http://fhir3.healthintersections.com.au/open");  // an address that returns Status 404 with an OperationOutcome
+            var client = new FhirClient("http://test.fhir.org/r3");  // an address that returns Status 404 with an OperationOutcome
 
             try
             {
@@ -1002,7 +1005,7 @@ namespace Hl7.Fhir.Tests.Rest
             var testEndpointDSTU1 = new Uri("http://spark.furore.com/fhir");
             var testEndpointDSTU12 = new Uri("http://fhirtest.uhn.ca/baseDstu1");
             var testEndpointDSTU22 = new Uri("http://fhirtest.uhn.ca/baseDstu2");
-            var testEndpointDSTU23 = new Uri("http://fhir3.healthintersections.com.au/open");
+            var testEndpointDSTU23 = new Uri("http://test.fhir.org/r3");
 
             var client = new FhirClient(testEndpointDSTU1);
             client.ParserSettings.AllowUnrecognizedEnums = true;
@@ -1052,7 +1055,7 @@ namespace Hl7.Fhir.Tests.Rest
 
         }
 
-        [TestMethod]
+        [TestMethod, TestCategory("IntegrationTest"), TestCategory("FhirClient")]
         public void TestAuthenticationOnBefore()
         {
             FhirClient validationFhirClient = new FhirClient("https://sqlonfhir.azurewebsites.net/fhir");

@@ -37,7 +37,7 @@ using Hl7.Fhir.Utility;
 */
 
 //
-// Generated for FHIR v3.0.0
+// Generated for FHIR v3.0.1
 //
 namespace Hl7.Fhir.Model
 {
@@ -170,6 +170,18 @@ namespace Hl7.Fhir.Model
                 if (EndElement != null) yield return EndElement;
             }
         }
+
+        [NotMapped]
+        internal override IEnumerable<ElementValue> NamedChildren 
+        { 
+            get 
+            { 
+                foreach (var item in base.NamedChildren) yield return item; 
+                if (StartElement != null) yield return new ElementValue("start", false, StartElement);
+                if (EndElement != null) yield return new ElementValue("end", false, EndElement);
+ 
+            } 
+        } 
     
     
     }

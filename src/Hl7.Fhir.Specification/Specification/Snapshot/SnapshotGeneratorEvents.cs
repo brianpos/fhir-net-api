@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2016, Furore (info@furore.com) and contributors
+ * Copyright (c) 2017, Furore (info@furore.com) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -10,7 +10,6 @@
 
 using System;
 using Hl7.Fhir.Model;
-using Hl7.Fhir.Specification.Navigation;
 
 namespace Hl7.Fhir.Specification.Snapshot
 {
@@ -95,6 +94,8 @@ namespace Hl7.Fhir.Specification.Snapshot
             }
         }
 
+        /// <summary>Indicates if the <see cref="PrepareElement"/> event has any active subscribers.</summary>
+        bool MustRaisePrepareElement => PrepareElement != null;
 
         // [WMR 20170105] NEW
 

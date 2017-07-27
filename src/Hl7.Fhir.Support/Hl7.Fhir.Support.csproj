@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFrameworks>net45;netstandard1.0</TargetFrameworks>
+    <TargetFrameworks>net45;net40;netstandard1.0</TargetFrameworks>
   </PropertyGroup>
 
   <Import Project="..\platforms.props" />
@@ -15,6 +15,12 @@
     <Description>Common interfaces and classes used by all FHIR .NET assemblies</Description>
     <PackageTags>HL7;FHIR;Elements;Utility</PackageTags>
     <AssemblyName>Hl7.Fhir.Support</AssemblyName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
+    <DocumentationFile>bin\Debug\net45\Hl7.Fhir.Support.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>

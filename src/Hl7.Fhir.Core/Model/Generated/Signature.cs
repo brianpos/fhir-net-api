@@ -37,7 +37,7 @@ using Hl7.Fhir.Utility;
 */
 
 //
-// Generated for FHIR v3.0.0
+// Generated for FHIR v3.0.1
 //
 namespace Hl7.Fhir.Model
 {
@@ -264,6 +264,22 @@ namespace Hl7.Fhir.Model
                 if (BlobElement != null) yield return BlobElement;
             }
         }
+
+        [NotMapped]
+        internal override IEnumerable<ElementValue> NamedChildren 
+        { 
+            get 
+            { 
+                foreach (var item in base.NamedChildren) yield return item; 
+                foreach (var elem in Type) { if (elem != null) yield return new ElementValue("type", true, elem); }
+                if (WhenElement != null) yield return new ElementValue("when", false, WhenElement);
+                if (Who != null) yield return new ElementValue("who", false, Who);
+                if (OnBehalfOf != null) yield return new ElementValue("onBehalfOf", false, OnBehalfOf);
+                if (ContentTypeElement != null) yield return new ElementValue("contentType", false, ContentTypeElement);
+                if (BlobElement != null) yield return new ElementValue("blob", false, BlobElement);
+ 
+            } 
+        } 
     
     
     }

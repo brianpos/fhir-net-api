@@ -71,15 +71,15 @@ namespace Hl7.Fhir.Validation
 
         internal Validator NewInstance()
         {
-            var newValidator = new Validator(Settings);
-            newValidator.OnSnapshotNeeded = this.OnSnapshotNeeded;
-            newValidator.OnExternalResolutionNeeded = this.OnExternalResolutionNeeded;
+            return new Validator(Settings)
+            {
+                OnSnapshotNeeded = this.OnSnapshotNeeded,
+                OnExternalResolutionNeeded = this.OnExternalResolutionNeeded,
 
 #if REUSE_SNAPSHOT_GENERATOR
-            newValidator._snapshotGenerator = this._snapshotGenerator;
+                _snapshotGenerator = this._snapshotGenerator
 #endif
-
-            return newValidator;
+            };
         }
 
 
@@ -120,6 +120,14 @@ namespace Hl7.Fhir.Validation
                 outcome.Add(Validate(instance, processor.Result));
 
             return outcome;
+
+            StructureDefinition profileResolutionNeeded(string canonical)
+            {
+                if (Settings.ResourceResolver != null)
+                    return Settings.ResourceResolver.FindStructureDefinition(canonical);
+                else
+                    return null;
+            }
         }
 
         internal OperationOutcome Validate(IElementNavigator instance, ElementDefinitionNavigator definition)
@@ -196,24 +204,45 @@ namespace Hl7.Fhir.Validation
                     // primitive against the regex given in the core definition
                     outcome.Add(VerifyPrimitiveContents(elementConstraints, instance));
                 }
-                else if (definition.HasChildren)
-                {
-                    // Handle in-lined constraints on children. In a snapshot, these children should be exhaustive,
-                    // so there's no point in also validating the <type> or <nameReference>
-                    // TODO: Check whether this is even true when the <type> has a profile?
-                    outcome.Add(this.ValidateChildConstraints(definition, instance));
-                }
                 else
                 {
-                    // No inline-children, so validation depends on the presence of a <type> or <nameReference>
-                    if (elementConstraints.Type != null || elementConstraints.ContentReference != null)
+                    bool isInlineChildren = !definition.Current.IsRootElement();
 
+                    // Now, validate the children
+                    if (definition.HasChildren)
                     {
-                        outcome.Add(this.ValidateType(elementConstraints, instance));
-                        outcome.Add(ValidateNameReference(elementConstraints, definition, instance));
+                        // If we are at the root of an abstract type (e.g. is this instance a Resource)?
+                        // or we are at a nested resource, we may expect more children in the instance than
+                        // we know about
+                        bool allowAdditionalChildren = (isInlineChildren && elementConstraints.IsResourcePlaceholder()) ||
+                                          (!isInlineChildren && definition.StructureDefinition.Abstract == true);
+
+                        // Handle in-lined constraints on children. In a snapshot, these children should be exhaustive,
+                        // so there's no point in also validating the <type> or <nameReference>
+                        // TODO: Check whether this is even true when the <type> has a profile?
+                        // Note: the snapshot is *not* exhaustive if the declared type is a base FHIR type (like Resource),
+                        // in which case there may be additional children (verified in the next step)
+                        outcome.Add(this.ValidateChildConstraints(definition, instance, allowAdditionalChildren: allowAdditionalChildren));
+
+                        // Special case: if we are located at a nested resource (i.e. contained or Bundle.entry.resource),
+                        // we need to validate based on the actual type of the instance
+                        if(isInlineChildren && elementConstraints.IsResourcePlaceholder())
+                        {
+                            outcome.Add(this.ValidateType(elementConstraints, instance));
+                        }
                     }
-                    else
-                        Trace(outcome, "ElementDefinition has no child, nor does it specify a type or nameReference to validate the instance data against", Issue.PROFILE_ELEMENTDEF_CONTAINS_NO_TYPE_OR_NAMEREF, instance);
+
+                    if (!definition.HasChildren)
+                    {
+                        // No inline-children, so validation depends on the presence of a <type> or <nameReference>
+                        if (elementConstraints.Type != null || elementConstraints.ContentReference != null)
+                        {
+                            outcome.Add(this.ValidateType(elementConstraints, instance));
+                            outcome.Add(ValidateNameReference(elementConstraints, definition, instance));
+                        }
+                        else
+                            Trace(outcome, "ElementDefinition has no child, nor does it specify a type or nameReference to validate the instance data against", Issue.PROFILE_ELEMENTDEF_CONTAINS_NO_TYPE_OR_NAMEREF, instance);
+                    }
                 }
 
                 outcome.Add(this.ValidateFixed(elementConstraints, instance));
@@ -234,10 +263,16 @@ namespace Hl7.Fhir.Validation
             }
         }
 
-
         internal OperationOutcome ValidateConstraints(ElementDefinition definition, IElementNavigator instance)
         {
             var outcome = new OperationOutcome();
+
+            if (!definition.Constraint.Any()) return outcome;
+
+            // Make sure FHIR extensions are installed in FP compiler
+            ElementNavFhirExtensions.PrepareFhirSymbolTableFunctions();
+
+
 
             if (Settings.SkipConstraintValidation) return outcome;
 
@@ -291,8 +326,9 @@ namespace Hl7.Fhir.Validation
         internal OperationOutcome ValidateBinding(ElementDefinition definition, IElementNavigator instance)
         {
             var outcome = new OperationOutcome();
-            var ts = Settings.TerminologyService;
+            if (definition.Binding == null) return outcome;
 
+            var ts = Settings.TerminologyService;
             if (ts == null)
             {
                 if (Settings.ResourceResolver == null)
@@ -302,36 +338,27 @@ namespace Hl7.Fhir.Validation
                     return outcome;
                 }
 
-                ts = new LocalTerminologyServer(Settings.ResourceResolver);
+                ts = new LocalTerminologyService(Settings.ResourceResolver);
             }
 
             var bindingValidator = new BindingValidator(ts, instance.Location);
 
             try
             {
-                return bindingValidator.ValidateBinding(instance, definition);
+                Element bindable = instance.ParseBindable();
+
+                // If the instance is not bindeable, ignore the Binding specified on the element, 
+                // it's simply not applicable
+                if (bindable != null)
+                    return bindingValidator.ValidateBinding(bindable, definition.Binding);
             }
             catch (Exception e)
             {
-                Trace(outcome, $"Terminology service failed while validating code X (system Y): {e.Message}", Issue.UNAVAILABLE_VALIDATE_CODE_FAILED, instance);
-                return outcome;
+                Trace(outcome, $"Terminology service call failed for binding at {definition.Path}: {e.Message}", Issue.TERMINOLOGY_SERVICE_FAILED, instance);                
             }
+
+            return outcome;
         }
-
-
-        internal static FHIRAllTypes? DetermineType(ElementDefinition definition, IElementNavigator instance)
-        {
-            if (definition.IsChoice())
-            {
-                if (instance.Type != null)
-                    return ModelInfo.FhirTypeNameToFhirType(instance.Type);
-                else
-                    return null;
-            }
-            else
-                return ModelInfo.FhirTypeNameToFhirType(definition.Type.First().Code);
-        }
-
 
         internal OperationOutcome ValidateNameReference(ElementDefinition definition, ElementDefinitionNavigator allDefinitions, IElementNavigator instance)
         {
@@ -487,27 +514,19 @@ namespace Hl7.Fhir.Validation
         }
 
 
-        private StructureDefinition profileResolutionNeeded(string canonical)
-        {
-            if (Settings.ResourceResolver != null)
-                return Settings.ResourceResolver.FindStructureDefinition(canonical);
-            else
-                return null;
-        }
-
-
         // Note: this modifies an SD that is passed to us and will alter a possibly cached
         // object shared amongst other threads. This is generally useful and saves considerable
         // time when the same snapshot is needed again, but may result in side-effects
-        private void snapshotGenerationNeeded(StructureDefinition definition)
+        private OperationOutcome snapshotGenerationNeeded(StructureDefinition definition)
         {
-            if (!Settings.GenerateSnapshot) return;
+            if (!Settings.GenerateSnapshot) return new OperationOutcome();
 
             // Default implementation: call event
             if (OnSnapshotNeeded != null)
             {
-                OnSnapshotNeeded(this, new OnSnapshotNeededEventArgs(definition, Settings.ResourceResolver));
-                return;
+                var eventData = new OnSnapshotNeededEventArgs(definition, Settings.ResourceResolver);
+                OnSnapshotNeeded(this, eventData);
+                return eventData.Result;
             }
 
             // Else, expand, depending on our configuration
@@ -516,6 +535,16 @@ namespace Hl7.Fhir.Validation
             if (generator != null)
             {
                 generator.Update(definition);
+#if DUMP_SNAPSHOTS
+
+                string xml = FhirSerializer.SerializeResourceToXml(definition);
+                string name = definition.Id ?? definition.Name.Replace(" ", "");
+
+                File.WriteAllText(@"c:\temp\validation\" + name + ".StructureDefinition.xml", xml);
+#endif
+
+
+                return generator.Outcome ?? new OperationOutcome();
 #else
             if (Settings.ResourceResolver != null)
             {
@@ -524,16 +553,9 @@ namespace Hl7.Fhir.Validation
                 (new SnapshotGenerator(Settings.ResourceResolver, settings)).Update(definition);
 
 #endif
-
-#if DUMP_SNAPSHOTS
-
-                string xml = FhirSerializer.SerializeResourceToXml(definition);
-                string name = definition.Id ?? definition.Name.Replace(" ", "");
-
-                File.WriteAllText(@"c:\temp\validation\" + name + ".StructureDefinition.xml", xml);
-#endif
             }
 
+            return new OperationOutcome();
         }
     }
 
@@ -550,6 +572,8 @@ namespace Hl7.Fhir.Validation
                    t == typeof(Model.Time) ||
                    t == typeof(FhirDecimal) ||
                    t == typeof(Integer) ||
+                   t == typeof(PositiveInt) ||
+                   t == typeof(UnsignedInt) ||
                    t == typeof(Model.Quantity) ||
                    t == typeof(FhirString);
         }
@@ -578,6 +602,8 @@ namespace Hl7.Fhir.Validation
         public StructureDefinition Definition { get; }
 
         public IResourceResolver Resolver { get; }
+
+        public OperationOutcome Result { get; set; }
     }
 
     public class OnResolveResourceReferenceEventArgs : EventArgs

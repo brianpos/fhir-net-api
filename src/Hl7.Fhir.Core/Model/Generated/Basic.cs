@@ -36,8 +36,10 @@ using Hl7.Fhir.Utility;
 
 */
 
+#pragma warning disable 1591 // suppress XML summary warnings 
+
 //
-// Generated for FHIR v3.0.0
+// Generated for FHIR v3.0.1
 //
 namespace Hl7.Fhir.Model
 {
@@ -216,6 +218,21 @@ namespace Hl7.Fhir.Model
 				if (Author != null) yield return Author;
             }
         }
+
+        [NotMapped]
+        internal override IEnumerable<ElementValue> NamedChildren
+        {
+            get
+            {
+                foreach (var item in base.NamedChildren) yield return item;
+                foreach (var elem in Identifier) { if (elem != null) yield return new ElementValue("identifier", true, elem); }
+                if (Code != null) yield return new ElementValue("code", false, Code);
+                if (Subject != null) yield return new ElementValue("subject", false, Subject);
+                if (CreatedElement != null) yield return new ElementValue("created", false, CreatedElement);
+                if (Author != null) yield return new ElementValue("author", false, Author);
+            }
+        }
+
     }
     
 }

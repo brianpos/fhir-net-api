@@ -1,13 +1,8 @@
 ﻿using Hl7.Fhir.Specification.Source;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Hl7.Fhir.Model;
-using System.IO;
 using Hl7.Fhir.Rest;
-using Hl7.Fhir.Specification.Snapshot;
 using Hl7.Fhir.Serialization;
 using System.Diagnostics;
 
@@ -32,7 +27,8 @@ namespace Hl7.Fhir.Validation
             patientWithSpecificOrganization(new[] { ElementDefinition.AggregationMode.Bundled }, "Bundled"),
             bundleWithSpecificEntries("Referenced"),
             patientWithSpecificOrganization(new[] { ElementDefinition.AggregationMode.Referenced }, "Referenced"),
-            buildParametersWithBoundParams()
+            buildParametersWithBoundParams(),
+            bundleWithConstrainedContained()
         };
 
 
@@ -163,6 +159,20 @@ namespace Hl7.Fhir.Validation
             return result;
         }
 
+        private static StructureDefinition bundleWithConstrainedContained()
+        {
+            var result = createTestSD($"http://validationtest.org/fhir/StructureDefinition/BundleWithConstrainedContained", 
+                            $"Bundle with a constraint on the Bundle.entry.resource",
+                    $"Bundle with a constraint on the Bundle.entry.resource", FHIRAllTypes.Bundle);
+
+            var cons = result.Differential.Element;
+
+            cons.Add(new ElementDefinition("Bundle").OfType(FHIRAllTypes.Bundle));
+            cons.Add(new ElementDefinition("Bundle.entry.resource.meta").Required());
+
+            return result;
+        }
+
 
         private static StructureDefinition patientWithSpecificOrganization(IEnumerable<ElementDefinition.AggregationMode> aggregation, string prefix)
         {
@@ -173,7 +183,7 @@ namespace Hl7.Fhir.Validation
 
             cons.Add(new ElementDefinition("Patient").OfType(FHIRAllTypes.Patient));
             cons.Add(new ElementDefinition("Patient.managingOrganization")
-                .OfType(FHIRAllTypes.Reference, ModelInfo.CanonicalUriForFhirCoreType(FHIRAllTypes.Organization))); //, aggregation));
+                .OfReference(ModelInfo.CanonicalUriForFhirCoreType(FHIRAllTypes.Organization), aggregation));
 
             return result;
         }
@@ -202,6 +212,7 @@ namespace Hl7.Fhir.Validation
             result.Status = PublicationStatus.Draft;
             result.Description = new Markdown(description);
             result.FhirVersion = ModelInfo.Version;
+            result.Derivation = StructureDefinition.TypeDerivationRule.Constraint;
 
             if (ModelInfo.IsKnownResource(constrainedType))
                 result.Kind = StructureDefinition.StructureDefinitionKind.Resource;
