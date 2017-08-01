@@ -91,8 +91,24 @@ namespace Hl7.Fhir.QuestionnaireServices
 
                 if (item.ed.Fixed != null)
                 {
+                    Element fixedValue = item.ed.Fixed;
                     var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
-                    pm.SetValue(instance, item.ed.Fixed);
+                    Type createElementType = pm.ReturnType;
+                    if (pm.ReturnType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
+                    {
+                        // check the element definition for the types
+                        createElementType = ModelInfo.FhirTypeToCsType[item.ed.PrimaryTypeCode().GetLiteral()];
+                    }
+                    if (item.ed.Fixed.GetType() != createElementType)
+                    {
+                        // need to convert the data over
+                        fixedValue = (Element)fac.Create(pm.ReturnType);
+                        if (fixedValue is Primitive && item.ed.Fixed is Code)
+                        {
+                            (fixedValue as Primitive).ObjectValue = (item.ed.Fixed as Code).Value;
+                        }
+                    }
+                    pm.SetValue(instance, fixedValue);
                     continue;
                 }
 
@@ -143,7 +159,13 @@ namespace Hl7.Fhir.QuestionnaireServices
                             if (answers.First().Value is Coding)
                             {
                                 Coding codedValue = answers.First().Value as Coding;
-                                Base prim = (Base)fac.Create(pm.ReturnType);
+                                Type createElementType = pm.ReturnType;
+                                if (pm.ReturnType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
+                                {
+                                    // check the element definition for the types
+                                    createElementType = ModelInfo.FhirTypeToCsType[item.ed.PrimaryTypeCode().GetLiteral()];
+                                }
+                                Base prim = (Base)fac.Create(createElementType);
                                 if (prim is Coding c)
                                 {
                                     pm.SetValue(instance, codedValue);
@@ -171,7 +193,9 @@ namespace Hl7.Fhir.QuestionnaireServices
                             {
                                 // Check for type conversion if needed
                                 if (pm.ElementType == typeof(Code) && answers.First().Value is FhirString valueString)
-                                    pm.SetValue(instance, new Code(((FhirString)answers.First().Value).Value));
+                                    pm.SetValue(instance, new Code(valueString.Value));
+                                else if (pm.ElementType == typeof(Id) && answers.First().Value is FhirString)
+                                    pm.SetValue(instance, new Id(((FhirString)answers.First().Value).Value));
                                 else
                                     pm.SetValue(instance, answers.First().Value);
                             }
@@ -275,7 +299,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                             result = new List<QuestionnaireResponse.AnswerComponent>();
                         result.AddRange(q.Answer);
                     }
-                    if (q.LinkId.StartsWith(si.Path) && result == null)
+                    if (q.LinkId.StartsWith(si.Path) && q.LinkId != si.Path && result == null)
                         result = new List<QuestionnaireResponse.AnswerComponent>();
                 }
             }
