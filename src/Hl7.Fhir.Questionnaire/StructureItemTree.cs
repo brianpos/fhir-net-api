@@ -28,8 +28,6 @@ namespace Hl7.Fhir.QuestionnaireServices
             if (sd != null)
             {
                 var si = StructureItemTree.CreateStructureTree(sd, source, null, true);
-                Type t = ModelInfo.FhirTypeToCsType[sd.ConstrainedType.GetLiteral()];
-                si.ClassMapping = ClassMapping.Create(t);
 
                 // Populate all the bindings
                 Dictionary<string, string> mapPathsToLinkIds = new Dictionary<string, string>();
@@ -197,6 +195,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             var nav = ElementDefinitionNavigator.ForSnapshot(sd);
             nav.MoveToFirstChild(); // move to root
             parent.Path = nav.Current.Path;
+            parent.ed = nav.Current;
 
             nav.MoveToFirstChild(); // move to first child
             CreateStructureChildren(parent, nav, source, replaceRoot);
@@ -426,6 +425,64 @@ namespace Hl7.Fhir.QuestionnaireServices
         enum RetainDueTo { Binding, FixedValue, MandatoryProperty, Discard };
 
         /// <summary>
+        /// Prune the tree for only those properties relevant when performing a specified mapping
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="mapCode"></param>
+        public static void PruneTreeForMapping(StructureItem item, string mapCode)
+        {
+            // do any of "my" properties have values bound as children
+            bool hasBoundChild = false;
+            foreach (var child in item.Children)
+            {
+                if (HasBoundValueInChild(child) || HasMappedCodeInChild(child, mapCode))
+                {
+                    hasBoundChild = true;
+                    break;
+                }
+            }
+
+            if (hasBoundChild)
+            {
+                List<StructureItem> newSet = new List<StructureItem>();
+                foreach (var child in item.Children)
+                {
+                    if (HasBoundValueInChild(child))
+                        newSet.Add(child);
+                    else if (HasMappedCodeInChild(child, mapCode))
+                        newSet.Add(child);
+                    else if (IsMandatory(child))
+                        newSet.Add(child);
+                    else if (HasFixedValueInChild(child))
+                        newSet.Add(child);
+                }
+                item.Children = newSet;
+            }
+            else if (IsMandatory(item))
+            {
+                List<StructureItem> newSet = new List<StructureItem>();
+                foreach (var child in item.Children)
+                {
+                    if (IsMandatory(child))
+                        newSet.Add(child);
+                    else if (HasFixedValueInChild(child))
+                        newSet.Add(child);
+                }
+                item.Children = newSet;
+            }
+            else
+            {
+                item.Children.Clear();
+            }
+
+            // Re-Process all the remaining children
+            foreach (var child in item.Children)
+            {
+                PruneTreeForMapping(child, mapCode);
+            }
+        }
+
+        /// <summary>
         /// Check to see if this child should be retained in the collection
         /// </summary>
         /// <param name="si"></param>
@@ -482,6 +539,17 @@ namespace Hl7.Fhir.QuestionnaireServices
             }
         }
 
+        private static bool HasMappedCodeInChild(StructureItem si, string mapCode)
+        {
+            if (!string.IsNullOrEmpty(si.MapTo(mapCode)))
+                return true;
+            foreach (var item in si.Children)
+            {
+                if (HasMappedCodeInChild(item, mapCode))
+                    return true;
+            }
+            return false;
+        }
         private static bool HasBoundValueInChild(StructureItem si)
         {
             if (!string.IsNullOrEmpty(si.LinkId))
@@ -496,7 +564,7 @@ namespace Hl7.Fhir.QuestionnaireServices
 
         private static bool IsMandatory(StructureItem si)
         {
-            if (si.ed.Min > 0)
+            if (si.ed?.Min > 0)
                 return true;
             return false;
         }

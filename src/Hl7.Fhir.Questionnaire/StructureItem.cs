@@ -50,6 +50,11 @@ namespace Hl7.Fhir.QuestionnaireServices
         public List<Element> FixedValuesInSlices { get; set; } = new List<Element>();
         public string SlicedPath { get; set; }
 
+        public string MapTo(string mapCode)
+        {
+            return String.Join(", ", ed?.Mapping?.Where(m => m.Identity == mapCode).Select(m => m.Map));
+        }
+
         public List<StructureItem> Children { get; set; } = new List<StructureItem>();
 
         public List<ElementDefinition> ValidationRules { get; set; } = new List<ElementDefinition>();
