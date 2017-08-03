@@ -24,39 +24,12 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
     [TestClass]
     public class QuestionnaireProcessingTests
     {
-        [TestInitialize]
-        public void SetupSource()
-        {
-            // Ensure the FHIR extensions are registered
-            Hl7.Fhir.FhirPath.PocoNavigatorExtensions.PrepareFhirSymbolTableFunctions();
-
-            _source = new CachedResolver(
-                new MultiResolver(
-                    new ZipSource("specification.zip"),
-                    new DirectorySource("TestData")
-                ));
-
-            var ctx = new ValidationSettings()
-            {
-                ResourceResolver = _source,
-                GenerateSnapshot = true,
-                EnableXsdValidation = true,
-                Trace = false,
-                ResolveExteralReferences = true
-            };
-
-            _validator = new Validator(ctx);
-        }
-
-        IResourceResolver _source;
-        Validator _validator;
-
         #region << Simple Practitioner >>
         [TestMethod]
         public void QuestionnaireCreateStandardPractitioner()
         {
-            var pracSd = _source.FindStructureDefinitionForCoreType(FHIRDefinedType.Practitioner);
-            var si = StructureItemTree.CreateStructureTree(pracSd, _source);
+            var pracSd = TestHelpers.Source.FindStructureDefinitionForCoreType(FHIRDefinedType.Practitioner);
+            var si = StructureItemTree.CreateStructureTree(pracSd, TestHelpers.Source);
 
             var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, GetPractitionerQuestionnaire(), GetPractitionerQuestionnaireResponse());
 
@@ -277,7 +250,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
                 @"TestData\hcxdir-practitioner.xml");
 
             var pracSd = new Serialization.FhirXmlParser().Parse<StructureDefinition>(xml);
-            var si = StructureItemTree.CreateStructureTree(pracSd, _source);
+            var si = StructureItemTree.CreateStructureTree(pracSd, TestHelpers.Source);
 
             var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, GetExtendedPractitionerQuestionnaire(), GetExtendedPractitionerQuestionnaireResponse());
 
@@ -541,12 +514,12 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         [TestMethod]
         public void QuestionnaireCreateBloodPressionObservation()
         {
-            var vitalSignsSd = _source.FindStructureDefinition("http://hl7.org/fhir/StructureDefinition/daf-vitalsigns");
+            var vitalSignsSd = TestHelpers.Source.FindStructureDefinition("http://hl7.org/fhir/StructureDefinition/daf-vitalsigns");
 
-            //Snapshot.SnapshotGenerator sg = new Snapshot.SnapshotGenerator(_source, 
+            //Snapshot.SnapshotGenerator sg = new Snapshot.SnapshotGenerator(TestHelpers.Source, 
             //    new Snapshot.SnapshotGeneratorSettings() { GenerateElementIds = true, ForceRegenerateSnapshots = true });
             //sg.Update(pracSd);
-            var si = StructureItemTree.CreateStructureTree(vitalSignsSd, _source);
+            var si = StructureItemTree.CreateStructureTree(vitalSignsSd, TestHelpers.Source);
 
             var obs = QuestionnaireProcessing.CreateResourceInstance<Observation>(vitalSignsSd, si, GetBloodPressureQuestionnaire(), GetBloodPressureQuestionnaireResponse());
             Assert.AreEqual(Observation.ObservationStatus.Preliminary, obs.Status);
@@ -671,12 +644,12 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qPart1.Group.Group.Add(qPart2.Group);
 
             System.Diagnostics.Debug.WriteLine("------------------");
-            var fullTree = StructureItemTree.GetStructureTree(qPart1.Group.Definition().Value, qPart1, _source, false);
-            var prunedTree = StructureItemTree.GetStructureTree(qPart1.Group.Definition().Value, qPart1, _source, true);
+            var fullTree = StructureItemTree.GetStructureTree(qPart1.Group.Definition().Value, qPart1, TestHelpers.Source, false);
+            var prunedTree = StructureItemTree.GetStructureTree(qPart1.Group.Definition().Value, qPart1, TestHelpers.Source, true);
 
             System.Diagnostics.Debug.WriteLine("------------------");
-            var fullTree2 = StructureItemTree.GetStructureTree(qPart2.Group.Definition().Value, qPart1, _source, false);
-            var prunedTree2 = StructureItemTree.GetStructureTree(qPart2.Group.Definition().Value, qPart1, _source, true);
+            var fullTree2 = StructureItemTree.GetStructureTree(qPart2.Group.Definition().Value, qPart1, TestHelpers.Source, false);
+            var prunedTree2 = StructureItemTree.GetStructureTree(qPart2.Group.Definition().Value, qPart1, TestHelpers.Source, true);
 
             System.Diagnostics.Debug.WriteLine("======================================");
             Assert.IsNotNull(fullTree);
@@ -701,18 +674,9 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             //StructureItemTree.PruneTree(prunedTree, mapPathsToLinkIds);
         }
 
-        private int DumpTree(StructureItem tree)
+        public static int DumpTree(StructureItem tree)
         {
-            int count = 1;
-            if (!string.IsNullOrEmpty(tree.SlicedPath))
-                System.Diagnostics.Debug.WriteLine($"{tree.Path}\t\t{tree.FixedValuesInSlices?.Count}\t\t{tree.MapTo("tcm")}");
-            else
-                System.Diagnostics.Debug.WriteLine($"{tree.Path}\t\t-->{tree.SlicedPath}\t{tree.FixedValuesInSlices?.Count}\t{tree.MapTo("tcm")}");
-            foreach (var item in tree.Children)
-            {
-                count += DumpTree(item);
-            }
-            return count;
+            return TestHelpers.DumpTree(tree);
         }
 
         // Now for some testing of a multiple resource Questionnaire!
@@ -732,7 +696,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qPart1.Group.Group.Add(qPart2.Group);
             qrP1.Group.Group.Add(qrP2.Group);
 
-            Bundle resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, _source);
+            Bundle resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, TestHelpers.Source);
 
             var prac = resources.Entry[0].Resource as Practitioner;
             Assert.AreEqual(true, prac.Active);
@@ -761,7 +725,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             // Assert.AreEqual("Range: <90  >160", obs.ReferenceRange[0].Text);
             for (int n = 0; n < 100; n++)
             {
-                resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, _source);
+                resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, TestHelpers.Source);
             }
         }
 
@@ -773,7 +737,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qPart1.Group.Definition(new FhirUri("http://healthconnex.com.au/hcxd/Practitioner"));
             var qrP1 = GetExtendedPractitionerQuestionnaireResponse();
 
-            Bundle resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, _source);
+            Bundle resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, TestHelpers.Source);
 
             var prac = resources.Entry[0].Resource as Practitioner;
             Assert.AreEqual(true, prac.Active);
@@ -790,7 +754,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(resources));
 
             // Now reproduce the QR from this content
-            QuestionnaireResponse qr = QuestionnaireFiller.CreateQuestionnaireResponse(qPart1, resources, _source);
+            QuestionnaireResponse qr = QuestionnaireFiller.CreateQuestionnaireResponse(qPart1, resources, TestHelpers.Source);
             qr.Id = "prac-ext-demo-qr";
             // qr = qrP1.DeepCopy() as QuestionnaireResponse;
             System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qrP1));
@@ -826,7 +790,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qPart1.Group.Group.Add(qPart2.Group);
             qrP1.Group.Group.Add(qrP2.Group);
 
-            Bundle resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, _source);
+            Bundle resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, TestHelpers.Source);
 
             var prac = resources.Entry[0].Resource as Practitioner;
             Assert.AreEqual(true, prac.Active);
@@ -855,7 +819,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             // Assert.AreEqual("Range: <90  >160", obs.ReferenceRange[0].Text);
 
             // Now reproduce the QR from this content
-            QuestionnaireResponse qr = QuestionnaireFiller.CreateQuestionnaireResponse(qPart1, resources, _source);
+            QuestionnaireResponse qr = QuestionnaireFiller.CreateQuestionnaireResponse(qPart1, resources, TestHelpers.Source);
             qr.Id = "prac-ext-demo-qr";
             qr = qrP1.DeepCopy() as QuestionnaireResponse;
 
@@ -869,7 +833,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
                 @"TestData\customslot.structuredefinition.xml");
 
             var pracSd = new Serialization.FhirXmlParser().Parse<StructureDefinition>(xml);
-            var si = StructureItemTree.CreateStructureTree(pracSd, _source);
+            var si = StructureItemTree.CreateStructureTree(pracSd, TestHelpers.Source);
             Assert.IsNotNull(si);
             DumpTree(si);
             Assert.IsFalse(StructureItemTree.ContainsPath(si, "Slot.meta"));
