@@ -20,7 +20,7 @@ namespace Hl7.Fhir.QuestionnaireServices
 {
     public static class QuestionnaireProcessing
     {
-        internal static Bundle CreateResourceInstances(Questionnaire q, QuestionnaireResponse questionnaireResponse, IResourceResolver source)
+        public static Bundle CreateResourceInstances(Questionnaire q, QuestionnaireResponse questionnaireResponse, IResourceResolver source)
         {
             // Loop through all the groups to locate the items that are marked against a resource type
             List<QuestionnaireResponse.GroupComponent> qrg = new List<QuestionnaireResponse.GroupComponent>();

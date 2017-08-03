@@ -253,7 +253,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     //    if (!nav.Current.IsMappedExtension()) // as this would already be there
                     //        item.Path += ":" + nav.Current.Name; // and add this into the property names
                     //}
-                    System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]{(nav.Current.Fixed != null ? " fixed value" : "")}");
+                    //System.Diagnostics.Debug.WriteLine($"{item.Path} ({nav.PathName}) {item.ExtensionUrl} [{nav.Current.PrimaryTypeCode()}]{(nav.Current.Fixed != null ? " fixed value" : "")}");
 
                     if (item.ed.Slicing != null)
                     {
@@ -330,17 +330,31 @@ namespace Hl7.Fhir.QuestionnaireServices
                             if (!string.IsNullOrEmpty(profile) && nav.Current.PrimaryTypeCode() != FHIRDefinedType.Reference && nav.Current.PrimaryTypeCode() != FHIRDefinedType.Uri)
                             {
                                 StructureDefinition sdDataType = source.FindStructureDefinition(profile);
-                                StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path, true);
-                                item.Children.AddRange(dataType.Children);
-                                item.ClassMapping = dataType.ClassMapping;
+                                if (sdDataType != null)
+                                {
+                                    StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path, true);
+                                    item.Children.AddRange(dataType.Children);
+                                    item.ClassMapping = dataType.ClassMapping;
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"StructureDefintion with URL {profile} was not found");
+                                }
                             }
                             else
                             {
                                 StructureDefinition sdDataType = source.FindStructureDefinitionForCoreType(nav.Current.PrimaryTypeCode().Value);
-                                // do not look at the cache, as the item path could be different
-                                StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path, true);
-                                item.Children.AddRange(dataType.Children);
-                                item.ClassMapping = dataType.ClassMapping;
+                                if (sdDataType != null)
+                                {
+                                    // do not look at the cache, as the item path could be different
+                                    StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path, true);
+                                    item.Children.AddRange(dataType.Children);
+                                    item.ClassMapping = dataType.ClassMapping;
+                                }
+                                else
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"StructureDefintion with URL {profile} was not found");
+                                }
                             }
                         }
                     }

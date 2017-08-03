@@ -33,7 +33,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             _source = new CachedResolver(
                 new MultiResolver(
                     new ZipSource("specification.zip"),
-                    new DirectorySource(@"C:\git\EHPD\Hcx.Directory.FhirApi\App_Data")
+                    new DirectorySource("TestData")
                 ));
 
             var ctx = new ValidationSettings()
@@ -274,7 +274,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         public void QuestionnaireCreateExtendedPractitioner()
         {
             string xml = System.IO.File.ReadAllText(
-                @"C:\git\EHPD\Hcx.Directory.FhirApi\App_Data\hcxdir-practitioner.xml");
+                @"TestData\hcxdir-practitioner.xml");
 
             var pracSd = new Serialization.FhirXmlParser().Parse<StructureDefinition>(xml);
             var si = StructureItemTree.CreateStructureTree(pracSd, _source);
@@ -679,16 +679,19 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var prunedTree2 = StructureItemTree.GetStructureTree(qPart2.Group.Definition().Value, qPart1, _source, true);
 
             System.Diagnostics.Debug.WriteLine("======================================");
+            Assert.IsNotNull(fullTree);
             int countFullTree = DumpTree(fullTree);
             System.Diagnostics.Debug.WriteLine("------------------");
+            Assert.IsNotNull(prunedTree);
             int countPrunedTree = DumpTree(prunedTree);
-            Assert.AreEqual(226, countFullTree);
-            Assert.AreEqual(36, countPrunedTree);
+            Assert.AreEqual(227, countFullTree);
+            Assert.AreEqual(30, countPrunedTree);
 
             System.Diagnostics.Debug.WriteLine("======================================");
-
+            Assert.IsNotNull(fullTree2);
             int countFullTree2 = DumpTree(fullTree2);
             System.Diagnostics.Debug.WriteLine("------------------");
+            Assert.IsNotNull(prunedTree2);
             int countPrunedTree2 = DumpTree(prunedTree2);
             Assert.AreEqual(192, countFullTree2);
             Assert.AreEqual(11, countPrunedTree2);
@@ -702,9 +705,9 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         {
             int count = 1;
             if (!string.IsNullOrEmpty(tree.SlicedPath))
-                System.Diagnostics.Debug.WriteLine($"{tree.Path}\t\t{tree.FixedValuesInSlices?.Count}");
+                System.Diagnostics.Debug.WriteLine($"{tree.Path}\t\t{tree.FixedValuesInSlices?.Count}\t\t{tree.MapTo("tcm")}");
             else
-                System.Diagnostics.Debug.WriteLine($"{tree.Path}\t\t-->{tree.SlicedPath}\t{tree.FixedValuesInSlices?.Count}");
+                System.Diagnostics.Debug.WriteLine($"{tree.Path}\t\t-->{tree.SlicedPath}\t{tree.FixedValuesInSlices?.Count}\t{tree.MapTo("tcm")}");
             foreach (var item in tree.Children)
             {
                 count += DumpTree(item);
@@ -716,9 +719,6 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         [TestMethod]
         public void QuestionnaireCreateMultipleResources()
         {
-            var pracQ = new Serialization.FhirXmlParser().Parse<Questionnaire>(
-                System.IO.File.ReadAllText(@"c:\temp\ehpd-practitioner-edit.xml"));
-
             Questionnaire qPart1 = GetExtendedPractitionerQuestionnaire();
             qPart1.Group.Definition(new FhirUri("http://healthconnex.com.au/hcxd/Practitioner"));
             var qrP1 = GetExtendedPractitionerQuestionnaireResponse();
@@ -813,9 +813,6 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         [TestMethod]
         public void QuestionnaireCreateMultipleResourcesAndBack()
         {
-            var pracQ = new Serialization.FhirXmlParser().Parse<Questionnaire>(
-                System.IO.File.ReadAllText(@"c:\temp\ehpd-practitioner-edit.xml"));
-
             Questionnaire qPart1 = GetExtendedPractitionerQuestionnaire();
             qPart1.Group.Definition(new FhirUri("http://healthconnex.com.au/hcxd/Practitioner"));
             var qrP1 = GetExtendedPractitionerQuestionnaireResponse();
@@ -864,18 +861,21 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
 
             Assert.IsTrue(qr.IsExactly(qrP1));
         }
-
-
         
         [TestMethod]
         public void QuestionnaireCreateCustomSlotDefinition()
         {
             string xml = System.IO.File.ReadAllText(
-                @"C:\git\EHPD\Hcx.Directory.FhirApi\App_Data\customslot.structuredefinition.xml");
+                @"TestData\customslot.structuredefinition.xml");
 
             var pracSd = new Serialization.FhirXmlParser().Parse<StructureDefinition>(xml);
             var si = StructureItemTree.CreateStructureTree(pracSd, _source);
+            Assert.IsNotNull(si);
             DumpTree(si);
+            Assert.IsFalse(StructureItemTree.ContainsPath(si, "Slot.meta"));
+            Assert.IsTrue(StructureItemTree.ContainsPath(si, "Slot.identifier.type.coding"));
+            Assert.IsTrue(StructureItemTree.ContainsPath(si, "Slot.identifier:AgedCare.system"));
+            Assert.IsTrue(StructureItemTree.ContainsPath(si, "Slot.identifier:AgedCare.value"));
         }
     }
 }
