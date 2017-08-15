@@ -92,7 +92,7 @@ namespace Hl7.Fhir.FhirPath
                     Rest.ResourceIdentity ri = new Rest.ResourceIdentity(reference);
 
                     // Go retrieve the resource? (seriously?)
-                    System.Diagnostics.Debug.WriteLine("Evaluating a reolve call: " + reference);
+                    System.Diagnostics.Debug.WriteLine("Evaluating a resolve call: " + reference);
                 }
             }
             return null;
