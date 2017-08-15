@@ -20,6 +20,8 @@ namespace Hl7.Fhir
         [TestMethod]
         public void QuestionnaireResponseFhirpathPocoTest()
         {
+            PocoNavigatorExtensions.PrepareFhirSymbolTableFunctions();
+
             var xml = TestDataHelper.ReadTestData("Large-QuestionnaireResponse.xml");
 
             var qr = (new FhirXmlParser()).Parse<QuestionnaireResponse>(xml);
