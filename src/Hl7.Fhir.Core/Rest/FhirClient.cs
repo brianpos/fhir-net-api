@@ -858,7 +858,8 @@ namespace Hl7.Fhir.Rest
             //        I would imagine that a null parameters object is different to an empty one?
             // EK: What else could we do?  POST an empty body?  We cannot use GET unless the caller indicates this is an
             // idempotent call....
-            if (parameters == null) parameters = new Parameters();
+            // Brian: At least don't create it if the request is explicitly asking for the Get to be used
+            if (parameters == null && !useGet) parameters = new Parameters();
 
             Bundle tx;
 
