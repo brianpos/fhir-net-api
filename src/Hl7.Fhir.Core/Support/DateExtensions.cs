@@ -6,6 +6,7 @@
  * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
  */
 
+using Hl7.Fhir.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,29 +66,12 @@ namespace Hl7.Fhir.Support
             }
             return null;
         }
+        public static string ToFhirDate(this System.DateTime me) => me.ToString("yyyy-MM-dd");
 
-        public static string ToFhirDate(this System.DateTime me)
-        {
-            return me.ToString("yyyy-MM-dd");
-        }
+        public static string ToFhirDate(this System.DateTime? me) => me.HasValue ? me.Value.ToString("yyyy-MM-dd") : null;
 
-        public static string ToFhirDate(this System.DateTime? me)
-        {
-            if (me.HasValue)
-                return me.Value.ToString("yyyy-MM-dd");
-            return null;
-        }
+        public static string ToFhirDateTime(this System.DateTime me) => PrimitiveTypeConverter.ConvertTo<string>(me);
 
-        public static string ToFhirDateTime(this System.DateTime me)
-        {
-            return me.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz");
-        }
-
-        public static string ToFhirDateTime(this System.DateTime? me)
-        {
-            if (me.HasValue)
-                return me.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffzzz");
-            return null;
-        }
+        public static string ToFhirDateTime(this System.DateTime? me) => me.HasValue ? PrimitiveTypeConverter.ConvertTo<string>(me) : null;
     }
 }

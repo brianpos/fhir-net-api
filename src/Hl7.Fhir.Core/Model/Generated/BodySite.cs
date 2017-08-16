@@ -234,6 +234,22 @@ namespace Hl7.Fhir.Model
 				foreach (var elem in Image) { if (elem != null) yield return elem; }
             }
         }
+
+        [NotMapped]
+        internal override IEnumerable<ElementValue> NamedChildren
+        {
+            get
+            {
+                foreach (var item in base.NamedChildren) yield return item;
+                if (Patient != null) yield return new ElementValue("patient", false, Patient);
+                foreach (var elem in Identifier) { if (elem != null) yield return new ElementValue("identifier", true, elem); }
+                if (Code != null) yield return new ElementValue("code", false, Code);
+                foreach (var elem in Modifier) { if (elem != null) yield return new ElementValue("modifier", true, elem); }
+                if (DescriptionElement != null) yield return new ElementValue("description", false, DescriptionElement);
+                foreach (var elem in Image) { if (elem != null) yield return new ElementValue("image", true, elem); }
+            }
+        }
+
     }
     
 }

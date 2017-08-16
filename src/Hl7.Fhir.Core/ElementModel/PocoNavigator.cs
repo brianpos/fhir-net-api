@@ -14,7 +14,7 @@ using Hl7.Fhir.ElementModel;
 using Hl7.Fhir.Utility;
 using System.Diagnostics;
 
-namespace Hl7.Fhir.FhirPath
+namespace Hl7.Fhir.ElementModel
 {
     // http://blogs.msdn.com/b/jaredpar/archive/2011/03/18/debuggerdisplay-attribute-best-practices.aspx
     [DebuggerDisplay(@"\{{ShortPath,nq}}")]
@@ -25,98 +25,56 @@ namespace Hl7.Fhir.FhirPath
             if (model == null) throw Error.ArgumentNull(nameof(model));
 
             //_current = new PocoElementNavigator(model.TypeName, model);
-            _parentPath = "";
+            _parentLocation = "";
             _parentShortPath = "";
             _parentCommonPath = "";
 
-            var me = new PocoElementNavigator(model.TypeName, model);
-            _siblings = new List<PocoElementNavigator> { me };
-            _index = 0;
+            _nav = new PocoElementNavigator(model);
         }
 
-        private PocoNavigator()
+        private PocoNavigator()     // for clone
         {
         }
 
-        private IList<PocoElementNavigator> _siblings;
-        private int _index;
-        private string _parentPath;
+        private PocoElementNavigator _nav;
+        private string _parentLocation;
         private string _parentShortPath;
         private string _parentCommonPath;
 
-        private PocoElementNavigator Current
-        {
-            get
-            {
-                return _siblings[_index];
-            }
-        }
+        private PocoElementNavigator Current => _nav;
 
         /// <summary>
         /// Returns 
         /// </summary>
-        public object Value
-        {
-            get
-            {
-#if DEBUGX
-                Console.WriteLine("    -> Read Value of {0}: {1}", _current.Name, _current.Value);
-#endif
-                return Current.Value;
-            }
-        }
+        public object Value => Current.Value;
 
         /// <summary>
         /// Returns 
         /// </summary>
-        public Base FhirValue
-        {
-            get
-            {
-#if DEBUGX
-                Console.WriteLine("    -> Read Value of {0}: {1}", _current.Name, _current.Value);
-#endif
-                return Current.FhirValue;
-            }
-        }
+        public Base FhirValue => Current.FhirValue;
 
         /// <summary>
         /// Return the FHIR TypeName
         /// </summary>
-        public string Type
-        {
-            get
-            {
-                return Current.TypeName; // This needs to be fixed
-            }
-        }
+        public string Type => FhirValue is BackboneElement ? "BackboneElement" : Current.TypeName;
 
         /// <summary>
         /// The FHIR TypeName is also returned for the name of the root element
         /// </summary>
-        public string Name
-        {
-            get
-            {
-#if DEBUGX
-                Console.WriteLine("Read Name: {0} (value = {1})", _current.Name, _current.Value);
-#endif
-                return Current.Name;
-            }
-        }
+        public string Name => Current.Name;
 
         public string Location
         {
             get
             {
                 var cur = Current;
-                if (String.IsNullOrEmpty(_parentPath))
+                if (String.IsNullOrEmpty(_parentLocation))
                 {
                     return cur.Name;
                 }
                 else
                 {
-                    return $"{_parentPath}.{cur.Name}[{cur._arrayIndex}]";
+                    return $"{_parentLocation}.{cur.Name}[{cur.ArrayIndex}]";
                 }
             }
         }
@@ -138,9 +96,9 @@ namespace Hl7.Fhir.FhirPath
                 else
                 {
                     // Needs to consider that the index might be irrelevant
-                    if (cur.PropMap.IsCollection)
+                    if (cur.AtCollection)
                     {
-                        return $"{_parentShortPath}.{cur.Name}[{cur._arrayIndex}]";
+                        return $"{_parentShortPath}.{cur.Name}[{cur.ArrayIndex}]";
                     }
                     return $"{_parentShortPath}.{cur.Name}";
                 }
@@ -170,95 +128,89 @@ namespace Hl7.Fhir.FhirPath
                 else
                 {
                     // Needs to consider that the index might be irrelevant
-                    if (cur.PropMap.IsCollection)
+                    if (cur.AtCollection)
                     {
                         Base fhirValue = cur.FhirValue;
-                        if (fhirValue is Identifier)
+                        if (fhirValue is Identifier ident)
                         {
                             // Need to construct a where clause for this property
-                            Identifier ident = fhirValue as Identifier;
                             if (!string.IsNullOrEmpty(ident.System))
                                 return $"{_parentCommonPath}.{cur.Name}.where(system='{ident.System}')";
                         }
-                        else if (fhirValue is ContactPoint)
+                        else if (fhirValue is ContactPoint cp)
                         {
                             // Need to construct a where clause for this property
-                            var cp = fhirValue as ContactPoint;
                             if (cp.System.HasValue)
                                 return $"{_parentCommonPath}.{cur.Name}.where(system='{cp.System.Value.GetLiteral()}')";
                         }
-                        else if (fhirValue is Coding)
+                        else if (fhirValue is Coding cd)
                         {
                             // Need to construct a where clause for this property
-                            var item = fhirValue as Coding;
-                            if (!string.IsNullOrEmpty(item.System))
-                                return $"{_parentCommonPath}.{cur.Name}.where(system='{item.System}')";
+                            if (!string.IsNullOrEmpty(cd.System))
+                                return $"{_parentCommonPath}.{cur.Name}.where(system='{cd.System}')";
                         }
-                        else if (fhirValue is Address)
+                        else if (fhirValue is Address addr)
                         {
                             // Need to construct a where clause for this property
-                            var addr = fhirValue as Address;
                             if (addr.Use.HasValue)
                                 return $"{_parentCommonPath}.{cur.Name}.where(use='{addr.Use.Value.GetLiteral()}')";
                         }
-                        else if (fhirValue is Questionnaire.GroupComponent)
+                        else if (fhirValue is Questionnaire.GroupComponent gc)
                         {
                             // Need to construct a where clause for this property
-                            var item = fhirValue as Questionnaire.GroupComponent;
-                            if (!string.IsNullOrEmpty(item.LinkId))
-                                return $"{_parentCommonPath}.{cur.Name}.where(linkId='{item.LinkId}')";
+                            if (!string.IsNullOrEmpty(gc.LinkId))
+                                return $"{_parentCommonPath}.{cur.Name}.where(linkId='{gc.LinkId}')";
                         }
-                        else if (fhirValue is Questionnaire.QuestionComponent)
+                        else if (fhirValue is Questionnaire.QuestionComponent qc)
                         {
                             // Need to construct a where clause for this property
-                            var item = fhirValue as Questionnaire.QuestionComponent;
-                            if (!string.IsNullOrEmpty(item.LinkId))
-                                return $"{_parentCommonPath}.{cur.Name}.where(linkId='{item.LinkId}')";
+                            if (!string.IsNullOrEmpty(qc.LinkId))
+                                return $"{_parentCommonPath}.{cur.Name}.where(linkId='{qc.LinkId}')";
                         }
-                        else if (fhirValue is QuestionnaireResponse.GroupComponent)
+                        else if (fhirValue is QuestionnaireResponse.GroupComponent rgc)
                         {
                             // Need to construct a where clause for this property
-                            var item = fhirValue as QuestionnaireResponse.GroupComponent;
-                            if (!string.IsNullOrEmpty(item.LinkId))
-                                return $"{_parentCommonPath}.{cur.Name}.where(linkId='{item.LinkId}')";
+                            if (!string.IsNullOrEmpty(rgc.LinkId))
+                                return $"{_parentCommonPath}.{cur.Name}.where(linkId='{rgc.LinkId}')";
                         }
-                        else if (fhirValue is QuestionnaireResponse.QuestionComponent)
+                        else if (fhirValue is QuestionnaireResponse.QuestionComponent rqc)
                         {
                             // Need to construct a where clause for this property
-                            var item = fhirValue as QuestionnaireResponse.QuestionComponent;
-                            if (!string.IsNullOrEmpty(item.LinkId))
-                                return $"{_parentCommonPath}.{cur.Name}.where(linkId='{item.LinkId}')";
+                            if (!string.IsNullOrEmpty(rqc.LinkId))
+                                return $"{_parentCommonPath}.{cur.Name}.where(linkId='{rqc.LinkId}')";
                         }
-                        else if (fhirValue is Extension)
+                        else if (fhirValue is Extension ext)
                         {
                             // Need to construct a where clause for this property
                             // The extension is different as with fhirpath there
                             // is a shortcut format of .extension('url'), and since
                             // all extensions have a property name of extension, can just at the brackets and string name
-                            var item = fhirValue as Extension;
-                            return $"{_parentCommonPath}.{cur.Name}('{item.Url}')";
+                            return $"{_parentCommonPath}.{cur.Name}('{ext.Url}')";
                         }
-                        return $"{_parentCommonPath}.{cur.Name}[{cur._arrayIndex}]";
+                        return $"{_parentCommonPath}.{cur.Name}[{cur.ArrayIndex}]";
                     }
                     return $"{_parentCommonPath}.{cur.Name}";
                 }
             }
         }
 
+        private object lockObject = new object();
+
         public bool MoveToFirstChild(string nameFilter = null)
         {
-            var children = Current.Children(nameFilter);
-            if (children.Any())
+            var oldLoc = Location;
+            var oldSP = ShortPath;
+            var oldCP = CommonPath;
+                
+            if (Current.MoveToFirstChild(nameFilter))
             {
-                lock(this)
+                lock(lockObject)
                 {
-                    _parentPath = Location;
-                    _parentShortPath = ShortPath;
-                    _parentCommonPath = CommonPath;
-
-                    _siblings = (List<PocoElementNavigator>)children;
-                    _index = 0;
+                    _parentLocation = oldLoc;
+                    _parentShortPath = oldSP;
+                    _parentCommonPath = oldCP;
                 }
+
                 return true;
             }
 
@@ -271,18 +223,9 @@ namespace Hl7.Fhir.FhirPath
         /// <returns>
         /// true if there was a next element, false if it was the last element
         /// </returns>
-        public bool MoveToNext()
+        public bool MoveToNext(string nameFilter = null)
         {
-            if (_siblings.Count > _index+1)
-            { 
-                // string oldName = Current.Name;
-                _index++;
-                // string newName = Current.Name;
-                // Console.WriteLine("Move Next: {0} -> {1}", oldName, newName);
-                return true;
-            }
-            // Console.WriteLine("Move Next: {0} (no more sibblings, didn't move)", this.GetName());
-            return false;
+            return Current.MoveToNext(nameFilter);
         }
 
         /// <summary>
@@ -292,14 +235,15 @@ namespace Hl7.Fhir.FhirPath
         public IElementNavigator Clone()
         {
             var result = new PocoNavigator();
-            lock (this)
+
+            lock (lockObject)
             {
-                result._siblings = this._siblings;
-                result._index = this._index;
-                result._parentPath = this._parentPath;
+                result._nav = this._nav.Clone();
+                result._parentLocation = this._parentLocation;
                 result._parentShortPath = this._parentShortPath;
                 result._parentCommonPath = this._parentCommonPath;
             }
+
             return result;
         }
     }

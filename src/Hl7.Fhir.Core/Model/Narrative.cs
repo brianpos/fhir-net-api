@@ -37,7 +37,7 @@ using Hl7.Fhir.Utility;
 */
 
 //
-// Generated on Tue, Sep 22, 2015 20:02+1000 for FHIR v1.0.1
+// Generated for FHIR v1.0.2
 //
 namespace Hl7.Fhir.Model
 {
@@ -53,36 +53,41 @@ namespace Hl7.Fhir.Model
         
         /// <summary>
         /// The status of a resource narrative
+        /// (url: http://hl7.org/fhir/ValueSet/narrative-status)
         /// </summary>
         [FhirEnumeration("NarrativeStatus")]
         public enum NarrativeStatus
         {
             /// <summary>
             /// The contents of the narrative are entirely generated from the structured data in the content.
+            /// (system: http://hl7.org/fhir/narrative-status)
             /// </summary>
-            [EnumLiteral("generated", "http://hl7.org/fhir/narrative-status")]
+            [EnumLiteral("generated", "http://hl7.org/fhir/narrative-status"), Description("Generated")]
             Generated,
             /// <summary>
             /// The contents of the narrative are entirely generated from the structured data in the content and some of the content is generated from extensions
+            /// (system: http://hl7.org/fhir/narrative-status)
             /// </summary>
-            [EnumLiteral("extensions", "http://hl7.org/fhir/narrative-status")]
+            [EnumLiteral("extensions", "http://hl7.org/fhir/narrative-status"), Description("Extensions")]
             Extensions,
             /// <summary>
             /// The contents of the narrative contain additional information not found in the structured data
+            /// (system: http://hl7.org/fhir/narrative-status)
             /// </summary>
-            [EnumLiteral("additional", "http://hl7.org/fhir/narrative-status")]
+            [EnumLiteral("additional", "http://hl7.org/fhir/narrative-status"), Description("Additional")]
             Additional,
             /// <summary>
             /// The contents of the narrative are some equivalent of "No human-readable text provided in this case"
+            /// (system: http://hl7.org/fhir/narrative-status)
             /// </summary>
-            [EnumLiteral("empty", "http://hl7.org/fhir/narrative-status")]
+            [EnumLiteral("empty", "http://hl7.org/fhir/narrative-status"), Description("Empty")]
             Empty,
         }
-        
+
         /// <summary>
         /// generated | extensions | additional | empty
         /// </summary>
-        [FhirElement("status", InSummary=true, Order=30)]
+        [FhirElement("status", InSummary = true, Order = 30)]
         [Cardinality(Min=1,Max=1)]
         [DataMember]
         public Code<Hl7.Fhir.Model.Narrative.NarrativeStatus> StatusElement
@@ -184,6 +189,17 @@ namespace Hl7.Fhir.Model
             }
         }
 
+
+        [NotMapped]
+        internal override IEnumerable<ElementValue> NamedChildren
+        {
+            get
+            {
+                foreach (var item in base.NamedChildren) yield return item;
+                if (StatusElement != null) yield return new ElementValue("status", false, StatusElement);
+                if (Div != null) yield return new ElementValue("div", false, Div);                
+            }
+        }
     }
     
 }

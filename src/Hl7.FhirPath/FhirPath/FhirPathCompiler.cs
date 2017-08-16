@@ -22,7 +22,7 @@ namespace Hl7.FhirPath
 {
     public class FhirPathCompiler
     {
-        private static Lazy<SymbolTable> _defaultSymbolTable = new Lazy<SymbolTable>(() => new SymbolTable().AddStandardFP(), isThreadSafe: false);
+        private static Lazy<SymbolTable> _defaultSymbolTable = new Lazy<SymbolTable>(() => new SymbolTable().AddStandardFP());
         
         public static void SetDefaultSymbolTable(Lazy<SymbolTable> st)
         {
@@ -63,9 +63,9 @@ namespace Hl7.FhirPath
         {
             Invokee inv = expression.ToEvaluator(Symbols);
 
-            return (IElementNavigator focus, IElementNavigator containerResource) =>
+            return (IElementNavigator focus, EvaluationContext ctx) =>
                 {
-                    var closure = Closure.Root(focus, containerResource);
+                    var closure = Closure.Root(focus, ctx);
                     return inv(closure, InvokeeFactory.EmptyArgs);
                 };
         }

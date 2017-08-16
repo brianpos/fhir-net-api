@@ -13,6 +13,7 @@ using Hl7.Fhir.Utility;
 using System;
 using System.IO.Compression;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace Hl7.Fhir.Rest
 {
@@ -57,8 +58,11 @@ namespace Hl7.Fhir.Rest
         public Action<HttpWebResponse, byte[]> AfterResponse { get; set; }
 
 
-
         public Bundle.EntryComponent Execute(Bundle.EntryComponent interaction)
+        {
+            return ExecuteAsync(interaction).WaitResult();
+        }
+        public async Task<Bundle.EntryComponent> ExecuteAsync(Bundle.EntryComponent interaction)
         {
             if (interaction == null) throw Error.ArgumentNull(nameof(interaction));
             bool compressRequestBody = false;
@@ -85,8 +89,8 @@ namespace Hl7.Fhir.Rest
                 request.WriteBody(compressRequestBody, outBody);
 
             // Make sure the HttpResponse gets disposed!
-            // using (HttpWebResponse webResponse = (HttpWebResponse)await request.GetResponseAsync(new TimeSpan(0, 0, 0, 0, Timeout)))
-            using (HttpWebResponse webResponse = (HttpWebResponse)request.GetResponseNoEx())
+            using (HttpWebResponse webResponse = (HttpWebResponse)await request.GetResponseAsync(new TimeSpan(0, 0, 0, 0, Timeout)).ConfigureAwait(false))
+            //using (HttpWebResponse webResponse = (HttpWebResponse)request.GetResponseNoEx())
             {
                 try
                 {
@@ -109,7 +113,7 @@ namespace Hl7.Fhir.Rest
                         else
                         {
                             LastResult = webResponse.ToBundleEntry(inBody, ParserSettings, throwOnFormatException: false);
-                            throw httpNonSuccessStatusToException(webResponse.StatusCode, LastResult.Resource);
+                            throw buildFhirOperationException(webResponse.StatusCode, LastResult.Resource);
                         }
                     }
                     catch(UnsupportedBodyTypeException bte)
@@ -180,47 +184,25 @@ namespace Hl7.Fhir.Rest
         }
 
 
-
-        /// <summary>
-        /// Convert a status code into an exception, or null if everything is fine.
-        /// </summary>
-        /// <param name="status">HTTP status code</param>
-        /// <param name="body">Content delivered by the server, parsed as a FHIR resource</param>
-        /// <returns></returns>
-        private static Exception httpNonSuccessStatusToException(HttpStatusCode status, Resource body)
-        {
-            if (status.IsInformational() || status.IsRedirection())      // 1xx and 3xx codes - we don't handle them, unless the .NET API did it for us
-            {
-                return Error.NotSupported("Server returned a status code '{0}', which is not supported by the FhirClient".FormatWith(status));
-            }
-            else if (status.IsClientError() || status.IsServerError())      // 4xx/5xx codes - client or server error.
-            {
-                return buildFhirOperationException(status, body);
-            }
-            else
-            {
-                return Error.NotSupported("Server returned an illegal http status code '{0}', which is not defined by the Http standard".FormatWith(status));
-            }
-        }
-
         private static Exception buildFhirOperationException(HttpStatusCode status, Resource body)
         {
-            var message = string.Format("Operation was unsuccessful, and returned status {0}.", status);
-            var outcome = body as OperationOutcome;
+            string message;
 
-            if (outcome != null)
-            {
-                // Body is an OperationOutcome
-                return new FhirOperationException(message + " OperationOutcome: " + outcome.ToString(), status, outcome);
-            }
-            else if (body != null)
-            {
-                return new FhirOperationException(message + " Body contains a " + body.TypeName, status);
-            }
+            if (status.IsInformational())
+                message = $"Operation resulted in an informational response ({status})";
+            else if (status.IsRedirection())
+                message = $"Operation resulted in an redirection response ({status})";
+            else if (status.IsClientError())
+                message = $"Operation was unsuccessful because of a client error ({status})";
             else
-            {
-                return new FhirOperationException(message + " Body is null", status);
-            }
+                message = $"Operation was unsuccessful, and returned status {status}";
+
+            if (body is OperationOutcome outcome)
+                return new FhirOperationException($"{message}. OperationOutcome: {outcome.ToString()}.", status, outcome);
+            else if (body != null)
+                return new FhirOperationException($"{message}. Body contains a {body.TypeName}.", status);
+            else
+                return new FhirOperationException($"{message}. Body has no content.", status);
         }
     }
 }

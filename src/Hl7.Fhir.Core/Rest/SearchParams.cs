@@ -32,14 +32,9 @@
 
 using Hl7.Fhir.Introspection;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Text.RegularExpressions;
-using Hl7.Fhir.Support;
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Serialization;
 using Hl7.Fhir.Utility;
@@ -405,26 +400,31 @@ namespace Hl7.Fhir.Rest
         /// <summary>
         /// Return only those elements marked as "summary" in the base definition of the resource(s)
         /// </summary>
+        [EnumLiteral("true")]
         True,
 
         /// <summary>
         /// Return only the "text" element, and any mandatory elements
         /// </summary>
+        [EnumLiteral("text")]
         Text,
 
         /// <summary>
         /// Remove the text element
         /// </summary>
+        [EnumLiteral("data")]
         Data,
 
         /// <summary>
         /// Search only: just return a count of the matching resources, without returning the actual matches
         /// </summary>
+        [EnumLiteral("count")]
         Count,
 
         /// <summary>
         /// Return all parts of the resource(s)
         /// </summary>
+        [EnumLiteral("false")]
         False
     }
 

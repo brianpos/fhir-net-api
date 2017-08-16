@@ -7,81 +7,64 @@ namespace Hl7.Fhir.ElementModel
 
     public static class ElementNavigatorExtensions
     {
-        public static IEnumerable<IElementNavigator> Children(this IElementNavigator navigator)
+        public static IEnumerable<IElementNavigator> Children(this IElementNavigator navigator, string name = null)
         {
-            var nav = navigator.Clone();
-            if (nav.MoveToFirstChild())
-            {
-                do
-                {
-                    yield return nav.Clone();
-                }
-                while (nav.MoveToNext());
-            }
-        }
-
-        public static IEnumerable<IElementNavigator> Children(this IEnumerable<IElementNavigator> navigators)
-        {
-            // use a standard enumerator approach
-            // this will then only grab 1 value if
-            // that is all the caller requires.
-            foreach (var navigator in navigators)
-            {
-                var nav = navigator.Clone();
-                if (nav.MoveToFirstChild())
-                {
-                    do
-                    {
-                        yield return nav.Clone();
-                    }
-                    while (nav.MoveToNext());
-                }
-            }
-        }
-
-        public static IEnumerable<IElementNavigator> Children(this IElementNavigator navigator, string name)
-        {
-            // use a standard enumerator approach
-            // this will then only grab 1 value if
-            // that is all the caller requires.
             var nav = navigator.Clone();
             if (nav.MoveToFirstChild(name))
             {
                 do
                 {
-                    // Some safety checking that the 
-                    // nameFilter parameter has been accurately
-                    // applied to the navigator
-                    if (nav?.Name == name)
-                        yield return nav.Clone();
-                    else
-                        throw new InvalidOperationException("Found an unexpected item in the navigator");
+                    yield return nav.Clone();
                 }
-                while (nav.MoveToNext());
+                while (nav.MoveToNext(name));
             }
         }
 
-        public static IEnumerable<IElementNavigator> Children(this IEnumerable<IElementNavigator> navigators, string name)
+
+        public static IEnumerable<IElementNavigator> Children(this IEnumerable<IElementNavigator> navigators, string name = null)
         {
             return navigators.SelectMany(n => n.Children(name));
+
+            // [20170524 EK] This is unneccessary, since this is exactly what SelectMany() does, so this just results
+            // in duplication of code inside the foreach() here.
+
+            // use a standard enumerator approach
+            // this will then only grab 1 value if
+            // that is all the caller requires.
+            //foreach (var navigator in navigators)
+            //{
+            //    var nav = navigator.Clone();
+            //    if (nav.MoveToFirstChild())
+            //    {
+            //        do
+            //        {
+            //            yield return nav.Clone();
+            //        }
+            //        while (nav.MoveToNext());
+            //    }
+            //}
         }
 
-        public static bool HasChildren(this IElementNavigator navigator)
+        public static bool HasChildren(this IEnumerable<IElementNavigator> navigators, string name = null)
         {
-            var nav = navigator.Clone();
-            return nav.MoveToFirstChild();
-        }
+            return navigators.Children(name).Any();
 
-        public static bool HasChildren(this IEnumerable<IElementNavigator> navigators)
-        {
+            // [20170524 EK] This is unneccessary, since this is exactly what Any() does, so this just results
+            // in duplication of code inside the foreach() here.
+
             // if any of the navigators have children
             // its true! (no need to expand the children)
-            foreach (var nav in navigators)
-            {
-                if (nav.HasChildren())
-                    return true;
-            }
-            return false;
+            //foreach (var nav in navigators)
+            //{
+            //    if (nav.HasChildren())
+            //        return true;
+            //}
+            //return false;
+        }
+
+        public static bool HasChildren(this IElementNavigator navigator, string name = null)
+        {
+            return navigator.Children(name).Any();
         }
 
         public static IEnumerable<IElementNavigator> Descendants(this IElementNavigator navigator)

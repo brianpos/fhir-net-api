@@ -18,33 +18,20 @@ namespace Hl7.Fhir.Utility
         public static string GetLiteral(this Enum e)
         {
             var attr = e.GetAttributeOnEnum<EnumLiteralAttribute>();
-
-            if (attr != null)
-                return attr.Literal;
-            else
-                return null;
+            return attr?.Literal ?? e.ToString();
         }
 
         public static string GetSystem(this Enum e)
         {
             var attr = e.GetAttributeOnEnum<EnumLiteralAttribute>();
-
-            if (attr != null)
-                return attr.System;
-            else
-                return null;
+            return attr?.System;
         }
 
         public static string GetDocumentation(this Enum e)
         {
             var attr = e.GetAttributeOnEnum<DescriptionAttribute>();
-
-            if (attr != null)
-                return attr.Description;
-            else
-                return null;
+            return attr?.Description ?? e.ToString();
         }
-
 
         private static Dictionary<Type, EnumMapping> _cache = new Dictionary<Type, EnumMapping>();
         private static Object _cacheLock = new Object();
@@ -98,44 +85,30 @@ namespace Hl7.Fhir.Utility
 
             public string GetLiteral(Enum value)
             {
-                // [WMR 20160421] Optimization
-                //if (_enumToLiteral.ContainsKey(value))
-                //    return _enumToLiteral[value];
-                //else
-                //    return null;
-                string result;
-                _enumToLiteral.TryGetValue(value, out result);
+                _enumToLiteral.TryGetValue(value, out string result);
                 return result;
             }
 
             public Enum ParseLiteral(string literal)
             {
-                // [WMR 20160421] Optimization
-                //if (_literalToEnum.ContainsKey(literal))
-                //    return _literalToEnum[literal];
-                //else
-                //    return null;
-                Enum result;
-                _literalToEnum.TryGetValue(literal, out result);
+                _literalToEnum.TryGetValue(literal, out Enum result);
                 return result;
             }
 
-            public bool ContainsLiteral(string literal)
-            {
-                return _literalToEnum.ContainsKey(literal);
-            }
+            public bool ContainsLiteral(string literal) => _literalToEnum.ContainsKey(literal);
 
             public static EnumMapping Create(Type enumType)
             {
                 if (enumType == null) throw Error.ArgumentNull("enumType");
                 if (!enumType.IsEnum()) throw Error.Argument("enumType", "Type {0} is not an enumerated type".FormatWith(enumType.Name));
 
-                var result = new EnumMapping();
-
-                result.Name = getEnumName(enumType);
-                result.EnumType = enumType;
-                result._enumToLiteral = new Dictionary<Enum, string>();
-                result._literalToEnum = new Dictionary<string, Enum>();
+                var result = new EnumMapping()
+                {
+                    Name = getEnumName(enumType),
+                    EnumType = enumType,
+                    _enumToLiteral = new Dictionary<Enum, string>(),
+                    _literalToEnum = new Dictionary<string, Enum>()
+                };
 
                 foreach (var enumValue in ReflectionHelper.FindEnumFields(enumType))
                 {
@@ -169,6 +142,5 @@ namespace Hl7.Fhir.Utility
                     return t.Name;
             }
         }
-
     }
 }

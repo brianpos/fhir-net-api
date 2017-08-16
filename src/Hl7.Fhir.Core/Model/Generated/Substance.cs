@@ -178,6 +178,19 @@ namespace Hl7.Fhir.Model
                     if (Quantity != null) yield return Quantity;
                 }
             }
+
+            [NotMapped]
+            internal override IEnumerable<ElementValue> NamedChildren
+            {
+                get
+                {
+                    foreach (var item in base.NamedChildren) yield return item;
+                    if (Identifier != null) yield return new ElementValue("identifier", false, Identifier);
+                    if (ExpiryElement != null) yield return new ElementValue("expiry", false, ExpiryElement);
+                    if (Quantity != null) yield return new ElementValue("quantity", false, Quantity);
+                }
+            }
+
             
         }
         
@@ -273,6 +286,18 @@ namespace Hl7.Fhir.Model
                     if (Substance != null) yield return Substance;
                 }
             }
+
+            [NotMapped]
+            internal override IEnumerable<ElementValue> NamedChildren
+            {
+                get
+                {
+                    foreach (var item in base.NamedChildren) yield return item;
+                    if (Quantity != null) yield return new ElementValue("quantity", false, Quantity);
+                    if (Substance != null) yield return new ElementValue("substance", false, Substance);
+                }
+            }
+
             
         }
         
@@ -456,6 +481,22 @@ namespace Hl7.Fhir.Model
 				foreach (var elem in Ingredient) { if (elem != null) yield return elem; }
             }
         }
+
+        [NotMapped]
+        internal override IEnumerable<ElementValue> NamedChildren
+        {
+            get
+            {
+                foreach (var item in base.NamedChildren) yield return item;
+                foreach (var elem in Identifier) { if (elem != null) yield return new ElementValue("identifier", true, elem); }
+                foreach (var elem in Category) { if (elem != null) yield return new ElementValue("category", true, elem); }
+                if (Code != null) yield return new ElementValue("code", false, Code);
+                if (DescriptionElement != null) yield return new ElementValue("description", false, DescriptionElement);
+                foreach (var elem in Instance) { if (elem != null) yield return new ElementValue("instance", true, elem); }
+                foreach (var elem in Ingredient) { if (elem != null) yield return new ElementValue("ingredient", true, elem); }
+            }
+        }
+
     }
     
 }

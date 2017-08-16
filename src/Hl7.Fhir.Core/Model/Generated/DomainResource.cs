@@ -214,6 +214,20 @@ namespace Hl7.Fhir.Model
 				foreach (var elem in ModifierExtension) { if (elem != null) yield return elem; }
             }
         }
+
+        [NotMapped]
+        internal override IEnumerable<ElementValue> NamedChildren
+        {
+            get
+            {
+                foreach (var item in base.NamedChildren) yield return item;
+                if (Text != null) yield return new ElementValue("text", false, Text);
+                foreach (var elem in Contained) { if (elem != null) yield return new ElementValue("contained", true, elem); }
+                foreach (var elem in Extension) { if (elem != null) yield return new ElementValue("extension", true, elem); }
+                foreach (var elem in ModifierExtension) { if (elem != null) yield return new ElementValue("modifierExtension", true, elem); }
+            }
+        }
+
     }
     
 }

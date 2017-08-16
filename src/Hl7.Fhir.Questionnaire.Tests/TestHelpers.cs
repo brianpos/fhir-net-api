@@ -18,6 +18,7 @@ using Hl7.Fhir.Validation;
 using Hl7.Fhir.QuestionnaireServices;
 using Hl7.Fhir.Specification.Source;
 using Hl7.Fhir.Rest;
+using Hl7.Fhir.FhirPath;
 
 namespace Hl7.Fhir.QuestionnaireServices.Tests
 {
@@ -28,7 +29,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         public static void SetupSource(TestContext context)
         {
             // Ensure the FHIR extensions are registered
-            Hl7.Fhir.FhirPath.PocoNavigatorExtensions.PrepareFhirSymbolTableFunctions();
+            ElementNavFhirExtensions.PrepareFhirSymbolTableFunctions();
 
             _source = new CachedResolver(
                 new MultiResolver(

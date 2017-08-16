@@ -31,11 +31,18 @@ namespace Hl7.Fhir.Validation
 
         public static bool IsPrimitiveValueConstraint(this ElementDefinition ed)
         {
+            //TODO: There is something smarter for this in STU3
             var path = ed.Path;
 
             return path.Count(c => c == '.') == 1 &&
                         path.EndsWith(".value") &&
                         Char.IsLower(path[0]);
+        }
+
+        internal static bool IsResourcePlaceholder(this ElementDefinition ed)
+        {
+            if (ed.Type == null) return false;
+            return ed.Type.Any(t => t.Code == FHIRDefinedType.Resource || t.Code == FHIRDefinedType.DomainResource);
         }
 
         public static string ConstraintDescription(this ElementDefinition.ConstraintComponent cc)

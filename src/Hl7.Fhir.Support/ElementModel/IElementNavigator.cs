@@ -33,7 +33,7 @@ namespace Hl7.Fhir.ElementModel
         /// Move to the next sibling of the current element.
         /// </summary>
         /// <returns>false when there is no next sibling, true otherwise.</returns>
-        bool MoveToNext();
+        bool MoveToNext(string nameFilter = null);
 
         /// <summary>
         /// Move to the first child of the current element.

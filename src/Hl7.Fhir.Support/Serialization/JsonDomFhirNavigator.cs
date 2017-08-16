@@ -34,10 +34,10 @@ namespace Hl7.Fhir.Serialization
         {
             var copy = new JsonDomFhirNavigator()
             {
-                _siblings = _siblings,
-                _index = _index,
-                _nameIndex = _nameIndex,
-                _parentPath = _parentPath
+                _siblings = this._siblings,
+                _index = this._index,
+                _nameIndex = this._nameIndex,
+                _parentPath = this._parentPath
             };
 
             return copy;
@@ -64,18 +64,28 @@ namespace Hl7.Fhir.Serialization
             }
         }
 
-        public bool MoveToFirstChild(string nameFilter = null)
+        private int nextMatch(JsonNavigatorNode[] nodes, string namefilter = null, int startAfter = -1)
         {
-            JsonNavigatorNode[] children;
-            if (nameFilter == null)
-                children = Current.GetChildren().ToArray();
-            else
+            for (int scan = startAfter + 1; scan < nodes.Length; scan++)
             {
-                // also handles JSON extensions here (as they are at the same level).
-                children = Current.GetChildren().Where(f => f.Name == nameFilter || f.Name == "_"+nameFilter).ToArray();
+                if (namefilter == null || nodes[scan].Name == namefilter || nodes[scan].Name == "_" + namefilter)
+                    return scan;
             }
 
+            return -1;
+        }
+
+        // TODO: Brian: the ToArray here will slow things down here as it forces 
+        // the complete enumeration of the children, and can't optimize directly 
+        // to the named element in question (as my other code had already handled)
+        public bool MoveToFirstChild(string nameFilter = null)
+        {
+            var children = Current.GetChildren().ToArray(); 
+
             if (children.Length == 0) return false;
+
+            var found = nextMatch(children, nameFilter);
+            if (found == -1) return false;
 
             _parentPath = Location;
             _siblings = children;
@@ -85,12 +95,14 @@ namespace Hl7.Fhir.Serialization
             return true;
         }
 
-        public bool MoveToNext()
+        public bool MoveToNext(string nameFilter = null)
         {
-            if (_index + 1 >= _siblings.Length) return false;
+            var found = nextMatch(_siblings, nameFilter, _index);
+
+            if (found == -1) return false;
 
             var currentName = Name;
-             _index += 1;
+            _index = found;
 
             if (currentName == Name)
                 _nameIndex += 1;
