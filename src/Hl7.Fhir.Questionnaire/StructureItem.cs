@@ -64,7 +64,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             OperationOutcome result = new OperationOutcome();
             IEnumerable<IElementNavigator> values;
             if (!string.IsNullOrEmpty(FhirpathExpression))
-                values = new Hl7.FhirPath.FhirPathCompiler().Compile(FhirpathExpression).Invoke(ParentContext, ContainerContext);
+                values = new Hl7.FhirPath.FhirPathCompiler().Compile(FhirpathExpression).Invoke(ParentContext, new EvaluationContext(ContainerContext));
             else
                 values = new List<IElementNavigator>(new[] { ParentContext });
             if (ValidationRules != null)
