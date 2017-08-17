@@ -8,6 +8,7 @@
 
 using Hl7.Fhir.ElementModel;
 using Hl7.Fhir.Model;
+using Hl7.Fhir.Utility;
 using Hl7.FhirPath;
 using Hl7.FhirPath.Expressions;
 using System;
@@ -17,6 +18,25 @@ using System.Text;
 
 namespace Hl7.Fhir.FhirPath
 {
+    public class FhirEvaluationContext : EvaluationContext
+    {
+        new public static readonly FhirEvaluationContext Default = new FhirEvaluationContext();
+
+        public FhirEvaluationContext() : base()
+        {
+        }
+
+        public FhirEvaluationContext(Resource context) : base(context?.ToNavigator())
+        {
+        }
+
+        public FhirEvaluationContext(IElementNavigator context) : base(context)
+        {
+        }
+
+        public Func<string,IElementNavigator> Resolver { get; set; }
+    }
+
     public static class ElementNavFhirExtensions
     {
         internal static bool _fhirSymbolTableExtensionsAdded = false;
@@ -29,17 +49,36 @@ namespace Hl7.Fhir.FhirPath
             }
         }
 
-        // TODO: Add support for the custom fhirpath function hasValue() on the default symbol table
-        //
+        public static Func<string, IElementNavigator> ToFhirPathResolver(this Func<string, Resource> resolver)
+        {
+            return navResolver;
+
+            IElementNavigator navResolver(string url)
+            {
+                var resource = resolver(url);
+                if (resource == null) return null;
+
+                return new PocoNavigator(resource);
+            }
+        }
+
         public static SymbolTable AddFhirExtensions(this SymbolTable t)
         {
             t.Add("hasValue", (ElementModel.IElementNavigator f) => f.HasValue(), doNullProp: false);
-            t.Add("resolve", (ElementModel.IElementNavigator f) => f.Resolve(), doNullProp: false);
+            t.Add("resolve", (ElementModel.IElementNavigator f, EvaluationContext ctx) => resolver(f,ctx), doNullProp: false);
             t.Add("htmlchecks", (ElementModel.IElementNavigator f) => f.HtmlChecks(), doNullProp: false);
 
             return t;
-        }
 
+            IElementNavigator resolver(ElementModel.IElementNavigator f, EvaluationContext ctx)
+            {
+                if(ctx is FhirEvaluationContext fctx)
+                    return f.Resolve(fctx.Resolver);
+                else
+                    return f.Resolve();
+            }
+        }
+        
         /// <summary>
         /// Check if the node has a value, and not just extensions.
         /// </summary>
@@ -71,33 +110,6 @@ namespace Hl7.Fhir.FhirPath
             return true;
         }
 
-        /// <summary>
-        /// Where this item is a reference, resolve it to an actual resource, and return that
-        /// </summary>
-        /// <param name="focus"></param>
-        /// <returns></returns>
-        public static ElementModel.IElementNavigator Resolve(this ElementModel.IElementNavigator focus)
-        {
-            if (focus == null)
-                return null;
-            if (focus.Value == null)
-                return null;
-            if (focus.Value is PocoElementNavigator)
-            {
-                var fv = (focus.Value as PocoElementNavigator).FhirValue;
-                if (fv is ResourceReference)
-                {
-                    string reference = (fv as ResourceReference).Reference;
-                    if (string.IsNullOrEmpty(reference))
-                        return null;
-                    Rest.ResourceIdentity ri = new Rest.ResourceIdentity(reference);
-
-                    // Go retrieve the resource? (seriously?)
-                    System.Diagnostics.Debug.WriteLine("Evaluating a reolve call: " + reference);
-                }
-            }
-            return null;
-        }
 
         public static IEnumerable<Base> ToFhirValues(this IEnumerable<ElementModel.IElementNavigator> results)
         {
@@ -151,38 +163,60 @@ namespace Hl7.Fhir.FhirPath
             });
         }
 
-        public static IEnumerable<Base> Select(this Base input, string expression, Resource resource = null)
-        {
-            var inputNav = new PocoNavigator(input);
-            var resourceNav = resource != null ? new PocoNavigator(resource) : null;
 
-            var result = inputNav.Select(expression, resourceNav);
+        //private static ScopedNavigator createNav(Base input) => new ScopedNavigator(new PocoNavigator(input));
+        private static PocoNavigator createNav(Base input) => new PocoNavigator(input);
+
+        public static IElementNavigator ToNavigator(this Base input) => new PocoNavigator(input);
+
+
+        public static IEnumerable<Base> Select(this Base input, string expression, FhirEvaluationContext ctx = null)
+        {
+            var inputNav = input.ToNavigator();
+            var result = inputNav.Select(expression, ctx ?? FhirEvaluationContext.Default);
             return result.ToFhirValues();            
         }
 
-        public static object Scalar(this Base input, string expression, Resource resource = null)
+        [Obsolete("Replace with the overload taking an FhirEvaluationContext, initialized with the resource parameter")]
+        public static IEnumerable<Base> Select(this Base input, string expression, Resource resource)
         {
-            var inputNav = new PocoNavigator(input);
-            var resourceNav = resource != null ? new PocoNavigator(resource) : null;
-
-            return inputNav.Scalar(expression, resourceNav);
+            return Select(input, expression, new FhirEvaluationContext(resource));
         }
 
-        public static bool Predicate(this Base input, string expression, Resource resource = null)
+        public static object Scalar(this Base input, string expression, FhirEvaluationContext ctx = null)
         {
-            var inputNav = new PocoNavigator(input);
-            var resourceNav = resource != null ? new PocoNavigator(resource) : null;
-
-            return inputNav.Predicate(expression, resourceNav);
+            var inputNav = input.ToNavigator();
+            return inputNav.Scalar(expression, ctx ?? FhirEvaluationContext.Default);
         }
 
-        public static bool IsBoolean(this Base input, string expression, bool value, Resource resource = null)
+        [Obsolete("Replace with the overload taking an FhirEvaluationContext, initialized with the resource parameter")]
+        public static object Scalar(this Base input, string expression, Resource resource)
         {
-            var inputNav = new PocoNavigator(input);
-            var resourceNav = resource != null ? new PocoNavigator(resource) : null;
-
-            return inputNav.IsBoolean(expression, value, resourceNav);
+            return Scalar(input, expression, new FhirEvaluationContext(resource));
         }
 
+        public static bool Predicate(this Base input, string expression, FhirEvaluationContext ctx = null)
+        {
+            var inputNav = input.ToNavigator();
+            return inputNav.Predicate(expression, ctx ?? FhirEvaluationContext.Default);
+        }
+
+        [Obsolete("Replace with the overload taking an FhirEvaluationContext, initialized with the resource parameter")]
+        public static bool Predicate(this Base input, string expression, Resource resource)
+        {
+            return Predicate(input, expression, new FhirEvaluationContext(resource));
+        }
+
+        public static bool IsBoolean(this Base input, string expression, bool value, FhirEvaluationContext ctx = null)
+        {
+            var inputNav = createNav(input);
+            return inputNav.IsBoolean(expression, value, ctx ?? FhirEvaluationContext.Default);
+        }
+
+        [Obsolete("Replace with the overload taking an FhirEvaluationContext, initialized with the resource parameter")]
+        public static bool IsBoolean(this Base input, string expression, bool value, Resource resource)
+        {
+            return IsBoolean(input, expression, value, new FhirEvaluationContext(resource));
+        }
     }
 }
