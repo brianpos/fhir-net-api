@@ -196,6 +196,15 @@ namespace Hl7.Fhir.QuestionnaireServices
                                     pm.SetValue(instance, new Code(valueString.Value));
                                 else if (pm.ElementType == typeof(Id) && answers.First().Value is FhirString)
                                     pm.SetValue(instance, new Id(((FhirString)answers.First().Value).Value));
+                                else if (pm.IsCollection)
+                                {
+                                    IList col = fac.Create(pm.ReturnType) as IList;
+                                    foreach (var itemValue in answers.Select(v => v.Value))
+                                    {
+                                        col.Add(itemValue);
+                                    }
+                                    pm.SetValue(instance, col);
+                                }
                                 else
                                     pm.SetValue(instance, answers.First().Value);
                             }

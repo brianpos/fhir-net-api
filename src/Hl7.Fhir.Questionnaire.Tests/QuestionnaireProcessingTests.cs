@@ -41,6 +41,10 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual("1970", prac.BirthDate);
             Assert.AreEqual(2, prac.Qualification?.Count);
             Assert.AreEqual("Brian Postlethwaite", prac.Name?.Text);
+            Assert.AreEqual("MOPO", prac.Address[0].Line.FirstOrDefault());
+            Assert.AreEqual("Ascot Vale Rd", prac.Address[0].Line.Skip(1).FirstOrDefault());
+            Assert.AreEqual("3039", prac.Address[0]?.PostalCode);
+
             Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
             Assert.AreEqual("Certification 3 - Aged Care", prac.Qualification[0].Code.Coding[0].Display);
             Assert.AreEqual("2017", prac.Qualification[0].Period.End);
@@ -85,6 +89,19 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
                 Text = "Name",
                 Type = Questionnaire.AnswerFormat.String,
                 LinkId = "Practitioner.name.text"
+            });
+            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            {
+                Text = "Address",
+                Type = Questionnaire.AnswerFormat.String,
+                Repeats = true,
+                LinkId = "Practitioner.address.line"
+            });
+            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            {
+                Text = "Post Code",
+                Type = Questionnaire.AnswerFormat.String,
+                LinkId = "Practitioner.address.postalCode"
             });
 
             // A collection of Qualifications
@@ -163,6 +180,24 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
                     { Value = new FhirString("Brian Postlethwaite") }
                 }
             });
+            gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Address",
+                LinkId = "Practitioner.address.line",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() {
+                    new QuestionnaireResponse.AnswerComponent() { Value = new FhirString("MOPO") },
+                    new QuestionnaireResponse.AnswerComponent() { Value = new FhirString("Ascot Vale Rd") }
+                }
+            });
+            gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Post Code",
+                LinkId = "Practitioner.address.postalCode",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new FhirString("3039") }
+                }
+            });
+
 
             // A collection of Qualifications
             var gCerts = new QuestionnaireResponse.GroupComponent();
