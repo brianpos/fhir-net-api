@@ -2,7 +2,7 @@
 <StructureDefinition xmlns="http://hl7.org/fhir">
   <id value="hcxdir-practitioner" />
   <meta>
-    <lastUpdated value="2017-08-03T20:48:09.29+10:00" />
+    <lastUpdated value="2017-09-01T10:02:57.52+10:00" />
   </meta>
   <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm">
     <valueInteger value="3" />
@@ -91,6 +91,14 @@
       <type>
         <code value="Extension" />
         <profile value="http://healthconnex.com.au/hcxd/Practitioner/ReferralMethods" />
+      </type>
+    </element>
+    <element>
+      <path value="Practitioner.extension" />
+      <name value="classification" />
+      <type>
+        <code value="Extension" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/practitioner-classification" />
       </type>
     </element>
     <element>
@@ -10840,6 +10848,14 @@
       <type>
         <code value="Extension" />
         <profile value="http://healthconnex.com.au/hcxd/Practitioner/ReferralMethods" />
+      </type>
+    </element>
+    <element>
+      <path value="Practitioner.extension" />
+      <name value="classification" />
+      <type>
+        <code value="Extension" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/practitioner-classification" />
       </type>
     </element>
     <element>

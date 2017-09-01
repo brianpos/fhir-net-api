@@ -119,6 +119,11 @@ namespace Hl7.Fhir.QuestionnaireServices
                         IEnumerable<Base> result = (IEnumerable<Base>)pm.GetValue(data);
                         foreach (var itemInCol in result)
                         {
+                            if (!string.IsNullOrEmpty(child.ExtensionUrl) && itemInCol is Extension ie)
+                            {
+                                if (ie.Url != child.ExtensionUrl)
+                                    continue;
+                            }
                             StructureItem itemAtValue;
                             var moreData = GetValues(child, itemInCol, path, linkId, out itemAtValue);
                             if (moreData.Any())

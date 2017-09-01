@@ -156,6 +156,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                         {
                             // Also need to handle repeating properties (array primitives)
                             var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
+                            object existingValue = pm.GetValue(instance);
                             if (answers.First().Value is Coding)
                             {
                                 Coding codedValue = answers.First().Value as Coding;
@@ -198,7 +199,9 @@ namespace Hl7.Fhir.QuestionnaireServices
                                     pm.SetValue(instance, new Id(((FhirString)answers.First().Value).Value));
                                 else if (pm.IsCollection)
                                 {
-                                    IList col = fac.Create(pm.ReturnType) as IList;
+                                    IList col = pm.GetValue(instance) as IList;
+                                    if (col == null)
+                                        col = fac.Create(pm.ReturnType) as IList;
                                     foreach (var itemValue in answers.Select(v => v.Value))
                                     {
                                         col.Add(itemValue);
@@ -219,8 +222,12 @@ namespace Hl7.Fhir.QuestionnaireServices
                                 // check the element definition for the types
                                 createElementType = ModelInfo.FhirTypeToCsType[item.ed.PrimaryTypeCode().GetLiteral()];
                             }
-                            object value = fac.Create(createElementType);
-                            pm.SetValue(instance, value);
+                            object value = pm.GetValue(instance);
+                            if (value == null)
+                            {
+                                value = fac.Create(createElementType);
+                                pm.SetValue(instance, value);
+                            }
                             if (pm.IsCollection)
                             {
                                 IList list = value as IList;
