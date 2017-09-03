@@ -357,8 +357,14 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
                 Type = Questionnaire.AnswerFormat.String,
                 LinkId = "Practitioner.extension:classification.valueCodeableConcept.text"
             });
+            gCoreProps.Question.Add(new Questionnaire.QuestionComponent()
+            {
+                Text = "Website",
+                Type = Questionnaire.AnswerFormat.String,
+                LinkId = "Practitioner.telecom:website.value"
+            });
 
-            
+
 
             // A collection of Qualifications
             var gCerts = new Questionnaire.GroupComponent();
@@ -483,6 +489,15 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
                     { Value = new FhirString("Agency Staff") }
                 }
             });
+            gCoreProps.Question.Add(new QuestionnaireResponse.QuestionComponent()
+            {
+                Text = "Website",
+                LinkId = "Practitioner.telecom:website.value",
+                Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
+                    { Value = new FhirString("http://example.org/brian") }
+                }
+            });
+
 
             // A collection of Qualifications
             var gCerts = new QuestionnaireResponse.GroupComponent();
@@ -709,8 +724,8 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             System.Diagnostics.Debug.WriteLine("------------------");
             Assert.IsNotNull(prunedTree);
             int countPrunedTree = DumpTree(prunedTree);
-            Assert.AreEqual(237, countFullTree);
-            Assert.AreEqual(33, countPrunedTree);
+            Assert.AreEqual(246, countFullTree);
+            Assert.AreEqual(37, countPrunedTree);
 
             System.Diagnostics.Debug.WriteLine("======================================");
             Assert.IsNotNull(fullTree2);
@@ -804,6 +819,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual("William Angliss TAFE", prac.Qualification[0].Issuer.Display);
             Assert.AreEqual("yes", prac.GetStringExtension("http://healthconnex.com.au/hcxd/Practitioner/AppointmentRequired"));
             Assert.AreEqual("Agency Staff", prac.GetExtensionValue<CodeableConcept>("http://hl7.org/fhir/StructureDefinition/practitioner-classification").Text);
+            Assert.AreEqual("http://example.org/brian", prac.Telecom[0].Value);
 
             System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(resources));
 

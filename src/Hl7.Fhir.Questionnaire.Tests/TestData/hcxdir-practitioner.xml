@@ -2,7 +2,7 @@
 <StructureDefinition xmlns="http://hl7.org/fhir">
   <id value="hcxdir-practitioner" />
   <meta>
-    <lastUpdated value="2017-09-01T10:02:57.52+10:00" />
+    <lastUpdated value="2017-09-04T08:03:26.557+10:00" />
   </meta>
   <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm">
     <valueInteger value="3" />
@@ -96,6 +96,9 @@
     <element>
       <path value="Practitioner.extension" />
       <name value="classification" />
+      <base>
+        <path value="Practitioner.extension" />
+      </base>
       <type>
         <code value="Extension" />
         <profile value="http://hl7.org/fhir/StructureDefinition/practitioner-classification" />
@@ -2611,6 +2614,10 @@
     </element>
     <element>
       <path value="Practitioner.telecom" />
+      <slicing>
+        <discriminator value="system" />
+        <rules value="openAtEnd" />
+      </slicing>
       <short value="A contact detail for the practitioner" />
       <definition value="A contact detail for the practitioner, e.g. a telephone number or an email address." />
       <comments value="Person may have multiple ways to be contacted with different uses or applicable periods.  May need to have options for contacting the person urgently, and also to help with identification." />
@@ -2618,7 +2625,6 @@
       <min value="0" />
       <max value="*" />
       <base>
-        <path value="Practitioner.telecom" />
         <min value="0" />
         <max value="*" />
       </base>
@@ -2874,6 +2880,334 @@
       <definition value="Time period when the contact point was/is in use." />
       <min value="0" />
       <max value="0" />
+      <base>
+        <path value="Practitioner.telecom.period" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="Period" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="N/A" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./useablePeriod[type=&quot;IVL&lt;TS&gt;&quot;]" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./StartDate and ./EndDate" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.period.id" />
+      <representation value="xmlAttr" />
+      <short value="xml:id (or equivalent in JSON)" />
+      <definition value="unique id for the element within a resource (for internal references)." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.period.id" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="id" />
+      </type>
+      <mapping>
+        <identity value="rim" />
+        <map value="n/a" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.period.extension" />
+      <short value="Additional Content defined by implementations" />
+      <definition value="May be used to represent additional information that is not part of the basic definition of the element. In order to make the use of extensions safe and manageable, there is a strict set of governance  applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension." />
+      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone." />
+      <alias value="extensions" />
+      <alias value="user content" />
+      <min value="0" />
+      <max value="*" />
+      <base>
+        <path value="Practitioner.telecom.period.extension" />
+        <min value="0" />
+        <max value="*" />
+      </base>
+      <type>
+        <code value="Extension" />
+      </type>
+      <mapping>
+        <identity value="rim" />
+        <map value="n/a" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.period.start" />
+      <short value="Starting time with inclusive boundary" />
+      <definition value="The start of the period. The boundary is inclusive." />
+      <comments value="If the low element is missing, the meaning is that the low boundary is not known." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.period.start" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="dateTime" />
+      </type>
+      <condition value="per-1" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="DR.1" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./low" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.period.end" />
+      <short value="End time with inclusive boundary, if not ongoing" />
+      <definition value="The end of the period. If the end of the period is missing, it means that the period is ongoing. The start may be in the past, and the end date in the future, which means that period is expected/planned to end at that time." />
+      <comments value="The high value includes any matching date/time. i.e. 2012-02-03T10:00:00 is in a period that has a end value of 2012-02-03." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.period.end" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="dateTime" />
+      </type>
+      <meaningWhenMissing value="If the end of the period is missing, it means that the period is ongoing" />
+      <condition value="per-1" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="DR.2" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./high" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom" />
+      <name value="website" />
+      <short value="A contact detail for the practitioner" />
+      <definition value="A contact detail for the practitioner, e.g. a telephone number or an email address." />
+      <comments value="Person may have multiple ways to be contacted with different uses or applicable periods.  May need to have options for contacting the person urgently, and also to help with identification." />
+      <requirements value="Need to know how to reach a practitioner." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom" />
+        <min value="0" />
+        <max value="*" />
+      </base>
+      <type>
+        <code value="ContactPoint" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="PRT-15, STF-10, ROL-12" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./telecom" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./ContactPoints" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.id" />
+      <representation value="xmlAttr" />
+      <short value="xml:id (or equivalent in JSON)" />
+      <definition value="unique id for the element within a resource (for internal references)." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.id" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="id" />
+      </type>
+      <mapping>
+        <identity value="rim" />
+        <map value="n/a" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.extension" />
+      <short value="Additional Content defined by implementations" />
+      <definition value="May be used to represent additional information that is not part of the basic definition of the element. In order to make the use of extensions safe and manageable, there is a strict set of governance  applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension." />
+      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone." />
+      <alias value="extensions" />
+      <alias value="user content" />
+      <min value="0" />
+      <max value="*" />
+      <base>
+        <path value="Practitioner.telecom.extension" />
+        <min value="0" />
+        <max value="*" />
+      </base>
+      <type>
+        <code value="Extension" />
+      </type>
+      <mapping>
+        <identity value="rim" />
+        <map value="n/a" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.system" />
+      <short value="phone | fax | email | pager | other" />
+      <definition value="Telecommunications form for contact point - what communications system is required to make use of the contact." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.system" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="code" />
+      </type>
+      <fixedCode value="other" />
+      <condition value="cpt-2" />
+      <isSummary value="true" />
+      <binding>
+        <strength value="required" />
+        <description value="Telecommunications form for contact point" />
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/contact-point-system" />
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2" />
+        <map value="XTN.3" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./scheme" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./ContactPointType" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.value" />
+      <short value="The actual contact point details" />
+      <definition value="The actual contact point details, in a form that is meaningful to the designated communication system (i.e. phone number or email address)." />
+      <comments value="Additional text data such as phone extension numbers, or notes about use of the contact are sometimes included in the value." />
+      <requirements value="Need to support legacy numbers that are not in a tightly controlled format." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.value" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="string" />
+      </type>
+      <mustSupport value="true" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="XTN.1 (or XTN.12)" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./url" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./Value" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.use" />
+      <short value="home | work | temp | old | mobile - purpose of this contact point" />
+      <definition value="Identifies the purpose for the contact point." />
+      <comments value="This is labeled as &quot;Is Modifier&quot; because applications should not mistake a temporary or old contact etc.for a current/permanent one. Applications can assume that a contact is current unless it explicitly says that it is temporary or old." />
+      <requirements value="Need to track the way a person uses this contact, so a user can choose which is appropriate for their purpose." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.use" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="code" />
+      </type>
+      <fixedCode value="work" />
+      <isModifier value="true" />
+      <isSummary value="true" />
+      <binding>
+        <strength value="required" />
+        <description value="Use of contact point" />
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/contact-point-use" />
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2" />
+        <map value="XTN.2 - but often indicated by field" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="unique(./use)" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./ContactPointPurpose" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.rank" />
+      <short value="Specify preferred order of use (1 = highest)" />
+      <definition value="Specifies a preferred order in which to use a set of contacts. Contacts are ranked with lower values coming before higher values." />
+      <comments value="Note that rank does not necessarily follow the order in which the contacts are represented in the instance." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.rank" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="positiveInt" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="n/a" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="n/a" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.period" />
+      <short value="Time period when the contact point was/is in use" />
+      <definition value="Time period when the contact point was/is in use." />
+      <min value="0" />
+      <max value="1" />
       <base>
         <path value="Practitioner.telecom.period" />
         <min value="0" />
@@ -10853,6 +11187,9 @@
     <element>
       <path value="Practitioner.extension" />
       <name value="classification" />
+      <base>
+        <path value="Practitioner.extension" />
+      </base>
       <type>
         <code value="Extension" />
         <profile value="http://hl7.org/fhir/StructureDefinition/practitioner-classification" />
@@ -11160,6 +11497,39 @@
       </mapping>
     </element>
     <element>
+      <path value="Practitioner.telecom" />
+      <slicing>
+        <discriminator value="system" />
+        <rules value="openAtEnd" />
+      </slicing>
+      <short value="A contact detail for the practitioner" />
+      <definition value="A contact detail for the practitioner, e.g. a telephone number or an email address." />
+      <comments value="Person may have multiple ways to be contacted with different uses or applicable periods.  May need to have options for contacting the person urgently, and also to help with identification." />
+      <requirements value="Need to know how to reach a practitioner." />
+      <min value="0" />
+      <max value="*" />
+      <base>
+        <min value="0" />
+        <max value="*" />
+      </base>
+      <type>
+        <code value="ContactPoint" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="PRT-15, STF-10, ROL-12" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./telecom" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./ContactPoints" />
+      </mapping>
+    </element>
+    <element>
       <path value="Practitioner.telecom.extension" />
       <slicing>
         <discriminator value="url" />
@@ -11372,6 +11742,144 @@
       <mapping>
         <identity value="servd" />
         <map value="./StartDate and ./EndDate" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom" />
+      <name value="website" />
+      <short value="A contact detail for the practitioner" />
+      <definition value="A contact detail for the practitioner, e.g. a telephone number or an email address." />
+      <comments value="Person may have multiple ways to be contacted with different uses or applicable periods.  May need to have options for contacting the person urgently, and also to help with identification." />
+      <requirements value="Need to know how to reach a practitioner." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom" />
+        <min value="0" />
+        <max value="*" />
+      </base>
+      <type>
+        <code value="ContactPoint" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="PRT-15, STF-10, ROL-12" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./telecom" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./ContactPoints" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.system" />
+      <short value="phone | fax | email | pager | other" />
+      <definition value="Telecommunications form for contact point - what communications system is required to make use of the contact." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.system" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="code" />
+      </type>
+      <fixedCode value="other" />
+      <condition value="cpt-2" />
+      <isSummary value="true" />
+      <binding>
+        <strength value="required" />
+        <description value="Telecommunications form for contact point" />
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/contact-point-system" />
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2" />
+        <map value="XTN.3" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./scheme" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./ContactPointType" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.value" />
+      <short value="The actual contact point details" />
+      <definition value="The actual contact point details, in a form that is meaningful to the designated communication system (i.e. phone number or email address)." />
+      <comments value="Additional text data such as phone extension numbers, or notes about use of the contact are sometimes included in the value." />
+      <requirements value="Need to support legacy numbers that are not in a tightly controlled format." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.value" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="string" />
+      </type>
+      <mustSupport value="true" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="XTN.1 (or XTN.12)" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="./url" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./Value" />
+      </mapping>
+    </element>
+    <element>
+      <path value="Practitioner.telecom.use" />
+      <short value="home | work | temp | old | mobile - purpose of this contact point" />
+      <definition value="Identifies the purpose for the contact point." />
+      <comments value="This is labeled as &quot;Is Modifier&quot; because applications should not mistake a temporary or old contact etc.for a current/permanent one. Applications can assume that a contact is current unless it explicitly says that it is temporary or old." />
+      <requirements value="Need to track the way a person uses this contact, so a user can choose which is appropriate for their purpose." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Practitioner.telecom.use" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="code" />
+      </type>
+      <fixedCode value="work" />
+      <isModifier value="true" />
+      <isSummary value="true" />
+      <binding>
+        <strength value="required" />
+        <description value="Use of contact point" />
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/contact-point-use" />
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2" />
+        <map value="XTN.2 - but often indicated by field" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="unique(./use)" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./ContactPointPurpose" />
       </mapping>
     </element>
     <element>

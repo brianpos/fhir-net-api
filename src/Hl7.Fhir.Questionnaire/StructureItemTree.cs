@@ -84,7 +84,15 @@ namespace Hl7.Fhir.QuestionnaireServices
                     {
                         foreach (var fixedValue in item.FixedValuesInSlices)
                         {
-                            if (thisValue.IsExactly(fixedValue))
+                            if (fixedValue is Code fixedCode && thisValue is ISystemAndCode thisCode)
+                            {
+                                if (fixedCode.Value == thisCode.Code)
+                                {
+                                    sliceFixedValueFound = true;
+                                    break;
+                                }
+                            }
+                            else if (thisValue.IsExactly(fixedValue))
                             {
                                 sliceFixedValueFound = true;
                                 break;
