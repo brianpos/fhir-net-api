@@ -13,8 +13,9 @@ using Hl7.Fhir.Utility;
 using Xunit;
 using Hl7.Fhir.Specification.Terminology;
 using System;
+using Hl7.Fhir.Validation;
 
-namespace Hl7.Fhir.Validation
+namespace Hl7.Fhir.Specification.Tests
 {
     [Trait("Category", "Validation")]
     public class BasicValidationTests : IClassFixture<ValidationFixture>
@@ -166,7 +167,7 @@ namespace Hl7.Fhir.Validation
         [Fact]
         public void AutoGeneratesDifferential()
         {
-            var identifierBsn = _source.FindStructureDefinition("http://validationtest.org/fhir/StructureDefinition/IdentifierWithBSN");
+            var identifierBsn = (StructureDefinition)_source.FindStructureDefinition("http://validationtest.org/fhir/StructureDefinition/IdentifierWithBSN").DeepCopy();
             Assert.NotNull(identifierBsn);
             identifierBsn.Snapshot = null;
 
@@ -233,7 +234,10 @@ namespace Hl7.Fhir.Validation
         [Fact]
         public void ValidatesPatternValue()
         {
-            var patientSd = (StructureDefinition)_source.FindStructureDefinitionForCoreType(FHIRAllTypes.Patient);
+            // [WMR 20170727] Fixed
+            // Do NOT modify common core Patient definition, as this would affect all subsequent tests.
+            // Instead, clone the core def and modify the clone
+            var patientSd = (StructureDefinition)_source.FindStructureDefinitionForCoreType(FHIRAllTypes.Patient).DeepCopy();
 
             var instance1 = new CodeableConcept("http://hl7.org/fhir/marital-status", "U");
 
@@ -598,25 +602,6 @@ namespace Hl7.Fhir.Validation
 
         }
 
-        class InMemoryResourceResolver : IResourceResolver
-        {
-            ILookup<string, Resource> _resources;
-
-            public InMemoryResourceResolver(IEnumerable<Resource> profiles)
-            {
-                _resources = profiles.ToLookup(r => getResourceUri(r), r => r as Resource);
-            }
-
-            public InMemoryResourceResolver(Resource profile) : this(new Resource[] { profile }) { }
-
-            public Resource ResolveByCanonicalUri(string uri) => null;
-
-            public Resource ResolveByUri(string uri) => _resources[uri].FirstOrDefault();
-
-            // cf. ResourceStreamScanner.StreamResources
-            static string getResourceUri(Resource res) => res.TypeName + "/" + res.Id;
-        }
-
         [Fact]
         public void HandlesParentElementOfCoreAbstractType()
         {
@@ -638,6 +623,22 @@ namespace Hl7.Fhir.Validation
             Assert.Equal(2, report.Errors);
             Assert.Equal(0, report.Warnings);
             Assert.DoesNotContain("Encountered unknown child elements 'timestamp'", report.ToString());
+        }
+
+
+        [Fact]
+        public void TriggerEscapingValidationError()
+        {
+            // This unit-test is here to trigger because of an escaping mistake in the FHIR spec 3.0.1.
+            // The cause is the escaped \\_ character in eld-16. I have manually corrected profiles-types.xml
+            // in the /data directory for this invariant, so this unit-test will normally pass.
+            // If it does not, the profiles-types.xml will have been updated/overwritten with a version that
+            // still contains this mistake.
+            var sd = (StructureDefinition)_source.FindStructureDefinitionForCoreType(FHIRAllTypes.Patient).DeepCopy();
+            sd.Snapshot.Element[0].SliceName = "dummy";
+
+            var result = _validator.Validate(sd);
+            Assert.True(result.Success);
         }
 
         // [WMR 20161220] Example by Christiaan Knaap
@@ -760,5 +761,26 @@ namespace Hl7.Fhir.Validation
         }
 
     }
+
+    class InMemoryResourceResolver : IResourceResolver
+    {
+        ILookup<string, Resource> _resources;
+
+        public InMemoryResourceResolver(IEnumerable<Resource> profiles)
+        {
+            _resources = profiles.ToLookup(r => getResourceUri(r), r => r as Resource);
+        }
+
+        public InMemoryResourceResolver(Resource profile) : this(new Resource[] { profile }) { }
+
+        public Resource ResolveByCanonicalUri(string uri) => null;
+
+        public Resource ResolveByUri(string uri) => _resources[uri].FirstOrDefault();
+
+        // cf. ResourceStreamScanner.StreamResources
+        static string getResourceUri(Resource res) => res.TypeName + "/" + res.Id;
+    }
+
+
 }
 
