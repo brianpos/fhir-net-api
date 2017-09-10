@@ -31,21 +31,20 @@ namespace Hl7.Fhir.QuestionnaireServices
         /// <summary>
         /// This is effectively a variation on the $populate operation
         /// </summary>
-        /// <param name="qPart1"></param>
+        /// <param name="questionnaire"></param>
         /// <param name="resources"></param>
         /// <param name="source"></param>
         /// <returns></returns>
         public static QuestionnaireResponse CreateQuestionnaireResponse(Model.Questionnaire questionnaire, Bundle resources, IResourceResolver source)
         {
             QuestionnaireResponse qa = new QuestionnaireResponse();
-            qa.Group = new QuestionnaireResponse.GroupComponent();
             qa.Questionnaire = new ResourceReference();
             qa.Questionnaire.Reference = "Questionnaire/" + questionnaire.Id;
 
             // Get the top level data context
-            ItemContext data = RetrieveContextContent(questionnaire.Group, new ItemContext { Resources = resources }, questionnaire, source);
+            ItemContext data = RetrieveContextContent(questionnaire, new ItemContext { Resources = resources }, questionnaire, source);
 
-            CreateAndPopulateGroup(questionnaire.Group, qa.Group, data, questionnaire, source);
+            CreateAndPopulateGroup(questionnaire.Item, qa.Item, data, questionnaire, source);
             return qa;
         }
 
@@ -58,6 +57,10 @@ namespace Hl7.Fhir.QuestionnaireServices
             {
                 definition = group.Definition;
                 linkId = group.LinkId;
+            }
+            if (scopedNode is Questionnaire q)
+            {
+                definition = q.GetExtensionValue<FhirUri>("http://hl7.org/fhir/StructureDefinition/extension-Questionnaire.item.definition")?.Value;
             }
 
             if (!string.IsNullOrEmpty(definition))
@@ -307,19 +310,19 @@ namespace Hl7.Fhir.QuestionnaireServices
                         }
                     }
                     break;
-                case Questionnaire.QuestionnaireItemType.Instant:
-                    foreach (var item in prepopulatedValues)
-                    {
-                        if (item is Instant)
-                        {
-                            var a = new QuestionnaireResponse.AnswerComponent();
-                            results.Add(a);
-                            a.Value = item as Instant;
-                            if (!qsource.Repeats.HasValue || !qsource.Repeats.Value)
-                                break;
-                        }
-                    }
-                    break;
+                //case Questionnaire.QuestionnaireItemType.Instant:
+                //    foreach (var item in prepopulatedValues)
+                //    {
+                //        if (item is Instant)
+                //        {
+                //            var a = new QuestionnaireResponse.AnswerComponent();
+                //            results.Add(a);
+                //            a.Value = item as Instant;
+                //            if (!qsource.Repeats.HasValue || !qsource.Repeats.Value)
+                //                break;
+                //        }
+                //    }
+                //    break;
                 case Questionnaire.QuestionnaireItemType.Time:
                     foreach (var item in prepopulatedValues)
                     {
@@ -476,69 +479,67 @@ namespace Hl7.Fhir.QuestionnaireServices
             return results;
         }
         
-        private static void CreateAndPopulateGroup(Questionnaire.ItemComponent qg, QuestionnaireResponse.ItemComponent answer_group, ItemContext contextData, Model.Questionnaire questionnaire, IResourceResolver source)
+        private static void CreateAndPopulateGroup(List<Questionnaire.ItemComponent> itemsQ, List<QuestionnaireResponse.ItemComponent> itemsAnswer, ItemContext contextData, Model.Questionnaire questionnaire, IResourceResolver source)
         {
-            // Initialize the base Group values
-            answer_group.LinkId = qg.LinkId;
-            answer_group.Title = qg.Title;
-            answer_group.Text = qg.Text;
-
             // Process any child Questions on this group
-            if (qg.Question != null && qg.Question.Count > 0)
+            if (itemsQ != null && itemsQ.Count > 0)
             {
-                answer_group.Question = new List<QuestionnaireResponse.ItemComponent>();
-                foreach (var sq in qg.Question)
-                {
-                    var a = new QuestionnaireResponse.ItemComponent();
-                    a.LinkId = sq.LinkId;
-                    a.Text = sq.Text;
-                    a.Answer = ExtractValue(contextData, sq, source);
-
-                    // TODO: Check for a default value
-                    if (a.Answer == null || a.Answer.Count == 0)
-                    {
-                        foreach (var e in sq.GetExtensions("http://hl7.org/fhir/StructureDefinition/questionnaire-defaultValue"))
-                        {
-                            if (a.Answer == null)
-                                a.Answer = new List<QuestionnaireResponse.AnswerComponent>();
-                            a.Answer.Add(new QuestionnaireResponse.AnswerComponent() { Value = e.Value });
-                            // should we actually validate the default value is of the correct type?
-                        }
-                    }
-                    if (a.Answer != null && a.Answer.Count > 0)
-                        answer_group.Question.Add(a);
-
-                    // Process any group items that this question has attached
-                }
-            }
-
-            // Process any child Groups on this group
-            if (qg.Group != null && qg.Group.Count > 0)
-            {
-                answer_group.Group = new List<QuestionnaireResponse.GroupComponent>();
-                foreach (var sg in qg.Group)
+                foreach (var itemQ in itemsQ)
                 {
                     // TODO: Source content from DataElements if required
-                    ItemContext dataForGroup = RetrieveContextContent(sg, contextData, questionnaire, source);
+                    ItemContext dataForItem = RetrieveContextContent(itemQ, contextData, questionnaire, source);
 
-                    if (dataForGroup.Data.Any())
+                    if (itemQ.Type == Questionnaire.QuestionnaireItemType.Group)
                     {
-                        if (!sg.Repeats.HasValue || sg.Repeats.Value == false)
-                            dataForGroup.Data = dataForGroup.Data.Take(1);
-                        foreach (var data in dataForGroup.Data)
+                        if (dataForItem.Data.Any())
                         {
-                            var newg = new QuestionnaireResponse.GroupComponent();
-                            answer_group.Group.Add(newg);
-                            CreateAndPopulateGroup(sg, newg, new ItemContext { Data = new []{ data }, Item = dataForGroup.Item, Resources = dataForGroup.Resources }, questionnaire, source);
+                            if (!itemQ.Repeats.HasValue || itemQ.Repeats.Value == false)
+                                dataForItem.Data = dataForItem.Data.Take(1);
+                            foreach (var data in dataForItem.Data)
+                            {
+                                var newg = new QuestionnaireResponse.ItemComponent();
+                                newg.LinkId = itemQ.LinkId;
+                                newg.Definition = itemQ.Definition;
+                                newg.Text = itemQ.Text;
+                                itemsAnswer.Add(newg);
+                                CreateAndPopulateGroup(itemQ.Item, newg.Item, new ItemContext { Data = new[] { data }, Item = dataForItem.Item, Resources = dataForItem.Resources }, questionnaire, source);
+                            }
+                        }
+                        else
+                        {
+                            // There must be at least 1 group, so lets create one.
+                            var newg = new QuestionnaireResponse.ItemComponent();
+                            newg.LinkId = itemQ.LinkId;
+                            newg.Definition = itemQ.Definition;
+                            newg.Text = itemQ.Text;
+                            itemsAnswer.Add(newg);
+                            CreateAndPopulateGroup(itemQ.Item, newg.Item, dataForItem, questionnaire, source);
                         }
                     }
                     else
                     {
-                        // There must be at least 1 group, so lets create one.
-                        var newg = new QuestionnaireResponse.GroupComponent();
-                        answer_group.Group.Add(newg);
-                        CreateAndPopulateGroup(sg, newg, dataForGroup, questionnaire, source);
+                        var a = new QuestionnaireResponse.ItemComponent();
+                        a.LinkId = itemQ.LinkId;
+                        a.Definition = itemQ.Definition;
+                        a.Text = itemQ.Text;
+                        a.Answer = ExtractValue(dataForItem, itemQ, source);
+
+                        // TODO: Check for a default value
+                        if (a.Answer == null || a.Answer.Count == 0)
+                        {
+                            foreach (var e in itemQ.GetExtensions("http://hl7.org/fhir/StructureDefinition/questionnaire-defaultValue"))
+                            {
+                                if (a.Answer == null)
+                                    a.Answer = new List<QuestionnaireResponse.AnswerComponent>();
+                                a.Answer.Add(new QuestionnaireResponse.AnswerComponent() { Value = e.Value });
+                                // should we actually validate the default value is of the correct type?
+                            }
+                        }
+                        if (a.Answer != null && a.Answer.Count > 0)
+                            itemsAnswer.Add(a);
                     }
+
+                    // Process any group items that this question has attached
                 }
             }
         }

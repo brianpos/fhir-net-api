@@ -387,7 +387,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     // Check for fixed values to put back into the slice parent
                     if (slicingItem != null && slicingItem != item)
                     {
-                        string path = item.Path + "." + slicingItem.ed.Slicing.Discriminator.FirstOrDefault();
+                        string path = item.Path + "." + slicingItem.ed.Slicing.Discriminator.FirstOrDefault().Path;
                         Element fixedValue = GetFixedValue(item, path);
                         if (fixedValue != null)
                         {
