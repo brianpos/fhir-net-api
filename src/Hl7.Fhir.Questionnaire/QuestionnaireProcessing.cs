@@ -22,10 +22,33 @@ namespace Hl7.Fhir.QuestionnaireServices
     {
         public static Bundle CreateResourceInstances(Questionnaire q, QuestionnaireResponse questionnaireResponse, IResourceResolver source)
         {
-            // Loop through all the groups to locate the items that are marked against a resource type
-            List<QuestionnaireResponse.GroupComponent> qrg = new List<QuestionnaireResponse.GroupComponent>();
-            qrg.Add(questionnaireResponse.Group);
-            var result = CreateResourceInstances(q, q.Group, qrg, source);
+            var fac = new DefaultModelFactory();
+            Bundle result = new Bundle();
+            result.Type = Bundle.BundleType.Batch;
+
+            string definition = q.GetExtensionValue<FhirUri>("http://hl7.org/fhir/StructureDefinition/extension-Questionnaire.item.definition")?.Value;
+            if (!string.IsNullOrEmpty(definition))
+            {
+                // this item has a definition, so we should process it
+                var si = StructureItemTree.GetStructureTree(definition, q, source);
+                if (si != null)
+                {
+                    Resource r = fac.Create(si.ClassMapping.NativeType) as Resource;
+                    result.AddResourceEntry(r, null);
+                    foreach (var a in questionnaireResponse.Item)
+                    {
+                        List<QuestionnaireResponse.ItemComponent> qrgItem = new List<QuestionnaireResponse.ItemComponent>();
+                        qrgItem.Add(a);
+                        PopulateResourceInstance(r, si, qrgItem);
+                    }
+                }
+            }
+
+            foreach (var qgi in q.Item)
+            {
+                var items = CreateResourceInstances(q, qgi, questionnaireResponse.Item.Where(g => g.LinkId == qgi.LinkId).ToList(), source);
+                result.Entry.AddRange(items.Entry);
+            }
             return result;
         }
 
@@ -35,7 +58,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             Bundle result = new Bundle();
             result.Type = Bundle.BundleType.Batch;
 
-            if (qg.Definition != null)
+            if (!string.IsNullOrEmpty(qg.Definition) && !qg.Definition.Contains("#"))
             {
                 // this item has a definition, so we should process it
                 var si = StructureItemTree.GetStructureTree(qg.Definition, q, source);
@@ -45,14 +68,14 @@ namespace Hl7.Fhir.QuestionnaireServices
                     {
                         Resource r = fac.Create(si.ClassMapping.NativeType) as Resource;
                         result.AddResourceEntry(r, null);
-                        List<QuestionnaireResponse.GroupComponent> qrgItem = new List<QuestionnaireResponse.GroupComponent>();
+                        List<QuestionnaireResponse.ItemComponent> qrgItem = new List<QuestionnaireResponse.ItemComponent>();
                         qrgItem.Add(a);
                         PopulateResourceInstance(r, si, qrgItem);
                     }
                 }
             }
 
-            foreach (var qgi in qg.Group)
+            foreach (var qgi in qg.Item)
             {
                 var items = CreateResourceInstances(q, qgi, qrg.Where(g => g.LinkId == qgi.LinkId).ToList(), source);
                 result.Entry.AddRange(items.Entry);
@@ -67,7 +90,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             System.Diagnostics.Debug.WriteLine("-----------------------------");
             T result = new T();
             List<QuestionnaireResponse.ItemComponent> groups = new List<QuestionnaireResponse.ItemComponent>();
-            groups.Add(questionnaireResponse.Group);
+            groups.AddRange(questionnaireResponse.Item);
 
             PopulateResourceInstance(result, parent, groups);
 
@@ -85,8 +108,8 @@ namespace Hl7.Fhir.QuestionnaireServices
 
                 if (item.ed.Slicing != null)
                 {
-                    Debug.WriteLine($"  Slice Name: {String.Join(", ", item.ed.Name)}");
-                    Debug.WriteLine($"  Discriminator: {String.Join(", ", item.ed.Slicing.Discriminator)}");
+                    Debug.WriteLine($"  Slice Name: {String.Join(", ", item.ed.SliceName)}");
+                    Debug.WriteLine($"  Discriminator: {String.Join(", ", item.ed.Slicing.Discriminator.FirstOrDefault().Path)}");
                 }
 
                 if (item.ed.Fixed != null)
@@ -132,7 +155,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                             foreach (var g in filteredGroups)
                             {
                                 object elementValue = fac.Create(pm.ElementType);
-                                List<QuestionnaireResponse.GroupComponent> g1 = new List<QuestionnaireResponse.GroupComponent>();
+                                List<QuestionnaireResponse.ItemComponent> g1 = new List<QuestionnaireResponse.ItemComponent>();
                                 g1.Add(g);
                                 PopulateResourceInstance(elementValue, item, g1);
                                 list.Add(elementValue);
@@ -238,7 +261,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                                     {
                                         e.Url = item.ExtensionUrl;
                                     }
-                                    List<QuestionnaireResponse.GroupComponent> g1 = new List<QuestionnaireResponse.GroupComponent>();
+                                    List<QuestionnaireResponse.ItemComponent> g1 = new List<QuestionnaireResponse.ItemComponent>();
                                     g1.Add(g);
                                     PopulateResourceInstance(arrayItem, item, g1);
                                     list.Add(arrayItem);
@@ -292,9 +315,9 @@ namespace Hl7.Fhir.QuestionnaireServices
             List<QuestionnaireResponse.AnswerComponent> result = null;
             foreach (var group in gp)
             {
-                if (group.Group.Count > 0)
+                if (group.Item.Count > 0)
                 {
-                    var descendantAnswers = GetAnswers(group.Group, si);
+                    var descendantAnswers = GetAnswers(group.Item, si);
                     if (descendantAnswers != null)
                     {
                         if (result == null)
@@ -304,20 +327,19 @@ namespace Hl7.Fhir.QuestionnaireServices
                         result.AddRange(descendantAnswers);
                     }
                 }
-
-                foreach (var q in group.Question)
+                // Check if THIS is a question on the way to the item
+                // (need to check if the path approach will always work once we get into the extensions)
+                if (group.LinkId == si.Path)
                 {
-                    // Check if THIS is a question on the way to the item
-                    // (need to check if the path approach will always work once we get into the extensions)
-                    if (q.LinkId == si.Path)
-                    {
-                        if (result == null)
-                            result = new List<QuestionnaireResponse.AnswerComponent>();
-                        result.AddRange(q.Answer);
-                    }
-                    if (q.LinkId.StartsWith(si.Path) && q.LinkId != si.Path && result == null)
+                    if (result == null)
                         result = new List<QuestionnaireResponse.AnswerComponent>();
+                    result.AddRange(group.Answer);
                 }
+                if (group.LinkId.StartsWith(si.Path)
+                    && !group.LinkId.StartsWith(si.Path+":") // and that this isn't a slice
+                    && group.LinkId != si.Path 
+                    && result == null)
+                    result = new List<QuestionnaireResponse.AnswerComponent>();
             }
             return result;
         }
