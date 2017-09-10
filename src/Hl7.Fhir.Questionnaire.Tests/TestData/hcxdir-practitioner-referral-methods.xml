@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <StructureDefinition xmlns="http://hl7.org/fhir">
   <id value="hcxdir-practitioner-referral-methods" />
   <meta>
@@ -7,24 +7,25 @@
   <url value="http://healthconnex.com.au/hcxd/Practitioner/ReferralMethods" />
   <version value="1" />
   <name value="hcxdir-practitioner-referral-methods" />
-  <display value="hcxdir-practitioner-referral-methods" />
+  <title value="hcxdir-practitioner-referral-methods" />
   <status value="draft" />
   <publisher value="Healthconnex" />
   <date value="2015-09-22T20:02:49+10:00" />
   <description value="extension to provide a note on the referral methods for a practitioner" />
-  <requirements value="The ability to add extensions in a structured way is what keeps FHIR resources simple." />
+  <purpose value="The ability to add extensions in a structured way is what keeps FHIR resources simple." />
   <copyright value="Telstra Health" />
   <fhirVersion value="1.0.1" />
-  <kind value="datatype" />
-  <constrainedType value="Extension" />
+  <kind value="primitive-type" />
+  <type value="Extension" />
   <abstract value="false" />
   <contextType value="resource" />
   <context value="Practitioner" />
-  <base value="http://hl7.org/fhir/StructureDefinition/Extension" />
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
+  <derivation value="constraint" />
   <snapshot>
     <element>
       <path value="Extension" />
-      <name value="extension" />
+      <sliceName value="extension" />
       <definition value="Optional Extensions Element - found in all resources." />
       <min value="0" />
       <max value="*" />
@@ -44,13 +45,13 @@
     <element>
       <path value="Extension.extension" />
       <slicing>
-        <discriminator value="url" />
+        <discriminator><type value="value" /><path value="url" /></discriminator>
         <rules value="openAtEnd" />
       </slicing>
     </element>
     <element>
       <path value="Extension.extension" />
-      <name value="preference" />
+      <sliceName value="preference" />
       <label value="Preference" />
       <min value="1" />
       <max value="1" />
@@ -112,7 +113,7 @@
       <path value="Extension.extension" />
       <short value="Additional Content defined by implementations" />
       <definition value="May be used to represent additional information that is not part of the basic definition of the element. In order to make the use of extensions safe and manageable, there is a strict set of governance  applied to the definition and use of extensions. Though any implementer is allowed to define an extension, there is a set of requirements that SHALL be met as part of the definition of the extension." />
-      <comments value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone." />
+      <comment value="There can be no stigma associated with the use of extensions by any application, project, or standard - regardless of the institution or jurisdiction that uses or defines the extensions.  The use of extensions is what allows the FHIR specification to retain a core level of simplicity for everyone." />
       <alias value="extensions" />
       <alias value="user content" />
       <min value="0" />
@@ -135,7 +136,7 @@
       <representation value="xmlAttr" />
       <short value="identifies the meaning of the extension" />
       <definition value="Source of the definition for the extension code - a logical name or a URL." />
-      <comments value="The definition may point directly to a computable or human-readable definition of the extensibility codes, or it may be a logical URI as declared in some other specification. The definition should be version specific.  This will ideally be the URI for the Resource Profile defining the extension, with the code for the extension after a #." />
+      <comment value="The definition may point directly to a computable or human-readable definition of the extensibility codes, or it may be a logical URI as declared in some other specification. The definition should be version specific.  This will ideally be the URI for the Resource Profile defining the extension, with the code for the extension after a #." />
       <min value="1" />
       <max value="1" />
       <base>
@@ -270,7 +271,7 @@
   <differential>
     <element>
       <path value="Extension" />
-      <name value="extension" />
+      <sliceName value="extension" />
       <definition value="Optional Extensions Element - found in all resources." />
       <min value="0" />
       <max value="*" />
@@ -290,13 +291,13 @@
     <element>
       <path value="Extension.extension" />
       <slicing>
-        <discriminator value="url" />
+        <discriminator><type value="value" /><path value="url" /></discriminator>
         <rules value="openAtEnd" />
       </slicing>
     </element>
     <element>
       <path value="Extension.extension" />
-      <name value="preference" />
+      <sliceName value="preference" />
       <label value="Preference" />
       <min value="1" />
       <max value="1" />
