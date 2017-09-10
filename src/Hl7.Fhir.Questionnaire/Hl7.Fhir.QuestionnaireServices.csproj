@@ -14,7 +14,7 @@
     <Summary>Support for working with FHIR metadata and validation. Supports FHIR DSTU2 (1.0).</Summary>
     <Description>This library offers additional support beyond core for HL7's FHIR standard (http://hl7.org/fhir). It contains functionality to working with FHIR's Questionnaire resource, validtion, and mapping to resources via StructureDefinitions</Description>
     <PackageTags>HL7 FHIR Profile Metadata Validation Publication Schematron Schema Questionnaire</PackageTags>
-    <AssemblyName>Hl7.Fhir.DSTU2.QuestionnaireServices</AssemblyName>
+    <AssemblyName>Hl7.Fhir.STU3.QuestionnaireServices</AssemblyName>
     <RootNamespace>Hl7.Fhir.QuestionnaireServices</RootNamespace>
     <Authors>Brian Postlethwaite (brian_pos@hotmail.com) and contributors</Authors>
     <Company />
