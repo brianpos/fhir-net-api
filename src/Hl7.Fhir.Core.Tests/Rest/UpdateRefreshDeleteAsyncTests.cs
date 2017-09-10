@@ -10,7 +10,7 @@ namespace Hl7.Fhir.Core.AsyncTests
     [TestClass]
     public class UpdateRefreshDeleteAsyncTests
     {
-        private string _endpoint = "https://api.hspconsortium.org/rpineda/open";
+        private string _endpoint = "https://sqlonfhir-stu3.azurewebsites.net/fhir";
 
         [TestMethod]
         [TestCategory("IntegrationTest")]
@@ -47,14 +47,20 @@ namespace Hl7.Fhir.Core.AsyncTests
             Console.WriteLine("Deleting patient...");
             await client.DeleteAsync(p);
 
-            Console.WriteLine("Reading patient...");
-            Func<System.Threading.Tasks.Task> act = async () =>
-            {
-                await client.ReadAsync<Patient>(new ResourceIdentity("/Patient/async-test-patient"));
-            };
+            // Delete a patient that doesn't exist
+            await client.DeleteAsync("Patient/xxxxxxx");
 
-            // VERIFY //
-            Assert.ThrowsException<FhirOperationException>(act, "the patient is no longer on the server");
+            Console.WriteLine("Reading patient...");
+            try
+            {
+                var patGone = await client.ReadAsync<Patient>(new ResourceIdentity("/Patient/async-test-patient"));
+                System.Diagnostics.Trace.WriteLine(pat.Id);
+                Assert.Fail("Patient should have been deleted from the server");
+            }
+            catch(FhirOperationException ex)
+            {
+                Assert.AreEqual(System.Net.HttpStatusCode.Gone, ex.Status, "Expected a gone status code");
+            }
             
             
             Console.WriteLine("Test Completed");
