@@ -47,6 +47,15 @@ namespace Hl7.Fhir.QuestionnaireServices
             return null;
         }
 
+        public static void PruneTree(StructureItem si, Questionnaire q)
+        {
+            Dictionary<string, string> mapPathsToLinkIds = new Dictionary<string, string>();
+            foreach (var item in q.Item)
+                BuildMapping(mapPathsToLinkIds, item);
+            PopulateBindings(si, mapPathsToLinkIds);
+            PruneTree(si, mapPathsToLinkIds);
+        }
+
         public static IEnumerable<Base> GetValues(StructureItem item, Base data, string path, string linkId, out StructureItem resultItem)
         {
             List<Base> results = new List<Base>();
@@ -221,6 +230,9 @@ namespace Hl7.Fhir.QuestionnaireServices
 
         private static void CreateStructureChildren(StructureItem parent, ElementDefinitionNavigator nav, IResourceResolver source, string replaceRoot = null)
         {
+            // Explicit loop detection - yes VERY dodgy
+            if (replaceRoot?.EndsWith("identifier.assigner") == true || replaceRoot?.EndsWith("assigner.identifier") == true)
+                return;
             StructureItem slicingItem = null;
             do
             {
