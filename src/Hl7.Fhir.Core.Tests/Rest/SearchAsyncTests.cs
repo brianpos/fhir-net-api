@@ -4,13 +4,14 @@ using Hl7.Fhir.Model;
 using Hl7.Fhir.Rest;
 using Task = System.Threading.Tasks.Task;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Hl7.Fhir.Tests.Rest;
 
 namespace Hl7.Fhir.Core.AsyncTests
 {
     [TestClass]
     public class SearchAsyncTests
     {
-        private string _endpoint = "https://api.hspconsortium.org/rpineda/open";
+        private string _endpoint = FhirClientTests.testEndpoint.OriginalString;
 
         [TestMethod]
         [TestCategory("IntegrationTest")]
@@ -23,7 +24,7 @@ namespace Hl7.Fhir.Core.AsyncTests
             };
 
             var srch = new SearchParams()
-                .Where("name=Daniel")
+                .Where("name=Peter")
                 .LimitTo(10)
                 .SummaryOnly()
                 .OrderBy("birthdate",
@@ -57,7 +58,7 @@ namespace Hl7.Fhir.Core.AsyncTests
             };
 
             var srch = new SearchParams()
-                .Where("name=Daniel")
+                .Where("name=Peter")
                 .LimitTo(10)
                 .SummaryOnly()
                 .OrderBy("birthdate",
@@ -93,7 +94,7 @@ namespace Hl7.Fhir.Core.AsyncTests
             };
 
             var srchParams = new SearchParams()
-                .Where("name=Daniel")
+                .Where("name=Peter")
                 .LimitTo(10)
                 .SummaryOnly()
                 .OrderBy("birthdate",
@@ -132,7 +133,7 @@ namespace Hl7.Fhir.Core.AsyncTests
                 PreferredReturn = Prefer.ReturnRepresentation
             };
             
-            var result1 = await client.SearchAsync<Patient>(new []{"family=clark"});
+            var result1 = await client.SearchAsync<Patient>(new []{ "family=Chalmers" });
 
             Assert.IsTrue(result1.Entry.Count >= 1);
 
@@ -160,7 +161,7 @@ namespace Hl7.Fhir.Core.AsyncTests
                 PreferredReturn = Prefer.ReturnRepresentation
             };
 
-            var result1 = await client.SearchAsync<Patient>(new[] { "family=clark" },null,1);
+            var result1 = await client.SearchAsync<Patient>(new[] { "family=Chalmers" },null,1);
 
             Assert.IsTrue(result1.Entry.Count >= 1);
 
