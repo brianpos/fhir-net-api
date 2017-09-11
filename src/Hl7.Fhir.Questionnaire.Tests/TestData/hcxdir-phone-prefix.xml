@@ -14,7 +14,7 @@
   <description value="Extension to telecom to capture phone prefix" />
   <purpose value="The ability to add extensions in a structured way is what keeps FHIR resources simple." />
   <copyright value="Healthconnex" />
-  <fhirVersion value="1.0.1" />
+  <fhirVersion value="3.0.1" />
   <kind value="primitive-type" />
   <type value="Extension" />
   <abstract value="false" />
@@ -22,71 +22,8 @@
   <context value="Location.telecom" />
   <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
   <derivation value="constraint" />
-  <snapshot>
-    <element>
-      <path value="Extension" />
-      <definition value="Optional Extensions Element - found in all resources." />
-      <min value="0" />
-      <max value="*" />
-      <base>
-        <path value="Extension" />
-        <min value="0" />
-        <max value="*" />
-      </base>
-      <type>
-        <code value="Element" />
-      </type>
-      <mapping>
-        <identity value="rim" />
-        <map value="N/A" />
-      </mapping>
-    </element>
-    <element>
-      <path value="Extension.url" />
-      <representation value="xmlAttr" />
-      <label value="hcxdir-phone-prefix url" />
-      <short value="identifies the meaning of the extension" />
-      <definition value="Source of the definition for the extension code - a logical name or a URL." />
-      <comment value="The definition may point directly to a computable or human-readable definition of the extensibility codes, or it may be a logical URI as declared in some other specification. The definition should be version specific.  This will ideally be the URI for the Resource Profile defining the extension, with the code for the extension after a #." />
-      <min value="1" />
-      <max value="1" />
-      <base>
-        <path value="Extension.url" />
-        <min value="1" />
-        <max value="1" />
-      </base>
-      <type>
-        <code value="uri" />
-        <profile value="http://healthconnex.com.au/hcxd/Phone/Prefix" />
-      </type>
-      <mapping>
-        <identity value="rim" />
-        <map value="N/A" />
-      </mapping>
-    </element>
-    <element>
-      <path value="Extension.value[x]" />
-      <label value="Prefix" />
-      <short value="Value of extension" />
-      <definition value="Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list)." />
-      <min value="1" />
-      <max value="1" />
-      <base>
-        <path value="Extension.value[x]" />
-        <min value="0" />
-        <max value="1" />
-      </base>
-      <type>
-        <code value="string" />
-      </type>
-      <mapping>
-        <identity value="rim" />
-        <map value="N/A" />
-      </mapping>
-    </element>
-  </snapshot>
   <differential>
-    <element>
+    <element id="1">
       <path value="Extension" />
       <definition value="Optional Extensions Element - found in all resources." />
       <min value="0" />
@@ -96,15 +33,12 @@
         <min value="0" />
         <max value="*" />
       </base>
-      <type>
-        <code value="Element" />
-      </type>
       <mapping>
         <identity value="rim" />
         <map value="N/A" />
       </mapping>
     </element>
-    <element>
+    <element id="2">
       <path value="Extension.url" />
       <representation value="xmlAttr" />
       <label value="hcxdir-phone-prefix url" />
@@ -127,7 +61,7 @@
         <map value="N/A" />
       </mapping>
     </element>
-    <element>
+    <element id="3">
       <path value="Extension.value[x]" />
       <label value="Prefix" />
       <short value="Value of extension" />
