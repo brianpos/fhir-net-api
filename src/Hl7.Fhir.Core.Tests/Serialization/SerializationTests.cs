@@ -82,7 +82,8 @@ namespace Hl7.Fhir.Tests.Serialization
             Assert.IsTrue(SerializationUtil.ProbeIsXml("<?xml />"));
         }
 
-        [TestMethod, Ignore] // Old tests, I'm note sure we need them anymore
+        [TestMethod] // This tests that the XML serializer does actually filter out the summary properties correctly
+                     // checks generation of the model (only patient), and also the serializer
         public void TestSummary()
         {
             var p = new Patient();
@@ -135,7 +136,7 @@ namespace Hl7.Fhir.Tests.Serialization
             Console.WriteLine(qData);
             Assert.IsFalse(qData.Contains("Test Questionnaire"));
             Assert.IsTrue(qData.Contains("<meta"));
-            Assert.IsTrue(qData.Contains("<text value=\"TEXT\""));
+            Assert.IsFalse(qData.Contains("<text value=\"TEXT\""));
             Assert.IsTrue(qData.Contains("<status value=\"active\""));
             Assert.IsTrue(qData.Contains("<date value=\"2015-09-27\""));
             Assert.IsTrue(qData.Contains("<title value=\"TITLE\""));
