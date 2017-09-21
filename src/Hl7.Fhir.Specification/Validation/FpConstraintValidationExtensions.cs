@@ -41,7 +41,7 @@ namespace Hl7.Fhir.Validation
                 try
                 {
                     var compiled = getExecutableConstraint(v, outcome, instance, constraintElement);
-                    success = compiled.Predicate(instance, new FhirEvaluationContext(context) { Resolver = callExternalResolver } );
+                    success = compiled.Predicate(instance, new FhirEvaluationContext(context) { Resolver = callExternalResolver });
                 }
                 catch (Exception e)
                 {
@@ -51,17 +51,22 @@ namespace Hl7.Fhir.Validation
 
                 if (!success)
                 {
+                    var text = "Instance failed constraint " + constraintElement.ConstraintDescription();
+                    var issue = constraintElement.Severity == ElementDefinition.ConstraintSeverity.Error ?
+                        Issue.CONTENT_ELEMENT_FAILS_ERROR_CONSTRAINT : Issue.CONTENT_ELEMENT_FAILS_WARNING_CONSTRAINT;
+
                     // just use the constraint description in the error message, as this is to explain the issue
                     // to a human, the code for the error should be in the coding
-                    var text = constraintElement.Human;
-                    outcome.AddIssue(new OperationOutcome.IssueComponent()
+                    var outcomeIssue = new OperationOutcome.IssueComponent()
                     {
-                        Severity = constraintElement.Severity == ElementDefinition.ConstraintSeverity.Error ? OperationOutcome.IssueSeverity.Error : OperationOutcome.IssueSeverity.Warning,
-                        Code = OperationOutcome.IssueType.Invariant,
-                        Details = new CodeableConcept(structureDefinitionUrl, constraintElement.Key, text, text),
+                        Severity = issue.Severity,
+                        Code = issue.Type,
+                        Details = issue.ToCodeableConcept(text),
                         Diagnostics = constraintElement.GetFhirPathConstraint(), // Putting the fhirpath expression of the invariant in the diagnostics
                         Location = new string[] { instance.Location }
-                    });
+                    };
+                    outcomeIssue.Details.Coding.Add(new Coding(structureDefinitionUrl, constraintElement.Key, constraintElement.Human));
+                    outcome.AddIssue(outcomeIssue);
                 }
             }
 
