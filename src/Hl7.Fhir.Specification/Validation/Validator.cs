@@ -246,7 +246,7 @@ namespace Hl7.Fhir.Validation
             outcome.Add(this.ValidatePattern(elementConstraints, instance));
             outcome.Add(this.ValidateMinMaxValue(elementConstraints, instance));
             outcome.Add(ValidateMaxLength(elementConstraints, instance));
-            outcome.Add(this.ValidateFp(elementConstraints, instance));
+            outcome.Add(this.ValidateFp(definition.StructureDefinition.Url, elementConstraints, instance));
             outcome.Add(this.ValidateBinding(elementConstraints, instance));
 
             // If the report only has partial information, no use to show the hierarchy, so flatten it.
