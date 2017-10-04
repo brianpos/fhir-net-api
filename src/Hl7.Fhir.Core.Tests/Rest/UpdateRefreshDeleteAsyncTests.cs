@@ -48,13 +48,17 @@ namespace Hl7.Fhir.Core.AsyncTests
             await client.DeleteAsync(p);
 
             Console.WriteLine("Reading patient...");
-            Func<Task> act = async () =>
+            // VERIFY //
+            try
             {
                 await client.ReadAsync<Patient>(new ResourceIdentity("/Patient/async-test-patient"));
-            };
-
-            // VERIFY //
-            Assert.ThrowsException<FhirOperationException>(act, "the patient is no longer on the server");
+                Assert.Fail("Expected the exception to be thrown that the patient isn't found");
+            }
+            catch (FhirOperationException ex)
+            {
+                // we are testing more than the exception being thrown, we also want to be sure of the type of status
+                Assert.AreEqual(System.Net.HttpStatusCode.Gone, ex.Status, "Expected the resource to have gone");
+            }
             
             
             Console.WriteLine("Test Completed");
