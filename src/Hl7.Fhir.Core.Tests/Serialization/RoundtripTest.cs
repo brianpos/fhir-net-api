@@ -213,45 +213,48 @@ namespace Hl7.Fhir.Tests.Serialization
                 return;
             if (inputFile.EndsWith(".xml"))
             {
-                var xml = File.ReadAllText(inputFile);
-                var resource = new FhirXmlParser().Parse<Resource>(xml);
+                Stream file = File.Open(inputFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var rdr = Utility.SerializationUtil.XmlReaderFromStream(file);
+                var resource = new FhirXmlParser().Parse<Resource>(rdr);
 
+                // This is to also verify that the Matches and IsExactly routines also operate as expected
                 var r2 = resource.DeepCopy();
                 Assert.IsTrue(resource.Matches(r2 as Resource), "Serialization of " + inputFile + " did not match output - Matches test");
                 Assert.IsTrue(resource.IsExactly(r2 as Resource), "Serialization of " + inputFile + " did not match output - IsExactly test");
                 Assert.IsFalse(resource.Matches(null), "Serialization of " + inputFile + " matched null - Matches test");
                 Assert.IsFalse(resource.IsExactly(null), "Serialization of " + inputFile + " matched null - IsExactly test");
 
-                var json = FhirSerializer.SerializeResourceToJson(resource);
-                File.WriteAllText(outputFile, json);
+                // var json = FhirSerializer.SerializeResourceToJson(resource);
+                // File.WriteAllText(outputFile, json);
+                using (var stream = System.IO.File.Open(outputFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    using (var sw = new StreamWriter(stream, new UTF8Encoding(false)))
+                    using (JsonWriter jw = Utility.SerializationUtil.CreateJsonTextWriter(sw))
+                    using (var writer = new JsonDomFhirWriter(jw))
+                    {
+                        FhirSerializer.Serialize(resource, writer, Fhir.Rest.SummaryType.False);
+                    }
+                    stream.Close();
+                }
             }
             else
             {
-                var json = File.ReadAllText(inputFile);
-                var resource = new FhirJsonParser().Parse<Resource>(json);
-                var xml = FhirSerializer.SerializeResourceToXml(resource);
-                File.WriteAllText(outputFile, xml);
-            }
-        }
+                Stream file = File.Open(inputFile, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var rdr = Utility.SerializationUtil.JsonReaderFromStream(file);
+                var resource = new FhirJsonParser().Parse<Resource>(rdr);
 
-        private void convertFeed(string inputFile, string outputFile)
-        {
-            //TODO: call validation after reading
-
-            if (inputFile.EndsWith(".xml"))
-            {
-                var xml = File.ReadAllText(inputFile);
-                var resource = new FhirXmlParser().Parse<Resource>(xml);
-
-                var json = FhirSerializer.SerializeResourceToJson(resource);
-                File.WriteAllText(outputFile, json);
-            }
-            else
-            {
-                var json = File.ReadAllText(inputFile);
-                var resource = new FhirJsonParser().Parse<Resource>(json);
-                var xml = FhirSerializer.SerializeResourceToXml(resource);
-                File.WriteAllText(outputFile, xml);
+                // var xml = FhirSerializer.SerializeResourceToXml(resource);
+                // File.WriteAllText(outputFile, xml);
+                using (var stream = System.IO.File.Open(outputFile, FileMode.Create, FileAccess.Write, FileShare.None))
+                {
+                    using (var sw = new StreamWriter(stream, new UTF8Encoding(false)))
+                    using (XmlWriter xw = XmlWriter.Create(sw, new XmlWriterSettings { OmitXmlDeclaration = true }))
+                    using (var writer = new XmlFhirWriter(xw))
+                    {
+                        FhirSerializer.Serialize(resource, writer, Fhir.Rest.SummaryType.False);
+                    }
+                    stream.Close();
+                }
             }
         }
     }
