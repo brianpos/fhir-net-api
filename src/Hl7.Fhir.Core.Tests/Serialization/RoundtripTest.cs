@@ -157,10 +157,7 @@ namespace Hl7.Fhir.Tests.Serialization
 
                 if (file.Contains("expansions.") || file.Contains("profiles-resources") || file.Contains("profiles-others") || file.Contains("valuesets."))
                     continue;
-                if (!isFeed(file))
-                    convertResource(file, outputFile);
-                else
-                    convertFeed(file, outputFile);
+                convertResource(file, outputFile);
             }
 
             Debug.WriteLine("Done!");
@@ -208,24 +205,6 @@ namespace Hl7.Fhir.Tests.Serialization
                 }
             }
         }
-
-        private bool isFeed(string filename)
-        {
-            var buffer = new char[250];
-
-
-            using (var reader = new StreamReader(new FileStream(filename, FileMode.Open)))
-            {
-                reader.Read(buffer, 0, buffer.Length);
-                var data = new String(buffer);
-
-                if (data.Contains("<feed")) return true;
-                if (data.Contains("resourceType") && data.Contains("Bundle") && !data.Contains("NewBundle")) return true;
-
-                return false;
-            }
-        }
-
 
         private void convertResource(string inputFile, string outputFile)
         {
