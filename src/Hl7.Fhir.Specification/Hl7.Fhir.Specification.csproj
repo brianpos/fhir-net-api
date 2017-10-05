@@ -51,10 +51,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="install.ps1">
-      <Pack>true</Pack>
-      <PackagePath>tools</PackagePath>
-    </Content>
     <Content Include="specification.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <PackagePath>contentFiles\any\any</PackagePath>
