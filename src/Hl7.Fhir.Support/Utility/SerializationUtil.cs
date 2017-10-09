@@ -95,6 +95,7 @@ namespace Hl7.Fhir.Utility
             settings.IgnoreProcessingInstructions = true;
             settings.IgnoreWhitespace = true;
             settings.DtdProcessing = DtdProcessing.Prohibit;
+            settings.ConformanceLevel = xmlReader.Settings.ConformanceLevel;
 
             return XmlReader.Create(xmlReader, settings);
         }
