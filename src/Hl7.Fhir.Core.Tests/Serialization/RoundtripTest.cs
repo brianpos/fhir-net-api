@@ -29,19 +29,26 @@ namespace Hl7.Fhir.Tests.Serialization
         [TestMethod]   
         public void RoundTripOneExample()
         {
-            string testFileName = "testscript-example(example).xml";
+            roundTripOneExample("testscript-example(example).xml");
+            roundTripOneExample("TestPatient.xml");
+        }
+
+        private void roundTripOneExample(string filename)
+        {
+            string testFileName = filename;
             var original = TestDataHelper.ReadTestData(testFileName);
 
-            var t = new FhirXmlParser().Parse<TestScript>(original);
-            var outputXml = FhirSerializer.SerializeResourceToXml(t);
-            XmlAssert.AreSame(testFileName,original, outputXml);
+            var t = new FhirXmlParser().Parse<Resource>(original);
 
-            var outputJson = FhirSerializer.SerializeResourceToJson(t);
-            var t2 = new FhirJsonParser().Parse<TestScript>(outputJson);
+            var outputXml = new FhirXmlSerializer().SerializeToString(t);
+            XmlAssert.AreSame(testFileName, original, outputXml);
+
+            var outputJson = new FhirJsonSerializer().SerializeToString(t);
+            var t2 = new FhirJsonParser().Parse<Resource>(outputJson);
             Assert.IsTrue(t.IsExactly(t2));
 
-            var outputXml2 = FhirSerializer.SerializeResourceToXml(t2);
-            XmlAssert.AreSame(testFileName, original, outputXml2);
+            var outputXml2 = new FhirXmlSerializer().SerializeToString(t2);
+            XmlAssert.AreSame(testFileName, original, outputXml2);            
         }
 
 
