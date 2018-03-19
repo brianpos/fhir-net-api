@@ -239,7 +239,7 @@ namespace Hl7.Fhir.Tests.Serialization
                     using (JsonWriter jw = Utility.SerializationUtil.CreateJsonTextWriter(sw))
                     using (var writer = new JsonDomFhirWriter(jw))
                     {
-                        FhirSerializer.Serialize(resource, writer, Fhir.Rest.SummaryType.False);
+                        new FhirJsonSerializer().Serialize(resource, writer, Fhir.Rest.SummaryType.False);
                     }
                     stream.Close();
                 }
@@ -258,7 +258,7 @@ namespace Hl7.Fhir.Tests.Serialization
                     using (XmlWriter xw = XmlWriter.Create(sw, new XmlWriterSettings { OmitXmlDeclaration = true }))
                     using (var writer = new XmlFhirWriter(xw))
                     {
-                        FhirSerializer.Serialize(resource, writer, Fhir.Rest.SummaryType.False);
+                        new FhirXmlSerializer().Serialize(resource, writer, Fhir.Rest.SummaryType.False);
                     }
                     stream.Close();
                 }

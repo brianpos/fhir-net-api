@@ -19,7 +19,7 @@ using Hl7.Fhir.Utility;
 
 namespace Hl7.Fhir.Serialization
 {
-    internal class XmlFhirWriter : IFhirWriter
+    public class XmlFhirWriter : IFhirWriter
     {
         private XmlWriter xw;
 

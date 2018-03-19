@@ -33,7 +33,7 @@ namespace Hl7.Fhir.Serialization
         }
 
         // [WMR 20160421] Caller is responsible for disposing writer
-        internal protected void Serialize(Base instance, IFhirWriter writer, SummaryType summary = SummaryType.False, string root = null)
+        public void Serialize(Base instance, IFhirWriter writer, SummaryType summary = SummaryType.False, string root = null)
         {
             if (instance is Resource resource)
                 new ResourceWriter(writer, Settings).Serialize(resource, summary);

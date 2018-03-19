@@ -18,7 +18,7 @@ using Hl7.Fhir.Introspection;
 
 namespace Hl7.Fhir.Serialization
 {
-    internal class JsonDomFhirWriter : IFhirWriter
+    public class JsonDomFhirWriter : IFhirWriter
     {
         private JsonWriter jw;
         private JToken _current = null;
