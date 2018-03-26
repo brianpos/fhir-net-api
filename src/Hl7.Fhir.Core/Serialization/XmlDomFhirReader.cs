@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -19,6 +19,7 @@ using System.Xml.Linq;
 
 namespace Hl7.Fhir.Serialization
 {
+    [Obsolete("Replace this class with XmlDomFhirNavigator from the Hl7.Fhir.Support assembly, and pass it to a Parse() overload which accepts IElementNavigator")]
     public class XmlDomFhirReader : IFhirReader
     {
         public const string BINARY_CONTENT_MEMBER_NAME = "content";

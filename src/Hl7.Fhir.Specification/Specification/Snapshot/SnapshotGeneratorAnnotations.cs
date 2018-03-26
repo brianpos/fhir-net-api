@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2017, Furore (info@furore.com) and contributors
+ * Copyright (c) 2017, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -14,8 +14,7 @@ using System.Linq;
 
 namespace Hl7.Fhir.Specification.Snapshot
 {
-    // Custom annotations for internal use by the SnapshotGenerator
-
+    /// <summary>Provides support for custom annotation types used by the <see cref="SnapshotGenerator"/>.</summary>
     public static class SnapshotGeneratorAnnotations
     {
         #region Annotation: Created By Snapshot Generator

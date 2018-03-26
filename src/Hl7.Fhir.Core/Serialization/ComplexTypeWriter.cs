@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -8,16 +8,11 @@
 
 using Hl7.Fhir.Introspection;
 using Hl7.Fhir.Model;
-using Hl7.Fhir.Support;
 using Hl7.Fhir.Utility;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 
 namespace Hl7.Fhir.Serialization
@@ -37,10 +32,31 @@ namespace Hl7.Fhir.Serialization
             NonValueElements
         }
 
-        public ComplexTypeWriter(IFhirWriter writer)
+        public ParserSettings Settings { get; private set; }
+
+        public ComplexTypeWriter(IFhirWriter writer, ParserSettings settings)
         {
             _writer = writer;
             _inspector = BaseFhirParser.Inspector;
+            Settings = settings;
+        }
+
+
+        internal void Serialize(Base instance, Rest.SummaryType summary, SerializationMode mode = SerializationMode.AllMembers, string root=null)
+        {
+            if (instance == null) throw Error.ArgumentNull(nameof(instance));
+
+            ClassMapping mapping = _inspector.ImportType(instance.GetType());
+            if (mapping == null)
+                throw Error.Format($"Asked to serialize unknown type '{instance.GetType()}'");
+
+            var rootName = root ?? mapping.Name;
+
+            _writer.WriteStartProperty(rootName);
+
+            Serialize(mapping, instance, summary, mode);
+
+            _writer.WriteEndProperty();
         }
 
         internal void Serialize(ClassMapping mapping, object instance, Rest.SummaryType summary, SerializationMode mode = SerializationMode.AllMembers)
@@ -48,6 +64,10 @@ namespace Hl7.Fhir.Serialization
             if (mapping == null) throw Error.ArgumentNull(nameof(mapping));
 
             _writer.WriteStartComplexContent();
+
+#pragma warning disable 618
+            if (Settings.CustomSerializer != null) Settings.CustomSerializer.OnBeforeSerializeComplexType(instance, _writer);
+#pragma warning restore
 
             // Emit members that need xml attributes / first (to facilitate stream writer API)
             // attributes first (xml) and order maintained for the rest
@@ -96,11 +116,23 @@ namespace Hl7.Fhir.Serialization
                     writeProperty(instance, summary, property, mode);
             }
 
+#pragma warning disable 618
+            if (Settings.CustomSerializer != null) Settings.CustomSerializer.OnAfterSerializeComplexType(instance, _writer);
+#pragma warning restore
+
             _writer.WriteEndComplexContent();
         }
 
         private void writeProperty(object instance, Rest.SummaryType summaryType, PropertyMapping property, SerializationMode mode)
         {
+            if (Settings.CustomSerializer != null)
+            {
+#pragma warning disable 618
+                bool done = Settings.CustomSerializer.OnBeforeSerializeProperty(property.Name, instance, _writer);
+#pragma warning restore
+                if (done) return;
+            }
+
             // Check whether we are asked to just serialize the value element (Value members of primitive Fhir datatypes)
             // or only the other members (Extension, Id etc in primitive Fhir datatypes)
             // Default is all
@@ -131,7 +163,7 @@ namespace Hl7.Fhir.Serialization
 
             _writer.WriteStartProperty(memberName);
 
-            var writer = new DispatchingWriter(_writer);
+            var writer = new DispatchingWriter(_writer, Settings);
 
             // Now, if our writer does not use dual properties for primitive values + rest (xml),
             // or this is a complex property without value element, serialize data normally
@@ -157,7 +189,7 @@ namespace Hl7.Fhir.Serialization
             if (instance is IList && ((IList)instance).Count > 0)
                 instance = ((IList)instance)[0];
 
-            if (prop.IsPrimitive || prop.Choice == ChoiceType.ResourceChoice)
+            if (instance == null || prop.IsPrimitive || prop.Choice == ChoiceType.ResourceChoice)
                 return false;
 
             return _inspector.ImportType(instance.GetType()).HasPrimitiveValueMember;

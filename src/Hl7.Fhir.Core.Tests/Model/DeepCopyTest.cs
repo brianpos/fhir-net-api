@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -31,7 +31,7 @@ namespace Hl7.Fhir.Tests.Model
 
             var p = new FhirXmlParser().Parse<Patient>(xml);
             var p2 = (Patient)p.DeepCopy();
-            var xml2 = FhirSerializer.SerializeResourceToXml(p2);
+            var xml2 = new FhirXmlSerializer().SerializeToString(p2);
             XmlAssert.AreSame("TestPatient.xml", xml, xml2);
         }
 
@@ -42,7 +42,7 @@ namespace Hl7.Fhir.Tests.Model
 
             var p = new FhirXmlParser().Parse<CarePlan>(xml);
             var p2 = (CarePlan)p.DeepCopy();
-            var xml2 = FhirSerializer.SerializeResourceToXml(p2);
+            var xml2 = new FhirXmlSerializer().SerializeToString(p2);
             XmlAssert.AreSame("careplan-example-f201-renal.xml", xml, xml2);
         }
 

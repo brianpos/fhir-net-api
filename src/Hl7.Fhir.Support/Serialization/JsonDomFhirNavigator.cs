@@ -1,5 +1,5 @@
 ﻿/*  
-* Copyright (c) 2017, Furore (info@furore.com) and contributors 
+* Copyright (c) 2017, Firely (info@fire.ly) and contributors 
 * See the file CONTRIBUTORS for details. 
 *  
 * This file is licensed under the BSD 3-Clause license 
@@ -8,6 +8,7 @@
 
 using Hl7.Fhir.ElementModel;
 using Hl7.Fhir.Utility;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ using System.Xml.Linq;
 
 namespace Hl7.Fhir.Serialization
 {
-    public partial struct JsonDomFhirNavigator : IElementNavigator, IAnnotated
+    public partial struct JsonDomFhirNavigator : IElementNavigator, IAnnotated, IPositionInfo
     {
         internal JsonDomFhirNavigator(string root, JObject current)
         {
@@ -63,6 +64,10 @@ namespace Hl7.Fhir.Serialization
                     return $"{_parentPath}.{Current.Name}[{_nameIndex}]";
             }
         }
+
+        public int LineNumber => Current.LineNumber;
+
+        public int LinePosition => Current.LinePosition;
 
         private int nextMatch(JsonNavigatorNode[] nodes, string namefilter = null, int startAfter = -1)
         {
@@ -117,20 +122,28 @@ namespace Hl7.Fhir.Serialization
         public IEnumerable<object> Annotations(Type type)
         {
             if (type == typeof(JsonSerializationDetails))
-                return new[] { new JsonSerializationDetails() { RawValue = Current.JsonValue?.Value } };
+            {
+                return new[]
+                {
+                    new JsonSerializationDetails()
+                    {
+                        RawValue = Current.JsonValue?.Value,
+                        LineNumber = Current.LineNumber,
+                        LinePosition = Current.LinePosition
+                    }
+                };
+            }
             else
                 return null;
         }
     }
 
-
+    
     internal static class JTokenExtensions
     {
-        public const string RESOURCETYPE_MEMBER_NAME = "resourceType";
-
         public static string GetCoreTypeFromObject(this JObject o)
         {
-            var type = o[RESOURCETYPE_MEMBER_NAME];
+            var type = o[JsonSerializationDetails.RESOURCETYPE_MEMBER_NAME];
 
             if (type is JValue typeValue && typeValue.Type == JTokenType.String)
                 return (string)typeValue.Value;

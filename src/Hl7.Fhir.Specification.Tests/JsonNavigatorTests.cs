@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -270,7 +270,7 @@ namespace Hl7.Fhir.Specification.Tests
             xmlw.Flush();
 
             Assert.IsTrue(sw.ToString().StartsWith("<?xml version=\"1.0\" encoding=\"utf-16\"?>" +
-                "<f:Patient xmlns:f=\"http://hl7.org/fhir\"><f:identifier><f:period><f:start value=\"2001-05-06\" /></f:period>"+
+                "<f:Patient id=\"pat1\" xmlns:f=\"http://hl7.org/fhir\"><f:identifier><f:period><f:start value=\"2001-05-06\" /></f:period>" +
                 "<f:assigner><f:display value=\"Acme Healthcare\" /></f:assigner><f:use value=\"usual\" />"));
         }
 

@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -21,7 +21,8 @@ using System.Text;
 namespace Hl7.Fhir.Serialization
 {
     public class ResourceReader
-    {       
+    {
+#pragma warning disable 612, 618
         private IFhirReader _reader;
         private ModelInspector _inspector;
 
@@ -33,6 +34,7 @@ namespace Hl7.Fhir.Serialization
             _inspector = BaseFhirParser.Inspector;
             Settings = settings;
         }
+#pragma warning restore 612,618
 
         public Resource Deserialize(Resource existing=null)
         {

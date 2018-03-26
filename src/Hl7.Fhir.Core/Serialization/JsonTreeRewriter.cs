@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2015, Furore (info@furore.com) and contributors
+ * Copyright (c) 2015, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -83,7 +83,7 @@ namespace Hl7.Fhir.Serialization
 
         private static IEnumerable<JProperty> expandPrimitiveChildren(IEnumerable<JProperty> children, string parentName)
         {
-            bool inResource = children.Any(prop => prop.Name == JsonDomFhirReader.RESOURCETYPE_MEMBER_NAME);
+            bool inResource = children.Any(prop => prop.Name == JsonSerializationDetails.RESOURCETYPE_MEMBER_NAME);
 
             foreach (var child in children)
             {

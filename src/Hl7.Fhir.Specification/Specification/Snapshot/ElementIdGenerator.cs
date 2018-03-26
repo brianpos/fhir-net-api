@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2017, Furore (info@furore.com) and contributors
+ * Copyright (c) 2017, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -44,6 +44,7 @@ namespace Hl7.Fhir.Specification.Snapshot
     /// <summary>Represents a segment of an element Id, derived from the (original) element name and the (optional) slice name.</summary>
     public struct ElementIdSegment
     {
+        /// <summary>Represents an empty segment.</summary>
         public static readonly ElementIdSegment Empty = new ElementIdSegment(null, null);
 
         /// <summary>Create a new <see cref="ElementIdSegment"/> from the specified (original) element name and (optional) slice name.</summary>

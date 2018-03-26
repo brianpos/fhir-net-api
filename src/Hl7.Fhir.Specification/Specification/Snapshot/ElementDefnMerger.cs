@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2017, Furore (info@furore.com) and contributors
+ * Copyright (c) 2017, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -50,15 +50,22 @@ namespace Hl7.Fhir.Specification.Snapshot
 
                 // paths can be changed under one circumstance: the snap is a choice[x] element, and diff limits the type choices
                 // to one. The name can then be changed to choiceXXXX, where XXXX is the name of the type.
-                if (snap.Path != diff.Path && snap.IsChoice() && diff.Type.Count() == 1)
+
+                // [WMR 20171004] Determine *distinct* type codes
+                // if (snap.Path != diff.Path && snap.IsChoice() && diff.Type.Count() == 1)
+                if (snap.Path != diff.Path && snap.IsChoice())
                 {
-                    // [WMR 20160906] WRONG! Must also handle snap.Path="Extension.value[x]" vs. diff.Path="Extension.extension.value[x]
-                    // if (snap.Path.Substring(0, snap.Path.Length - 3) + diff.Type.First().Code.ToString().Capitalize() != diff.Path)
-                    if (!ElementDefinitionNavigator.IsCandidateBasePath(snap.Path, diff.Path))
+                    var distinctTypeCodes = diff.DistinctTypeCodes();
+                    if (distinctTypeCodes.Count == 1)
                     {
-                        throw Error.InvalidOperation($"Invalid operation in snapshot generator. Path cannot be changed from '{snap.Path}' to '{diff.Path}', since the type is sliced to '{diff.Type.First().Code}'");
+                        // [WMR 20160906] WRONG! Must also handle snap.Path="Extension.value[x]" vs. diff.Path="Extension.extension.value[x]
+                        // if (snap.Path.Substring(0, snap.Path.Length - 3) + diff.Type.First().Code.ToString().Capitalize() != diff.Path)
+                        if (!ElementDefinitionNavigator.IsCandidateBasePath(snap.Path, diff.Path))
+                        {
+                            throw Error.InvalidOperation($"Invalid operation in snapshot generator. Path cannot be changed from '{snap.Path}' to '{diff.Path}', since the type is sliced to '{diff.Type.First().Code}'");
+                        }
+                        snap.PathElement = mergePrimitiveAttribute(snap.PathElement, diff.PathElement);
                     }
-                    snap.PathElement = mergePrimitiveAttribute(snap.PathElement, diff.PathElement);
                 }
 
                 // [WMR 20170421] Element.Id is NOT inherited!
@@ -107,7 +114,7 @@ namespace Hl7.Fhir.Specification.Snapshot
                 if (!diff.Type.IsNullOrEmpty() && !diff.Type.IsExactly(snap.Type))
                 {
                     snap.Type = new List<ElementDefinition.TypeRefComponent>(diff.Type.DeepCopy());
-                    foreach (var element in snap.Type) { onConstraint(snap); }
+                    foreach (var element in snap.Type) { onConstraint(element); }
                 }
 
                 // ElementDefinition.contentReference cannot be overridden by a derived profile                

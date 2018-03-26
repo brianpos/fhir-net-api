@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2016, Furore (info@furore.com) and contributors
+ * Copyright (c) 2016, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -81,8 +81,10 @@ namespace Hl7.Fhir.Specification.Terminology
                     if (code != null && coding == null)
                         coding = new Coding(system, code, display);
 
-                    var codeDisplay = codeableConcept != null ? FhirSerializer.SerializeToJson(codeableConcept)
-                                            : FhirSerializer.SerializeToJson(coding);
+                    // Serialize the code or coding to json for display purposes in the issue
+                    var jsonSer = new FhirJsonSerializer();
+                    var codeDisplay = codeableConcept != null ? jsonSer.SerializeToString(codeableConcept)
+                                            : jsonSer.SerializeToString(coding);
 
                     outcome.AddIssue($"Validation of '{codeDisplay}' failed, but" +
                                 $"the terminology service at {Endpoint.Endpoint.ToString()} did not provide further details.",

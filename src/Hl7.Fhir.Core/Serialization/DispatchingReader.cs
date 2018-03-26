@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -20,6 +20,7 @@ using Hl7.Fhir.Utility;
 
 namespace Hl7.Fhir.Serialization
 {
+#pragma warning disable 612,618
     public class DispatchingReader
     {
         private readonly IFhirReader _current;
@@ -36,6 +37,7 @@ namespace Hl7.Fhir.Serialization
 
             Settings = settings;
         }
+#pragma warning restore 612,618
 
         public object Deserialize(PropertyMapping prop, string memberName, object existing=null)
         {

@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2016, Furore (info@furore.com) and contributors
+ * Copyright (c) 2016, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -60,7 +60,7 @@ namespace Hl7.Fhir.Validation
             if (value is Primitive)
                 return value.ToString();
             else
-                return FhirSerializer.SerializeToJson(value, root: value.TypeName);
+                return new FhirJsonSerializer().SerializeToString(value);
         }
 
         public static bool IsExactlyEqualTo(this IElementNavigator left, IElementNavigator right)

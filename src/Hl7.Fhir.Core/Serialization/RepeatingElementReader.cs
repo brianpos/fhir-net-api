@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -23,6 +23,7 @@ namespace Hl7.Fhir.Serialization
 {
     public class RepeatingElementReader
     {
+#pragma warning disable 612, 618
         private IFhirReader _current;
         private ModelInspector _inspector;
 
@@ -36,7 +37,7 @@ namespace Hl7.Fhir.Serialization
             Settings = settings;
         }
 
-        
+#pragma warning restore 612, 618
 
         public IList Deserialize(PropertyMapping prop, string memberName, IList existing=null)
         {

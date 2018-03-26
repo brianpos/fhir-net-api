@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -321,7 +321,7 @@ namespace Hl7.Fhir.Specification.Tests
             // Save back to disk to create a conflicting duplicate
             var b = new Bundle();
             b.AddResourceEntry(ext, url);
-            var xml = FhirSerializer.SerializeToXml(b);
+            var xml = new FhirXmlSerializer().SerializeToString(b);
             var filePath = Path.Combine(DirectorySource.SpecificationDirectory, dupFileName) + ".xml";
             var filePath2 = Path.Combine(DirectorySource.SpecificationDirectory, dupFileName) + "2.xml";
             File.WriteAllText(filePath, xml);

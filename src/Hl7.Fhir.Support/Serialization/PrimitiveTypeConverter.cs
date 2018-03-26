@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -132,7 +132,7 @@ namespace Hl7.Fhir.Serialization
             if(typeof(byte[]) == to)
                 return System.Convert.FromBase64String(value);
             if (typeof(DateTimeOffset) == to)
-                return XmlConvert.ToDateTimeOffset(value);
+                return ConvertToDatetimeOffset(value);
             if(typeof(System.Uri) == to)
                 return new Uri(value, UriKind.RelativeOrAbsolute);
             if (to.IsEnum())
@@ -147,6 +147,15 @@ namespace Hl7.Fhir.Serialization
             throw Error.NotSupported($"Cannot convert string value '{value}' to a {to.Name}");
         }
 
+        private static DateTimeOffset ConvertToDatetimeOffset(string value)
+        {
+            if (!value.Contains("T"))
+            {
+                // MV: when there is no time-part, consider this then as a UTC datetime by adding Zulu = UTC(+0)
+                return XmlConvert.ToDateTimeOffset(value + "Z");
+            }
+            return XmlConvert.ToDateTimeOffset(value);
+        }
 
         public static bool CanConvert(Type type)
         {

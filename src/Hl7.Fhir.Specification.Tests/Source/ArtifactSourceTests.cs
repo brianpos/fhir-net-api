@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -23,6 +23,46 @@ namespace Hl7.Fhir.Specification.Tests
     [TestClass]
     public class ArtifactSourceTests
     {
+        private static string _testPath;
+
+        [ClassInitialize]
+        public static void SetupExampleDir(TestContext context)
+        {
+            _testPath = prepareExampleDirectory(out int numFiles);
+        }
+
+        private static string prepareExampleDirectory(out int numFiles)
+        {
+            var zipFile = Path.Combine(Directory.GetCurrentDirectory(), "specification.zip");
+            var zip = new ZipCacher(zipFile);
+            var zipPath = zip.GetContentDirectory();
+
+            var testPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(testPath);
+
+            copy(zipPath, "extension-definitions.xml", testPath);
+            copy(zipPath, "flag.xsd", testPath);
+            copy(zipPath, "patient.sch", testPath);
+            copy(@"TestData", "TestPatient.xml", testPath);
+            File.WriteAllText(Path.Combine(testPath, "bla.dll"), "This is text, acting as a dll");
+            File.WriteAllText(Path.Combine(testPath, "nonfhir.xml"), "<root>this is not a valid FHIR xml resource.</root>");
+            File.WriteAllText(Path.Combine(testPath, "invalid.xml"), "<root>this is invalid xml");
+
+            var subPath = Path.Combine(testPath, "sub");
+            Directory.CreateDirectory(subPath);
+            copy(@"TestData", "TestPatient.json", subPath);
+
+            // If you add or remove files, please correct the numFiles here below
+            numFiles = 8 - 1;   // 8 files - 1 binary (which should be ignored)
+
+            return testPath;
+        }
+
+        private static void copy(string dir, string file, string outputDir)
+        {
+            File.Copy(Path.Combine(dir, file), Path.Combine(outputDir, file));
+        }
+
         [TestMethod]
         public void ZipCacherShouldCache()
         {
@@ -76,47 +116,6 @@ namespace Hl7.Fhir.Specification.Tests
             Assert.IsFalse(fa.IsActual());
         }
 
-        private void copy(string dir, string file, string outputDir)
-        {
-            File.Copy(Path.Combine(dir, file), Path.Combine(outputDir, file));
-        }
-
-        private string prepareExampleDirectory(out int numFiles)
-        {
-            var zipFile = Path.Combine(Directory.GetCurrentDirectory(), "specification.zip");
-            var zip = new ZipCacher(zipFile);
-            var zipPath = zip.GetContentDirectory();
-
-            var testPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(testPath);
-
-            copy(zipPath, "extension-definitions.xml", testPath);
-            copy(zipPath, "flag.xsd", testPath);
-            copy(zipPath, "patient.sch", testPath);
-            copy(@"TestData", "TestPatient.xml", testPath);
-            File.WriteAllText(Path.Combine(testPath, "bla.dll"), "This is text, acting as a dll");
-            File.WriteAllText(Path.Combine(testPath, "nonfhir.xml"), "<root>this is not a valid FHIR xml resource.</root>");
-            File.WriteAllText(Path.Combine(testPath, "invalid.xml"), "<root>this is invalid xml");
-
-            var subPath = Path.Combine(testPath, "sub");
-            Directory.CreateDirectory(subPath);
-            copy(@"TestData", "TestPatient.json", subPath);
-
-            // If you add or remove files, please correct the numFiles here below
-            numFiles = 8 - 1;   // 8 files - 1 binary (which should be ignored)
-
-            return testPath;
-        }
-
-
-        private string _testPath;
-
-        [TestInitialize]
-        public void SetupExampleDir()
-        {
-            _testPath = prepareExampleDirectory(out int numFiles);
-        }
-
         [TestMethod]
         public void UseFileArtifactSource()
         {
@@ -168,16 +167,18 @@ namespace Hl7.Fhir.Specification.Tests
             Assert.IsTrue(names.Contains("TestPatient.xml"));
             Assert.IsTrue(names.Contains("nonfhir.xml"));
             Assert.IsTrue(names.Contains("invalid.xml"));
-            Assert.AreEqual(0, fa.Errors.Length);
+            //[WMR 20171020] TODO: Use ArtifactSummary.Error
+            //Assert.AreEqual(0, fa.Errors.Length);
 
             // Call a method on the IConformanceSource interface to trigger prepareResources
             var sd = fa.FindStructureDefinition("http://hl7.org/fhir/StructureDefinition/patient-birthTime");
             Assert.IsNotNull(sd);
 
-            Assert.AreEqual(1, fa.Errors.Length);
-            var error = fa.Errors[0];
-            Debug.Print($"{error.FileName} : {error.Error.Message}");
-            Assert.AreEqual("invalid.xml", Path.GetFileName(error.FileName));
+            var errors = fa.Errors().ToList();
+            Assert.AreEqual(1, errors.Count);
+            var error = errors[0];
+            Debug.Print($"{error.Origin} : {error.Error.Message}");
+            Assert.AreEqual("invalid.xml", Path.GetFileName(error.Origin));
         }
 
         [TestMethod]
@@ -192,7 +193,7 @@ namespace Hl7.Fhir.Specification.Tests
         public void ReadsSubdirectories()
         {
             var testPath = prepareExampleDirectory(out int numFiles);
-            var fa = new DirectorySource(testPath, includeSubdirectories: true);
+            var fa = new DirectorySource(testPath, new DirectorySourceSettings() {  IncludeSubDirectories = true });
             var names = fa.ListArtifactNames();
 
             Assert.AreEqual(numFiles, names.Count());
@@ -335,7 +336,7 @@ namespace Hl7.Fhir.Specification.Tests
                     {
                         // Note: we still have write permissions...
 
-                        var dirSource = new DirectorySource(testPath, includeSubdirectories: true);
+                        var dirSource = new DirectorySource(testPath, new DirectorySourceSettings() { IncludeSubDirectories = true });
 
                         // [WMR 20170823] Test ListArtifactNames => prepareFiles()
                         var names = dirSource.ListArtifactNames();
