@@ -700,6 +700,12 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         }
         #endregion
 
+        private void DebugDumpOutputXml(Base fragment)
+        {
+            var doc = System.Xml.Linq.XDocument.Parse(new Serialization.FhirXmlSerializer().SerializeToString(fragment));
+            System.Diagnostics.Trace.WriteLine(doc.ToString(System.Xml.Linq.SaveOptions.None));
+        }
+
         [TestMethod]
         public void QuestionnaireCreatePublishToAzure()
         {
@@ -714,7 +720,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Questionnaire qPart1;
             QuestionnaireResponse qrP1;
             CreateMergedQuestionnaire(out qPart1, out qrP1);
-            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qPart1));
+            DebugDumpOutputXml(qPart1);
             server.Update(qPart1);
 
             // now put the Prac on the server!
@@ -729,7 +735,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             StructureItemTree.PruneTree(si, q);
             var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, q, qr);
             prac.Id = "demoPatId";
-            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(prac));
+            DebugDumpOutputXml(prac);
             server.Update(prac);
         }
 
