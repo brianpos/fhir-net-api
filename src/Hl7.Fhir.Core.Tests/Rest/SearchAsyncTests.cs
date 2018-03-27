@@ -137,7 +137,7 @@ namespace Hl7.Fhir.Core.AsyncTests
                     SortOrder.Descending);
 
             var result1 = client.SearchUsingPost<Patient>(srch);
-
+            DebugDumpOutputXml(result1);
             Assert.IsTrue(result1.Entry.Count >= 1);
 
             while (result1 != null)
@@ -146,12 +146,18 @@ namespace Hl7.Fhir.Core.AsyncTests
                 {
                     Patient p = (Patient)e.Resource;
                     Console.WriteLine(
-                        $"NAME: {p.Name[0].Given.FirstOrDefault()} {p.Name[0].Family.FirstOrDefault()}");
+                        $"NAME: {p.Name.FirstOrDefault()?.Given?.FirstOrDefault()} {p.Name.FirstOrDefault()?.Family?.FirstOrDefault()}");
                 }
                 result1 = client.Continue(result1, PageDirection.Next);
             }
 
             Console.WriteLine("Test Completed");
+        }
+
+        private void DebugDumpOutputXml(Base fragment)
+        {
+            var doc = System.Xml.Linq.XDocument.Parse(new Serialization.FhirXmlSerializer().SerializeToString(fragment));
+            System.Diagnostics.Trace.WriteLine(doc.ToString(System.Xml.Linq.SaveOptions.None));
         }
 
         [TestMethod]
@@ -226,7 +232,7 @@ namespace Hl7.Fhir.Core.AsyncTests
                 {
                     Patient p = (Patient)e.Resource;
                     Console.WriteLine(
-                        $"NAME: {p.Name[0].Given.FirstOrDefault()} {p.Name[0].Family.FirstOrDefault()}");
+                        $"NAME: {p.Name.FirstOrDefault()?.Given?.FirstOrDefault()} {p.Name.FirstOrDefault()?.Family?.FirstOrDefault()}");
                 }
                 result1 = client.Continue(result1, PageDirection.Next);
             }

@@ -499,8 +499,8 @@ namespace Hl7.Fhir.QuestionnaireServices
         /// <summary>
         /// Check to see if this child should be retained in the collection
         /// </summary>
-        /// <param name="si"></param>
-        /// <param name="group"></param>
+        /// <param name="item"></param>
+        /// <param name="mapPathsToLinkIds"></param>
         /// <returns></returns>
         internal static void PruneTree(StructureItem item, Dictionary<string, string> mapPathsToLinkIds)
         {

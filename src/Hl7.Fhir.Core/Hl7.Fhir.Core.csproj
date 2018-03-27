@@ -23,6 +23,11 @@
      <DebugType>full</DebugType>
      <DebugSymbols>True</DebugSymbols>
    </PropertyGroup>
+
+   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
+     <DebugType>full</DebugType>
+     <DebugSymbols>true</DebugSymbols>
+   </PropertyGroup>
    <ItemGroup>
      <Compile Remove="Rest\Search\**" />
      <EmbeddedResource Remove="Rest\Search\**" />
