@@ -151,6 +151,11 @@ namespace Hl7.Fhir.Serialization
             var found = nextMatch(_current, nameFilter);
             if (found == null) return false;
 
+            // Check if there are no children of the resource element
+            // e.g. <resource><OperationOutcome/></resource>
+            if (found is XElement xe2 && isResourceNameElement(xe2.Name) && xe2.FirstNode == null)
+                return false;
+
             _parentPath = Location;
 
             // Move the _current position to the newly found element,

@@ -186,6 +186,10 @@
       </group>
     </Questionnaire>
   </contained>
+  <contained>
+    <!-- This empty resource causes a null ref in the parsing, not validation -->
+    <OperationOutcome />
+  </contained>
   <identifier>
     <use value="usual"/>
     <system value="urn:oid:0.1.2.3.4.5.6.7"/>
