@@ -31,7 +31,7 @@ namespace Hl7.Fhir.QuestionnaireServices
         /// <summary>
         /// This is effectively a variation on the $populate operation
         /// </summary>
-        /// <param name="qPart1"></param>
+        /// <param name="questionnaire"></param>
         /// <param name="resources"></param>
         /// <param name="source"></param>
         /// <returns></returns>

@@ -187,6 +187,9 @@ namespace Hl7.Fhir.QuestionnaireServices
         /// http://hl7.org/fhir/elementdefinition.html#ElementDefinition
         /// </summary>
         /// <param name="sd"></param>
+        /// <param name="source"></param>
+        /// <param name="replaceRoot"></param>
+        /// <param name="skipCache"></param>
         /// <returns></returns>
         public static StructureItem CreateStructureTree(StructureDefinition sd, IResourceResolver source, string replaceRoot = null, bool skipCache = false)
         {
@@ -512,8 +515,8 @@ namespace Hl7.Fhir.QuestionnaireServices
         /// <summary>
         /// Check to see if this child should be retained in the collection
         /// </summary>
-        /// <param name="si"></param>
-        /// <param name="group"></param>
+        /// <param name="item"></param>
+        /// <param name="mapPathsToLinkIds"></param>
         /// <returns></returns>
         internal static void PruneTree(StructureItem item, Dictionary<string, string> mapPathsToLinkIds)
         {

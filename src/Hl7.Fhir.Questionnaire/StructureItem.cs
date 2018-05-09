@@ -149,6 +149,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             // ...
 
             // Validate the invariants defined here
+            var vc = new FhirEvaluationContext(ParentContext);
             foreach (var inv in rule.Constraint)
             {
                 string expression = inv.Expression;
@@ -157,7 +158,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     // test this invariant rule
                     foreach (var item in values)
                     {
-                        if (!item.Predicate(expression, ParentContext))
+                        if (!item.Predicate(expression, vc))
                         {
                             result.AddIssue(new OperationOutcome.IssueComponent()
                             {
