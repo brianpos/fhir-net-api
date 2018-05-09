@@ -24,6 +24,16 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
     [TestClass]
     public class QuestionnaireProcessingTests
     {
+        private void DebugDumpOutputXml(Base fragment)
+        {
+
+// #if DUMP_OUTPUT
+            // commented out, since this will fill up the CI build's output log
+            var doc = System.Xml.Linq.XDocument.Parse(new Serialization.FhirXmlSerializer().SerializeToString(fragment));
+            System.Diagnostics.Trace.WriteLine(doc.ToString(System.Xml.Linq.SaveOptions.None));
+// #endif
+        }
+
         #region << Simple Practitioner >>
         [TestMethod]
         public void QuestionnaireCreateStandardPractitioner()
@@ -34,7 +44,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, GetPractitionerQuestionnaire(), GetPractitionerQuestionnaireResponse());
 
             if (prac != null)
-                System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(prac));
+                DebugDumpOutputXml(prac);
 
             Assert.AreEqual(true, prac.Active);
             Assert.AreEqual(AdministrativeGender.Male, prac.Gender);
@@ -289,7 +299,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
 
             var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, GetExtendedPractitionerQuestionnaire(), GetExtendedPractitionerQuestionnaireResponse());
 
-            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(prac));
+            DebugDumpOutputXml(prac);
 
             Assert.AreEqual(true, prac.Active);
             Assert.AreEqual(AdministrativeGender.Male, prac.Gender);
@@ -778,7 +788,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual("yes", prac.GetStringExtension("http://healthconnex.com.au/hcxd/Practitioner/AppointmentRequired"));
             Assert.AreEqual("Agency Staff", prac.GetExtensionValue<CodeableConcept>("http://hl7.org/fhir/StructureDefinition/practitioner-classification").Text);
 
-            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(resources));
+            DebugDumpOutputXml(resources);
 
             var obs = resources.Entry[1].Resource as Observation;
             Assert.AreEqual(Observation.ObservationStatus.Preliminary, obs.Status);
@@ -821,13 +831,13 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual("Agency Staff", prac.GetExtensionValue<CodeableConcept>("http://hl7.org/fhir/StructureDefinition/practitioner-classification").Text);
             Assert.AreEqual("http://example.org/brian", prac.Telecom[0].Value);
 
-            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(resources));
+            DebugDumpOutputXml(resources);
 
             // Now reproduce the QR from this content
             QuestionnaireResponse qr = QuestionnaireFiller.CreateQuestionnaireResponse(qPart1, resources, TestHelpers.Source);
             qr.Id = "prac-ext-demo-qr";
             // qr = qrP1.DeepCopy() as QuestionnaireResponse;
-            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qrP1));
+            DebugDumpOutputXml(qrP1);
 
             // 1 property should be intentionally different (diff in Questionnaire than in structure def)
             // so check for this in the output, then correct it before comparing that are the same
@@ -838,7 +848,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             qr.Group.Group[2].Question[1].Answer[0].Value = new FhirString("Certification 3 - Community Care");
 
             if (qr != null)
-                System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qr));
+                DebugDumpOutputXml(qr);
 
             Assert.IsTrue(qr.IsExactly(qrP1));
         }
@@ -875,7 +885,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual("yes", prac.GetStringExtension("http://healthconnex.com.au/hcxd/Practitioner/AppointmentRequired"));
             Assert.AreEqual("Agency Staff", prac.GetExtensionValue<CodeableConcept>("http://hl7.org/fhir/StructureDefinition/practitioner-classification").Text);
 
-            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(resources));
+            DebugDumpOutputXml(resources);
 
             var obs = resources.Entry[1].Resource as Observation;
             Assert.AreEqual(Observation.ObservationStatus.Preliminary, obs.Status);
