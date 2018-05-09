@@ -60,7 +60,7 @@ namespace Hl7.Fhir.Specification.Tests
             var slice = s as SliceGroupBucket;
 
             Assert.Equal(ElementDefinition.SlicingRules.OpenAtEnd, slice.Rules);
-            Assert.Equal(true, slice.Ordered);
+            Assert.True(slice.Ordered);
             Assert.Equal("Patient.telecom", slice.Name);
             Assert.Equal(3, slice.ChildSlices.Count);
             Assert.IsType<ElementBucket>(slice.Entry);
@@ -72,7 +72,7 @@ namespace Hl7.Fhir.Specification.Tests
             var email = slice.ChildSlices[1] as SliceGroupBucket;
             Assert.Equal("Patient.telecom:email", email.Name);
             Assert.Equal(ElementDefinition.SlicingRules.Closed, email.Rules);
-            Assert.Equal(false, email.Ordered);
+            Assert.False(email.Ordered);
 
             Assert.IsType<SliceBucket>(email.Entry);
             Assert.Equal(2, email.ChildSlices.Count);
