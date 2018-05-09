@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2014, Furore (info@furore.com) and contributors
+ * Copyright (c) 2014, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -154,66 +154,6 @@ namespace Hl7.Fhir.Specification.Tests
             Assert.IsNotNull(us);
             Assert.IsTrue(us is StructureDefinition);
         }
-
-        [TestMethod]
-        public void GetSomeArtifactsBySummary()
-        {
-            var fa = source;
-
-            var summaries = fa.ListSummaries();
-
-            var summary = summaries.ResolveByCanonicalUri("http://hl7.org/fhir/ValueSet/v2-0292");
-            Assert.IsNotNull(summary);
-            var vs = summary.LoadResource();
-            Assert.IsTrue(vs is ValueSet);
-            Assert.IsTrue(vs.GetOrigin().EndsWith("v2-tables.xml"));
-
-            summary = summaries.ResolveByCanonicalUri("http://hl7.org/fhir/ValueSet/administrative-gender");
-            Assert.IsNotNull(summary);
-            vs = summary.LoadResource();
-            Assert.IsNotNull(vs);
-            Assert.IsTrue(vs is ValueSet);
-
-            summary = summaries.ResolveByCanonicalUri("http://hl7.org/fhir/ValueSet/location-status");
-            Assert.IsNotNull(summary);
-            vs = summary.LoadResource();
-            Assert.IsNotNull(vs);
-            Assert.IsTrue(vs is ValueSet);
-
-            summary = summaries.ResolveByCanonicalUri("http://hl7.org/fhir/StructureDefinition/Condition");
-            Assert.IsNotNull(summary);
-            var rs = summary.LoadResource();
-            Assert.IsNotNull(rs);
-            Assert.IsTrue(rs is StructureDefinition);
-            Assert.IsTrue(rs.GetOrigin().EndsWith("profiles-resources.xml"));
-
-            summary = summaries.ResolveByCanonicalUri("http://hl7.org/fhir/StructureDefinition/ValueSet");
-            Assert.IsNotNull(summary);
-            rs = summary.LoadResource();
-            Assert.IsNotNull(rs);
-            Assert.IsTrue(rs is StructureDefinition);
-
-            summary = summaries.ResolveByCanonicalUri("http://hl7.org/fhir/StructureDefinition/Money");
-            Assert.IsNotNull(summary);
-            var dt = summary.LoadResource();
-            Assert.IsNotNull(dt);
-            Assert.IsTrue(dt is StructureDefinition);
-
-            // Try to find a core extension
-            summary = summaries.ResolveByCanonicalUri("http://hl7.org/fhir/StructureDefinition/diagnosticorder-reason");
-            Assert.IsNotNull(summary);
-            var ext = summary.LoadResource();
-            Assert.IsNotNull(ext);
-            Assert.IsTrue(ext is StructureDefinition);
-
-            // Try to find an additional US profile (they are distributed with the spec for now)
-            summary = summaries.ResolveByCanonicalUri("http://hl7.org/fhir/StructureDefinition/uslab-dr");
-            Assert.IsNotNull(summary);
-            var us = summary.LoadResource();
-            Assert.IsNotNull(us);
-            Assert.IsTrue(us is StructureDefinition);
-        }
-
 
         [TestMethod]
         public void TestFilenameDeDuplication()
@@ -430,34 +370,6 @@ namespace Hl7.Fhir.Specification.Tests
                 Debug.WriteLine($"{title} : {(multiThreaded ? "multi" : "single")} threaded, {cnt} resources, duration {sw.ElapsedMilliseconds} ms");
                 Assert.IsTrue(sw.ElapsedMilliseconds < maxDuration);
             }
-        }
-
-        [TestMethod]
-        public void ListSummaries()
-        {
-            var source = new DirectorySource(Path.Combine(DirectorySource.SpecificationDirectory, "TestData", "snapshot-test"),
-                new DirectorySourceSettings { IncludeSubDirectories = true });
-
-            var vs = source.Summaries(ResourceType.ValueSet); Assert.IsTrue(vs.Any());
-            var cm = source.Summaries(ResourceType.ConceptMap); Assert.IsFalse(cm.Any());
-            var ns = source.Summaries(ResourceType.NamingSystem); Assert.IsFalse(ns.Any());
-            var sd = source.Summaries(ResourceType.StructureDefinition); Assert.IsTrue(sd.Any());
-            var de = source.Summaries(ResourceType.DataElement); Assert.IsFalse(de.Any());
-            var cf = source.Summaries(ResourceType.Conformance); Assert.IsTrue(cf.Any());
-            var od = source.Summaries(ResourceType.OperationDefinition); Assert.IsTrue(od.Any());
-            var sp = source.Summaries(ResourceType.SearchParameter); Assert.IsFalse(sp.Any());
-            var all = source.ListSummaries();
-
-            Assert.AreEqual(vs.Count() + cm.Count() + ns.Count() + sd.Count() + de.Count() + cf.Count() + od.Count() + sp.Count(), all.Count());
-
-            //Assert.IsTrue(vs.ConformanceResources().Any(s => s.GetConformanceCanonicalUrl() == "http://hl7.org/fhir/ValueSet/contact-point-system"));
-            //Assert.IsTrue(vs.ConformanceResources().Any(s => s.GetConformanceCanonicalUrl() == "http://hl7.org/fhir/ConceptMap/v2-contact-point-use"));
-            //Assert.IsTrue(vs.ConformanceResources().Any(s => s.GetConformanceCanonicalUrl() == "http://hl7.org/fhir/NamingSystem/tx-rxnorm"));
-            //Assert.IsTrue(vs.ConformanceResources().Any(s => s.GetConformanceCanonicalUrl() == "http://hl7.org/fhir/StructureDefinition/shareablevalueset"));
-            //Assert.IsTrue(vs.ConformanceResources().Any(s => s.GetConformanceCanonicalUrl() == "http://hl7.org/fhir/DataElement/Device.manufactureDate"));
-            //Assert.IsTrue(vs.ConformanceResources().Any(s => s.GetConformanceCanonicalUrl() == "http://hl7.org/fhir/SearchParameter/Condition-onset-info"));
-            //Assert.IsTrue(vs.ConformanceResources().Any(s => s.GetConformanceCanonicalUrl() == "http://hl7.org/fhir/OperationDefinition/ValueSet-validate-code"));
-            //Assert.IsTrue(vs.ConformanceResources().Any(s => s.GetConformanceCanonicalUrl() == "http://hl7.org/fhir/Conformance/base"));
         }
 
         [TestMethod]

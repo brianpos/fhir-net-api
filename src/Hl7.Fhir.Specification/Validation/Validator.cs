@@ -1,5 +1,5 @@
 ﻿/* 
- * Copyright (c) 2016, Furore (info@furore.com) and contributors
+ * Copyright (c) 2016, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
@@ -413,15 +413,20 @@ namespace Hl7.Fhir.Validation
         }
 
 
-        internal void Trace(OperationOutcome outcome, string message, Issue issue, string location)
+        internal OperationOutcome.IssueComponent Trace(OperationOutcome outcome, string message, Issue issue, string location)
         {
             if (Settings.Trace || issue.Severity != OperationOutcome.IssueSeverity.Information)
-                outcome.AddIssue(message, issue, location);
+                return outcome.AddIssue(message, issue, location);
+
+            return null;
         }
 
-        internal void Trace(OperationOutcome outcome, string message, Issue issue, IElementNavigator location)
+        internal OperationOutcome.IssueComponent Trace(OperationOutcome outcome, string message, Issue issue, IElementNavigator location)
         {
-            Trace(outcome, message, issue, location.Location);
+            if (Settings.Trace || issue.Severity != OperationOutcome.IssueSeverity.Information)
+                return Trace(outcome, message, issue, location.Location);
+
+            return null;
         }
 
         private string toStringRepresentation(IElementNavigator vp)
