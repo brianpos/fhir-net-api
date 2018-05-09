@@ -38,7 +38,7 @@ namespace Hl7.Fhir.Tests.Rest
         //public static Uri testEndpoint = new Uri("http://nde-fhir-ehelse.azurewebsites.net/fhir");
 
         //public static Uri _endpointSupportingSearchUsingPost = new Uri("http://localhost:49911/fhir");
-        public static Uri _endpointSupportingSearchUsingPost = new Uri("http://nde-fhir-ehelse.azurewebsites.net/fhir");
+        public static Uri _endpointSupportingSearchUsingPost = new Uri("http://sqlonfhir-ci2.azurewebsites.net/fhir");
 
         public static Uri TerminologyEndpoint = new Uri("http://ontoserver.csiro.au/dstu2_1");
 
