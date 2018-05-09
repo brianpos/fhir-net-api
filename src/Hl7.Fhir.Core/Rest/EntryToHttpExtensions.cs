@@ -129,14 +129,20 @@ namespace Hl7.Fhir.Rest
             }
             else if (searchUsingPost)
             {
-                string bodyParameters = null;
-                foreach(Parameters.ParameterComponent parameter in ((Parameters)data).Parameter)
-                {
-                    if (!string.IsNullOrEmpty(bodyParameters)) bodyParameters += "&";
-                    bodyParameters += $"{parameter.Name}={parameter.Value}";
-                }
-                body = Encoding.UTF8.GetBytes(Uri.EscapeDataString(bodyParameters));
                 request.ContentType = "application/x-www-form-urlencoded";
+                StringBuilder postData = new StringBuilder();
+                foreach (Parameters.ParameterComponent parameter in ((Parameters)data).Parameter)
+                {
+                    if (postData.Length > 0)
+                        postData.Append("&");
+                    postData.Append(Uri.EscapeUriString(parameter.Name));
+                    postData.Append("=");
+                    postData.Append(Uri.EscapeUriString(parameter.Value?.ToString()));
+                }
+                if (postData.Length > 0)
+                    body = Encoding.UTF8.GetBytes(postData.ToString());
+                else
+                    body = null;
             }
             else
             {
