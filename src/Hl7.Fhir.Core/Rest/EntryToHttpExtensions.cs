@@ -12,7 +12,8 @@ using System;
 using System.Net;
 using System.Reflection;
 using Hl7.Fhir.Utility;
-using System.Text;
+using System.Collections.Generic;
+using System.Net.Http;
 
 namespace Hl7.Fhir.Rest
 {
@@ -129,20 +130,22 @@ namespace Hl7.Fhir.Rest
             }
             else if (searchUsingPost)
             {
-                request.ContentType = "application/x-www-form-urlencoded";
-                StringBuilder postData = new StringBuilder();
-                foreach (Parameters.ParameterComponent parameter in ((Parameters)data).Parameter)
+                IDictionary<string, string> bodyParameters = new Dictionary<string, string>();
+                foreach(Parameters.ParameterComponent parameter in ((Parameters)data).Parameter)
                 {
-                    if (postData.Length > 0)
-                        postData.Append("&");
-                    postData.Append(Uri.EscapeUriString(parameter.Name));
-                    postData.Append("=");
-                    postData.Append(Uri.EscapeUriString(parameter.Value?.ToString()));
+                    bodyParameters.Add(parameter.Name, parameter.Value.ToString());
                 }
-                if (postData.Length > 0)
-                    body = Encoding.UTF8.GetBytes(postData.ToString());
+                if (bodyParameters.Count > 0)
+                {
+                    FormUrlEncodedContent content = new FormUrlEncodedContent(bodyParameters);
+                    body = content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                }
                 else
+                {
                     body = null;
+                }
+
+                request.ContentType = "application/x-www-form-urlencoded";
             }
             else
             {

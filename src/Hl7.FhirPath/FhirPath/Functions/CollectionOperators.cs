@@ -61,7 +61,7 @@ namespace Hl7.FhirPath.Functions
         {
             return focus.Skip(1);
         }
-        
+
         public static bool Contains(this IEnumerable<IElementNavigator> focus, IElementNavigator value)
         {
             return focus.Contains(value, new EqualityOperators.ValueProviderEqualityComparer());
@@ -99,8 +99,10 @@ namespace Hl7.FhirPath.Functions
                     throw Error.InvalidOperation("Resource type name may only appear at the root of a document");
 
                 // If we are at a resource, we should match a path that is possibly not rooted in the resource
-                // (e.g. doing "name.family" on a Patient is equivalent to "Patient.name.family")        
-                if (nav.Type == name)
+                // (e.g. doing "name.family" on a Patient is equivalent to "Patient.name.family")   
+                // Also we do some poor polymorphism here: Resource.meta.lastUpdated is also allowed.
+                var baseClasses = new[] { "Resource", "DomainResource" };
+                if (nav.Type == name || baseClasses.Contains(name))
                 {
                     return new List<IElementNavigator>() { nav };
                 }
@@ -114,8 +116,5 @@ namespace Hl7.FhirPath.Functions
                 return nav.Children(name);
             }
         }
-
-     
-
     }
 }
