@@ -14,6 +14,9 @@ using Hl7.Fhir.Model;
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
+using System.Net.Http;
+using System.Collections.Specialized;
+using System.Linq;
 
 namespace Hl7.Fhir.Test
 {
@@ -94,16 +97,29 @@ namespace Hl7.Fhir.Test
             string resourceType = "Patient";
             var parameters = new List<Tuple<string, string>>();
             parameters.Add(new Tuple<string, string>("Key", specialCharacters));
+            parameters.Add(new Tuple<string, string>("Key", "second value"));
+            parameters.Add(new Tuple<string, string>("secondary content", "1 2 3 4"));
             SearchParams searchParams = SearchParams.FromUriParamList(parameters);
 
             Bundle bundle = new TransactionBuilder(endpoint).SearchUsingPost(searchParams, resourceType).ToBundle();
             byte[] body;
-            bundle.Entry[0].ToHttpRequest(Prefer.ReturnRepresentation, ResourceFormat.Json, true, false, out body);
+            var req = bundle.Entry[0].ToHttpRequest(Prefer.ReturnRepresentation, ResourceFormat.Json, true, false, out body);
+            Assert.AreEqual("application/x-www-form-urlencoded", req.Headers[HttpRequestHeader.ContentType]);
 
-            string actual = Encoding.UTF8.GetString(body);
-            Assert.AreEqual(expected, actual);
+            string bodyAsString = Encoding.UTF8.GetString(body);
+            FormUrlEncodedContent fc = new System.Net.Http.FormUrlEncodedContent(parameters.Select(s => new KeyValuePair<string, string>(s.Item1, s.Item2)));
+            var t = fc.ReadAsStringAsync().Result;
+            Assert.AreEqual(t, bodyAsString);
+
+            HttpContent content = new StringContent(bodyAsString, Encoding.UTF8, req.Headers[HttpRequestHeader.ContentType]);
+            Assert.IsTrue(content.IsFormData());
+            NameValueCollection data = content.ReadAsFormDataAsync().Result;
+            Assert.AreEqual(parameters[0].Item2, data.GetValues("Key")[0]);
+            Assert.AreEqual(parameters[1].Item2, data.GetValues("Key")[1]);
+
+            Assert.AreEqual(parameters[2].Item2, data.GetValues("secondary content")[0]);
         }
-        
+
         [TestMethod]
         public void TestSearchUsingPost_MethodIsPost()
         {
