@@ -18,25 +18,6 @@ using System.Text;
 
 namespace Hl7.Fhir.FhirPath
 {
-    public class FhirEvaluationContext : EvaluationContext
-    {
-        new public static readonly FhirEvaluationContext Default = new FhirEvaluationContext();
-
-        public FhirEvaluationContext() : base()
-        {
-        }
-
-        public FhirEvaluationContext(Resource context) : base(context?.ToNavigator())
-        {
-        }
-
-        public FhirEvaluationContext(IElementNavigator context) : base(context)
-        {
-        }
-
-        public Func<string,IElementNavigator> Resolver { get; set; }
-    }
-
     public static class ElementNavFhirExtensions
     {
         internal static bool _fhirSymbolTableExtensionsAdded = false;
@@ -56,9 +37,7 @@ namespace Hl7.Fhir.FhirPath
             IElementNavigator navResolver(string url)
             {
                 var resource = resolver(url);
-                if (resource == null) return null;
-
-                return new PocoNavigator(resource);
+                return resource?.ToElementNavigator();
             }
         }
 
@@ -150,9 +129,8 @@ namespace Hl7.Fhir.FhirPath
                 {
                     return new FhirString((string)result);
                 }
-                if (result is Model.Primitives.PartialDateTime)
+                if (result is Model.Primitives.PartialDateTime dt)
                 {
-                    var dt = (Model.Primitives.PartialDateTime)result;
                     return new FhirDateTime(dt.ToUniversalTime());
                 }
                 else
@@ -163,17 +141,10 @@ namespace Hl7.Fhir.FhirPath
             });
         }
 
-
-        //private static ScopedNavigator createNav(Base input) => new ScopedNavigator(new PocoNavigator(input));
-        private static PocoNavigator createNav(Base input) => new PocoNavigator(input);
-
-        public static IElementNavigator ToNavigator(this Base input) => new PocoNavigator(input);
-
-
         public static IEnumerable<Base> Select(this Base input, string expression, FhirEvaluationContext ctx = null)
         {
-            var inputNav = input.ToNavigator();
-            var result = inputNav.Select(expression, ctx ?? FhirEvaluationContext.Default);
+            var inputNav = input.ToElementNavigator();
+            var result = inputNav.Select(expression, ctx ?? FhirEvaluationContext.CreateDefault());
             return result.ToFhirValues();            
         }
 
@@ -185,8 +156,8 @@ namespace Hl7.Fhir.FhirPath
 
         public static object Scalar(this Base input, string expression, FhirEvaluationContext ctx = null)
         {
-            var inputNav = input.ToNavigator();
-            return inputNav.Scalar(expression, ctx ?? FhirEvaluationContext.Default);
+            var inputNav = input.ToElementNavigator();
+            return inputNav.Scalar(expression, ctx ?? FhirEvaluationContext.CreateDefault());
         }
 
         [Obsolete("Replace with the overload taking an FhirEvaluationContext, initialized with the resource parameter")]
@@ -197,8 +168,8 @@ namespace Hl7.Fhir.FhirPath
 
         public static bool Predicate(this Base input, string expression, FhirEvaluationContext ctx = null)
         {
-            var inputNav = input.ToNavigator();
-            return inputNav.Predicate(expression, ctx ?? FhirEvaluationContext.Default);
+            var inputNav = input.ToElementNavigator();
+            return inputNav.Predicate(expression, ctx ?? FhirEvaluationContext.CreateDefault());
         }
 
         [Obsolete("Replace with the overload taking an FhirEvaluationContext, initialized with the resource parameter")]
@@ -209,8 +180,8 @@ namespace Hl7.Fhir.FhirPath
 
         public static bool IsBoolean(this Base input, string expression, bool value, FhirEvaluationContext ctx = null)
         {
-            var inputNav = createNav(input);
-            return inputNav.IsBoolean(expression, value, ctx ?? FhirEvaluationContext.Default);
+            var inputNav = input.ToElementNavigator();
+            return inputNav.IsBoolean(expression, value, ctx ?? FhirEvaluationContext.CreateDefault());
         }
 
         [Obsolete("Replace with the overload taking an FhirEvaluationContext, initialized with the resource parameter")]
