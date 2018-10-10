@@ -1,10 +1,9 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hl7.Fhir.Core", "Hl7.Fhir.Core\Hl7.Fhir.Core.csproj", "{5F6AB430-A601-4FE9-BAB2-ADC06619D215}"
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hl7.Fhir.Core", "Hl7.Fhir.Core\Hl7.Fhir.Core.csproj", "{1E26FE9D-EEF8-4C39-B54F-6CA12F7C7CA5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hl7.Fhir.Core.Tests", "Hl7.Fhir.Core.Tests\Hl7.Fhir.Core.Tests.csproj", "{6E78C31B-1D65-4B6C-B3A3-97EF2776CA8E}"
 EndProject
@@ -29,6 +28,7 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hl7.Fhir.QuestionnaireServices", "Hl7.Fhir.Questionnaire\Hl7.Fhir.QuestionnaireServices.csproj", "{2259939B-987A-411E-96D9-ED3CA7565471}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hl7.Fhir.QuestionnaireServices.Tests", "Hl7.Fhir.Questionnaire.Tests\Hl7.Fhir.QuestionnaireServices.Tests.csproj", "{7F37DE58-F257-4348-81DD-6EF342E83D7B}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hl7.Fhir.Serialization", "Hl7.Fhir.Serialization\Hl7.Fhir.Serialization.csproj", "{3F59D8BC-BDB8-4958-BB18-F53CB6FC23CA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3DFF25B4-2D04-4A38-AA43-FE222828A86C} = {3DFF25B4-2D04-4A38-AA43-FE222828A86C}
