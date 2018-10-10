@@ -203,9 +203,6 @@
           }
         ]
       }
-    },
-    {
-      "resourceType":  "OperationOutcome"
     }
   ],
   "identifier": [
