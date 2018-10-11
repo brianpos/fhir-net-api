@@ -67,7 +67,7 @@ namespace Hl7.Fhir.Serialization.Tests
 
             if (compare.Success == false)
             {
-                Debug.WriteLine($"Difference in {compare.Details} at {compare.FailureLocation}");
+                Trace.WriteLine($"Difference in {compare.Details} at {compare.FailureLocation}");
                 Assert.IsTrue(compare.Success);
             }
             Assert.IsTrue(compare.Success);

@@ -102,28 +102,28 @@ namespace Hl7.Fhir.Serialization.Tests
             var examplePath = Path.Combine(baseTestPath, "input");
             Directory.CreateDirectory(examplePath);
             // Unzip files into this path
-            Debug.WriteLine("Unzipping example files from {0} to {1}", examplesZip, examplePath);
+            Trace.WriteLine($"Unzipping example files from {examplesZip} to {examplePath}");
 
             examplesZip.ExtractToDirectory(examplePath);
 
             var intermediate1Path = Path.Combine(baseTestPath, "intermediate1");
-            Debug.WriteLine("Converting files in {0} to {1}", baseTestPath, intermediate1Path);
+            Trace.WriteLine($"Converting files in {baseTestPath} to {intermediate1Path}");
             var sw = new Stopwatch();
             sw.Start();
             convertFiles(examplePath, intermediate1Path, usingPoco, provider);
             sw.Stop();
-            Debug.WriteLine("Conversion took {0} seconds", sw.ElapsedMilliseconds / 1000);
+            Trace.WriteLine($"Conversion took {sw.ElapsedMilliseconds / 1000} seconds");
             sw.Reset();
 
             var intermediate2Path = Path.Combine(baseTestPath, "intermediate2");
-            Debug.WriteLine("Re-converting files in {0} back to original format in {1}", intermediate1Path, intermediate2Path);
+            Trace.WriteLine($"Re-converting files in {intermediate1Path} back to original format in {intermediate2Path}");
             sw.Start();
             convertFiles(intermediate1Path, intermediate2Path, usingPoco, provider);
             sw.Stop();
-            Debug.WriteLine("Conversion took {0} seconds", sw.ElapsedMilliseconds / 1000);
+            Trace.WriteLine($"Conversion took {sw.ElapsedMilliseconds / 1000} seconds");
             sw.Reset();
 
-            Debug.WriteLine("Comparing files in {0} to files in {1}", baseTestPath, intermediate2Path);
+            Trace.WriteLine($"Comparing files in {baseTestPath} to files in {intermediate2Path}");
             compareFiles(examplePath, intermediate2Path);
         }
 
