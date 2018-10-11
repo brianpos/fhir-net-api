@@ -93,8 +93,8 @@ namespace Hl7.Fhir.QuestionnaireServices
                 {
                     Element fixedValue = item.ed.Fixed;
                     var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
-                    Type createElementType = pm.ReturnType;
-                    if (pm.ReturnType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
+                    Type createElementType = pm.ElementType;
+                    if (pm.ElementType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
                     {
                         // check the element definition for the types
                         createElementType = ModelInfo.FhirTypeToCsType[item.ed.PrimaryTypeCode().GetLiteral()];
@@ -102,7 +102,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     if (item.ed.Fixed.GetType() != createElementType)
                     {
                         // need to convert the data over
-                        fixedValue = (Element)fac.Create(pm.ReturnType);
+                        fixedValue = (Element)fac.Create(pm.ElementType);
                         if (fixedValue is Primitive && item.ed.Fixed is Code)
                         {
                             (fixedValue as Primitive).ObjectValue = (item.ed.Fixed as Code).Value;
@@ -120,12 +120,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     {
                         var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
                         object value = pm.GetValue(instance);
-                        if (value == null)
-                        {
-                            value = fac.Create(pm.ReturnType);
-                            pm.SetValue(instance, value);
-                        }
-                        if (pm.ReturnType != pm.ElementType)
+                        if (pm.IsCollection)
                         {
                             // this is a collection
                             IList list = value as IList;
@@ -140,6 +135,11 @@ namespace Hl7.Fhir.QuestionnaireServices
                         }
                         else
                         {
+                            if (value == null)
+                            {
+                                value = fac.Create(pm.ElementType);
+                                pm.SetValue(instance, value);
+                            }
                             // backbone element style property, so let it flow in as normal
                             PopulateResourceInstance(value, item, filteredGroups);
                         }
@@ -160,8 +160,8 @@ namespace Hl7.Fhir.QuestionnaireServices
                             if (answers.First().Value is Coding)
                             {
                                 Coding codedValue = answers.First().Value as Coding;
-                                Type createElementType = pm.ReturnType;
-                                if (pm.ReturnType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
+                                Type createElementType = pm.ElementType;
+                                if (pm.ElementType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
                                 {
                                     // check the element definition for the types
                                     createElementType = ModelInfo.FhirTypeToCsType[item.ed.PrimaryTypeCode().GetLiteral()];
@@ -200,8 +200,8 @@ namespace Hl7.Fhir.QuestionnaireServices
                                 else if (pm.IsCollection)
                                 {
                                     IList col = pm.GetValue(instance) as IList;
-                                    if (col == null)
-                                        col = fac.Create(pm.ReturnType) as IList;
+                                    //if (col == null)
+                                    //    col = fac.Create(pm.ReturnType) as IList;
                                     foreach (var itemValue in answers.Select(v => v.Value))
                                     {
                                         col.Add(itemValue);
@@ -216,8 +216,8 @@ namespace Hl7.Fhir.QuestionnaireServices
                         {
                             // This item is on the way to one that DOES have a value, so create it and continue
                             var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
-                            Type createElementType = pm.ReturnType;
-                            if (pm.ReturnType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
+                            Type createElementType = pm.ElementType;
+                            if (pm.ElementType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
                             {
                                 // check the element definition for the types
                                 createElementType = ModelInfo.FhirTypeToCsType[item.ed.PrimaryTypeCode().GetLiteral()];

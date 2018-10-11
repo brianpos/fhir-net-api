@@ -121,7 +121,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                 if (ContainsPath(child, path))
                 {
                     var pm = item.ClassMapping.FindMappedElementByName(child.FhirpathExpression);
-                    if (pm.ReturnType != pm.ElementType)
+                    if (pm.IsCollection)
                     {
                         // this is a collection
                         IEnumerable<Base> result = (IEnumerable<Base>)pm.GetValue(data);
@@ -198,7 +198,7 @@ namespace Hl7.Fhir.QuestionnaireServices
 
             StructureItem parent = new StructureItem();
             Type t = ModelInfo.GetTypeForFhirType(sd.ConstrainedType.HasValue ? sd.ConstrainedType.GetLiteral() : sd.Name);
-            parent.ClassMapping = ClassMapping.Create(t);
+            parent.ClassMapping = Serialization.BaseFhirParser.Inspector.FindClassMappingByType(t);
 
             // Build the snapshot if it doesn't already exist
             if (!sd.HasSnapshot)
@@ -287,7 +287,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     if (pm != null)
                     {
                         // skip over the raw values
-                        if (pm.ReturnType == pm.ElementType && !pm.ElementType.CanBeTreatedAsType(typeof(Base)))
+                        if (!pm.IsCollection && !pm.ElementType.CanBeTreatedAsType(typeof(Base)))
                             continue;
                     }
                     if (slicingItem != null && slicingItem != item)
@@ -307,7 +307,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                         if (pm.Choice == ChoiceType.DatatypeChoice)
                         {
                             Type t = ModelInfo.FhirTypeToCsType[nav.Current.PrimaryTypeCode().GetLiteral()];
-                            item.ClassMapping = ClassMapping.Create(t);
+                            item.ClassMapping = Serialization.BaseFhirParser.Inspector.FindClassMappingByType(t);
                         }
                         else if (pm.Choice == ChoiceType.ResourceChoice)
                         {
@@ -322,10 +322,10 @@ namespace Hl7.Fhir.QuestionnaireServices
                             // Note that ReturnType would have the type of the collection
                             // where the ElementType is the type of the item in the collection
                             // or where not a collection, both are the same value
-                            item.ClassMapping = ClassMapping.Create(pm.ElementType);
+                            item.ClassMapping = Serialization.BaseFhirParser.Inspector.FindClassMappingByType(pm.ElementType);
                         }
 
-                        if (pm.ReturnType != pm.ElementType)
+                        if (pm.IsCollection)
                             item.IsArray = true;
 
                         // Now process all the children
