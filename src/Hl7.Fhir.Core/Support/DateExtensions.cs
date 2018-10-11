@@ -17,7 +17,7 @@ namespace Hl7.Fhir.Support
 {
     public static class DateExtensions
     {
-        public static DateTime? ToDateTime(this Model.FhirDateTime me)
+        public static DateTime? ToDateTime(this Hl7.Fhir.Model.FhirDateTime me)
         {
             if (me == null)
                 return null;
@@ -42,7 +42,7 @@ namespace Hl7.Fhir.Support
             return null;
         }
 
-        public static DateTime? ToDateTime(this Model.Date me)
+        public static DateTime? ToDateTime(this Hl7.Fhir.Model.Date me)
         {
             if (me == null)
                 return null;
