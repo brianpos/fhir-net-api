@@ -19,6 +19,7 @@ namespace Hl7.Fhir.Serialization
         public PocoBuilder(PocoBuilderSettings settings = null)
         {
             _settings = settings?.Clone() ?? new PocoBuilderSettings();
+            ExceptionHandler = _settings.ExceptionHandler;
         }
 
         private readonly PocoBuilderSettings _settings;

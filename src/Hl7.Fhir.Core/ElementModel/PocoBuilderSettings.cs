@@ -25,6 +25,11 @@ namespace Hl7.Fhir.Serialization
         /// </summary>
         public bool IgnoreUnknownMembers { get; set; }
 
+        /// <summary>
+        /// And exception handler that should be used while parsing
+        /// </summary>
+        public ExceptionNotificationHandler ExceptionHandler { get; set; }
+
         /// <summary>Default constructor. Creates a new <see cref="PocoBuilderSettings"/> instance with default property values.</summary>
         public PocoBuilderSettings() { }
 
@@ -45,6 +50,7 @@ namespace Hl7.Fhir.Serialization
 
             other.AllowUnrecognizedEnums = AllowUnrecognizedEnums;
             other.IgnoreUnknownMembers = IgnoreUnknownMembers;
+            other.ExceptionHandler = ExceptionHandler;
         }
 
         /// <summary>Creates a new <see cref="PocoBuilderSettings"/> object that is a copy of the current instance.</summary>

@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 using Hl7.Fhir.Utility;
 using static Hl7.Fhir.Model.Bundle;
 using System.Drawing;
+using System.Diagnostics;
 
 namespace Hl7.Fhir.Tests.Rest
 {
@@ -33,15 +34,15 @@ namespace Hl7.Fhir.Tests.Rest
         //public static Uri testEndpoint = new Uri("http://test.fhir.org/r2");
         //public static Uri testEndpoint = new Uri("http://vonk.fire.ly");
         //public static Uri testEndpoint = new Uri("https://api.fhir.me");
-        public static Uri testEndpoint = new Uri("http://fhirtest.uhn.ca/baseDstu2");
+        //public static Uri testEndpoint = new Uri("http://fhirtest.uhn.ca/baseDstu2");
         //public static Uri testEndpoint = new Uri("http://localhost:49911/fhir");
-        //public static Uri testEndpoint = new Uri("http://sqlonfhir-dstu2.azurewebsites.net/fhir");
+        public static Uri testEndpoint = new Uri("http://sqlonfhir-ci2.azurewebsites.net/fhir");
         //public static Uri testEndpoint = new Uri("http://nde-fhir-ehelse.azurewebsites.net/fhir");
 
         //public static Uri _endpointSupportingSearchUsingPost = new Uri("http://localhost:49911/fhir");
         public static Uri _endpointSupportingSearchUsingPost = new Uri("http://sqlonfhir-ci2.azurewebsites.net/fhir");
 
-        public static Uri TerminologyEndpoint = new Uri("http://ontoserver.csiro.au/dstu2_1");
+        public static Uri TerminologyEndpoint = new Uri("http://sqlonfhir-ci2.azurewebsites.net/fhir");
 
         [TestInitialize]
         public void TestInitialize()
@@ -238,7 +239,7 @@ namespace Hl7.Fhir.Tests.Rest
         public void Search()
         {
             // an endpoint that is known to support compression
-            FhirClient client = new FhirClient("http://sqlonfhir-dstu2.azurewebsites.net/fhir"); // testEndpoint);
+            FhirClient client = new FhirClient("http://sqlonfhir-ci2.azurewebsites.net/fhir"); // testEndpoint);
             Bundle result;
 
             client.CompressRequestBody = true;
@@ -425,15 +426,26 @@ namespace Hl7.Fhir.Tests.Rest
 
             // Now validate this resource
             client.ReturnFullResource = true;       // which is also the default
+
+            // client.PreferredFormat = ResourceFormat.Json;
             Parameters p = new Parameters();
           //  p.Add("mode", new FhirString("create"));
             p.Add("resource", pat);
             OperationOutcome ooI = (OperationOutcome)client.InstanceOperation(ri.WithoutVersion(), "validate", p);
             Assert.IsNotNull(ooI);
+
+            // Some settings to force things through the new exception handling code
+            client.ParserSettings.PermissiveParsing = false;
+            bool parseIssueDetected = false;
+            client.ParserSettings.ExceptionHandler = (object source, ExceptionNotification args) =>
+            {
+                Trace.WriteLine($"Parsing Exception: {args.Message}");
+                parseIssueDetected = true;
+            };
+            ooI = (OperationOutcome)client.InstanceOperation(ri.WithoutVersion(), "validate", p);
+            Assert.IsNotNull(ooI);
+            Assert.IsTrue(parseIssueDetected, "expected a parsing issue to have occurred");
         }
-
-
-
 
         private Uri createdTestPatientUrl = null;
 

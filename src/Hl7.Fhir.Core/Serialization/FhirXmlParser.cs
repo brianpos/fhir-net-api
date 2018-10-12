@@ -1,4 +1,4 @@
-﻿/* 
+/* 
  * Copyright (c) 2018, Firely (info@fire.ly) and contributors
  * See the file CONTRIBUTORS for details.
  * 
@@ -28,6 +28,7 @@ namespace Hl7.Fhir.Serialization
                 new FhirXmlParsingSettings
                 {
                     DisallowSchemaLocation = Settings.DisallowXsiAttributesOnRoot,
+                    PermissiveParsing = settings.PermissiveParsing
                 };
 
         public Base Parse(string xml, Type dataType)

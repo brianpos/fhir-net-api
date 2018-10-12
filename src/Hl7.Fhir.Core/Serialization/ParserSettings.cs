@@ -15,7 +15,7 @@ namespace Hl7.Fhir.Serialization
     public class ParserSettings
     {
         [Obsolete("Due to a bug, the Default has always been ignored, so it is now officially deprecated")]
-        public static readonly ParserSettings Default = new ParserSettings() { AcceptUnknownMembers = false, AllowUnrecognizedEnums = false, DisallowXsiAttributesOnRoot = true };
+        public static readonly ParserSettings Default = new ParserSettings() { AcceptUnknownMembers = false, AllowUnrecognizedEnums = false, DisallowXsiAttributesOnRoot = true, PermissiveParsing = true };
 
         /// <summary>
         /// Raise an error when an xsi:schemaLocation is encountered.
@@ -31,6 +31,16 @@ namespace Hl7.Fhir.Serialization
         /// Do not throw when the data has an element that does not map to a property in the Poco.
         /// </summary>
         public bool AcceptUnknownMembers { get; set; }
+
+        /// <summary>
+        /// Do not raise exceptions for recoverable errors.
+        /// </summary>
+        public bool PermissiveParsing;
+
+        /// <summary>
+        /// And exception handler that should be used while parsing
+        /// </summary>
+        public ExceptionNotificationHandler ExceptionHandler { get; set; }
 
         /// <summary>Default constructor. Creates a new <see cref="ParserSettings"/> instance with default property values.</summary>
         public ParserSettings() { }
@@ -53,12 +63,14 @@ namespace Hl7.Fhir.Serialization
             other.DisallowXsiAttributesOnRoot = DisallowXsiAttributesOnRoot;
             other.AllowUnrecognizedEnums = AllowUnrecognizedEnums;
             other.AcceptUnknownMembers = AcceptUnknownMembers;
+            other.PermissiveParsing = PermissiveParsing;
+            other.ExceptionHandler = ExceptionHandler;
         }
 
         /// <summary>Creates a new <see cref="ParserSettings"/> object that is a copy of the current instance.</summary>
         public ParserSettings Clone() => new ParserSettings(this);
 
         /// <summary>Creates a new <see cref="ParserSettings"/> instance with default property values.</summary>
-        public static ParserSettings CreateDefault() => new ParserSettings();
+        public static ParserSettings CreateDefault() => new ParserSettings() { AcceptUnknownMembers = false, AllowUnrecognizedEnums = false, DisallowXsiAttributesOnRoot = true, PermissiveParsing = true };
     }
 }
