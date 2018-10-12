@@ -427,7 +427,7 @@ namespace Hl7.Fhir.Tests.Rest
             // Now validate this resource
             client.ReturnFullResource = true;       // which is also the default
 
-            // client.PreferredFormat = ResourceFormat.Json;
+            client.PreferredFormat = ResourceFormat.Xml;
             Parameters p = new Parameters();
           //  p.Add("mode", new FhirString("create"));
             p.Add("resource", pat);

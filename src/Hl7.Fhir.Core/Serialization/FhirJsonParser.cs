@@ -25,19 +25,24 @@ namespace Hl7.Fhir.Serialization
         public T Parse<T>(JsonReader reader) where T : Base => (T)Parse(reader, typeof(T));
 
         // TODO: True for DSTU2, should be false in STU3
-        private readonly FhirJsonParsingSettings jsonNodeSettings = new FhirJsonParsingSettings { AllowJsonComments = true };
+        private FhirJsonParsingSettings buildNodeSettings(ParserSettings settings) =>
+                new FhirJsonParsingSettings
+                {
+                    AllowJsonComments = true,
+                    PermissiveParsing = settings.PermissiveParsing
+                };
 
         public Base Parse(string json, Type dataType)
         {
             var jsonReader =
-                FhirJsonNode.Parse(json, ModelInfo.GetFhirTypeNameForType(dataType), jsonNodeSettings);
+                FhirJsonNode.Parse(json, ModelInfo.GetFhirTypeNameForType(dataType), buildNodeSettings(Settings));
             return Parse(jsonReader, dataType);
         }
 
         public Base Parse(JsonReader reader, Type dataType)
         {
             var jsonReader =
-                FhirJsonNode.Read(reader, ModelInfo.GetFhirTypeNameForType(dataType), jsonNodeSettings);
+                FhirJsonNode.Read(reader, ModelInfo.GetFhirTypeNameForType(dataType), buildNodeSettings(Settings));
             return Parse(jsonReader, dataType);
         }
     }
