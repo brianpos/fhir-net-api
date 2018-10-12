@@ -15,7 +15,7 @@ using Hl7.Fhir.Specification;
 namespace Hl7.Fhir.ElementModel.Adapters
 {
 #pragma warning disable 612, 618
-    internal class ElementNavToTypedElementAdapter : ITypedElement, IAnnotated, IExceptionSource
+    public class ElementNavToTypedElementAdapter : ITypedElement, IAnnotated, IExceptionSource
     {
         public readonly IElementNavigator Current;
 

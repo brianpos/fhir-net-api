@@ -11,6 +11,7 @@ using Hl7.Fhir.ElementModel;
 using Hl7.Fhir.Specification;
 using Hl7.Fhir.Utility;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -172,9 +173,17 @@ namespace Hl7.Fhir.Serialization
 
             var childParent = containedResource ?? me;
 
+            IEnumerable<ITypedElement> orderedChildren = source.Children();
+            bool orderingRequired = true;
             // Now, do the same for the children
             // xml requires a certain order, so let's make sure we serialize in the right order
-            var orderedChildren = source.Children().OrderBy(c => c.Definition?.Order ?? 0);
+            if (source is Hl7.Fhir.ElementModel.Adapters.ElementNavToTypedElementAdapter nav)
+            {
+                if (nav.Current.GetType().Name.StartsWith("Poco"))
+                    orderingRequired = false;
+            }
+            if (orderingRequired)
+                orderedChildren = orderedChildren.OrderBy(c => c.Definition?.Order ?? 0);
 
             foreach (var child in orderedChildren)
                 build(child, childParent);
