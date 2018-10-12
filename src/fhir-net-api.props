@@ -2,13 +2,13 @@
   
   <!-- Solution-wide properties for NuGet packaging -->
   <PropertyGroup>
-    <Authors>Ewout Kramer (ewout@fire.ly) and contributors</Authors>
-    <Company>Firely (https://fire.ly)</Company>
-    <Copyright>Copyright 2018 Firely.  Contains materials (C) HL7 International</Copyright>
-    <PackageProjectUrl>https://github.com/ewoutkramer/fhir-net-api</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ewoutkramer/fhir-net-api</RepositoryUrl>
+    <Authors>Brian Postlethwaite, Ewout Kramer (ewout@fire.ly) and contributors</Authors>
+    <Company>Telstra Health</Company>
+    <Copyright>Copyright 2018 Telstra Health.  Contains materials (C) HL7 International</Copyright>
+    <PackageProjectUrl>https://github.com/brianpos/fhir-net-api</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/brianpos/fhir-net-api</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageIconUrl>https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/icon-fhir-32.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/brianpos/fhir-net-api/master/icon-fhir-32.png</PackageIconUrl>
     <PackageReleaseNotes>See http://ewoutkramer.github.io/fhir-net-api/whats-new.html</PackageReleaseNotes>
     <PackageLicenseUrl>https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/develop/LICENSE</PackageLicenseUrl>
   </PropertyGroup>

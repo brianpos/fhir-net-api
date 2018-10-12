@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <Version>$(SupportApiVersion)</Version>
-    <PackageId>Hl7.Fhir.ElementModel</PackageId>
+    <PackageId>TelstraHealth.Fhir.ElementModel</PackageId>
     <Title>HL7 FHIR library for the base ElementModel classes</Title>
     <Summary>Interfaces and classes to work with FHIR data without using POCOs.</Summary>
     <Description>Interfaces and classes to work with FHIR data without using POCOs, in concert with the Hl7.Fhir.Serialization assembly.</Description>
