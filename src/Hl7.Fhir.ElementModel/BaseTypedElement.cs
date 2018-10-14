@@ -10,7 +10,7 @@ namespace Hl7.Fhir.Serialization
     /// A base class for creating components wrapping another <see cref="ITypedElement"/> component.
     /// </summary>
     /// <remarks>
-    /// By default, all members of <see cref="ITypedElement"/> are forwarden to the instance passed in the
+    /// By default, all members of <see cref="ITypedElement"/> are forwarded to the instance passed in the
     /// constructor, but any of the members can be overridden in the subclass.
     /// </remarks>
     public class BaseTypedElement : ITypedElement, IAnnotated, IExceptionSource
