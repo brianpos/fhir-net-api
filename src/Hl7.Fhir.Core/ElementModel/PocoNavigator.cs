@@ -168,8 +168,10 @@ namespace Hl7.Fhir.ElementModel
             new PocoNavigator(@base, rootName);
 
         public static ITypedElement ToTypedElement(this Base @base, string rootName = null) =>
-            new PocoNavigator(@base, rootName).ToTypedElement();
+            // new PocoNavigator(@base, rootName).ToTypedElement();
+            new PocoElementNode(@base, _pocoSDProvider, rootName);
 
+        private static PocoStructureDefinitionSummaryProvider _pocoSDProvider = new PocoStructureDefinitionSummaryProvider();
 #pragma warning restore 612, 618
     }
 }
