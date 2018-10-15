@@ -21,7 +21,7 @@ namespace Hl7.Fhir.Serialization
 
         public BaseFhirParser(ParserSettings settings = null)
         {
-            Settings = settings?.Clone() ?? new ParserSettings();
+            Settings = settings?.Clone() ?? ParserSettings.CreateDefault();
         }
 
         private static Lazy<ModelInspector> _inspector = createDefaultModelInspector();
