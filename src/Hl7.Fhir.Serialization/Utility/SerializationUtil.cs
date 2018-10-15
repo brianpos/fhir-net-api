@@ -120,9 +120,10 @@ namespace Hl7.Fhir.Utility
                 IgnoreComments = ignoreComments,
                 IgnoreProcessingInstructions = true,
                 IgnoreWhitespace = true,
-                DtdProcessing = DtdProcessing.Prohibit,
-                ConformanceLevel = xmlReader.Settings.ConformanceLevel
+                DtdProcessing = DtdProcessing.Prohibit
             };
+            if (xmlReader.Settings != null)
+                settings.ConformanceLevel = xmlReader.Settings.ConformanceLevel;
 
             return XmlReader.Create(xmlReader, settings);
         }
