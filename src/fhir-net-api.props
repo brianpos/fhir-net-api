@@ -14,8 +14,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FhirApiVersion>1.0.0-alpha4</FhirApiVersion>
-    <SupportApiVersion>1.0.0-alpha4</SupportApiVersion>
+    <FhirApiVersion>1.0.0-alpha5</FhirApiVersion>
+    <SupportApiVersion>1.0.0-alpha5</SupportApiVersion>
   </PropertyGroup>
 
   <!-- Although netstandard1.1 support codegen using the Expression class, we need at least
@@ -42,6 +42,9 @@
     <AssemblyOriginatorKeyFile>..\FhirNetApi.snk</AssemblyOriginatorKeyFile>
     <IncludeSymbols>True</IncludeSymbols>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+    <NoWarn>1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
