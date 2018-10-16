@@ -102,7 +102,7 @@ namespace Hl7.Fhir.Utility
         public static JsonReader JsonReaderFromStream(Stream input)
             => JsonReaderFromTextReader(new StreamReader(input));
 
-        private static JsonReader JsonReaderFromTextReader(TextReader input)
+        public static JsonReader JsonReaderFromTextReader(TextReader input)
         {
             return new JsonTextReader(input)
             {
