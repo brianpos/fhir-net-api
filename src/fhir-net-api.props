@@ -14,8 +14,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <FhirApiVersion>1.0.0-alpha6</FhirApiVersion>
-    <SupportApiVersion>1.0.0-alpha6</SupportApiVersion>
+    <FhirApiVersion>1.0.0-alpha7</FhirApiVersion>
+    <SupportApiVersion>1.0.0-alpha7</SupportApiVersion>
   </PropertyGroup>
 
   <!-- Although netstandard1.1 support codegen using the Expression class, we need at least
