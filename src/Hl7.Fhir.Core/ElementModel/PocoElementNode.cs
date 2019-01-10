@@ -16,7 +16,7 @@ using System.Linq;
 
 namespace Hl7.Fhir.ElementModel
 {
-    internal class PocoElementNode : ITypedElement, IAnnotated, IExceptionSource, IShortPathGenerator, IFhirValueProvider, IResourceTypeSupplier
+    public class PocoElementNode : ITypedElement, IAnnotated, IExceptionSource, IShortPathGenerator, IFhirValueProvider, IResourceTypeSupplier
     {
         public readonly object Current;
         public readonly PocoStructureDefinitionSummaryProvider Provider;
