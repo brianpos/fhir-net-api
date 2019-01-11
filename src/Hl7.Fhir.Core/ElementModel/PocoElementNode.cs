@@ -33,11 +33,12 @@ namespace Hl7.Fhir.ElementModel
             Definition = Specification.ElementDefinitionSummary.ForRoot(rootName ?? parent.TypeName, typeInfo);
             Location = InstanceType;
             ShortPath = InstanceType;
+            CommonPath = InstanceType;
             ArrayIndex = 0;
             Provider = provider;
         }
 
-        private PocoElementNode(object instance, PocoElementNode parent, string location, string shortPath, int arrayIndex,
+        private PocoElementNode(object instance, PocoElementNode parent, string location, string shortPath, string commonPath, int arrayIndex,
             IElementDefinitionSummary summary)
         {
             Current = instance;
@@ -47,6 +48,7 @@ namespace Hl7.Fhir.ElementModel
             Definition = summary;
             Location = location;
             ShortPath = shortPath;
+            CommonPath = commonPath;
             ArrayIndex = arrayIndex;
             Provider = parent.Provider;
         }
@@ -54,11 +56,12 @@ namespace Hl7.Fhir.ElementModel
         public IElementDefinitionSummary Definition { get; private set; }
 
         public string ShortPath { get; private set; }
+        public string CommonPath { get; private set; }
 
         private IStructureDefinitionSummary down() =>
             // If this is a backbone element, the child type is the nested complex type
-            Definition.Type[0] is IStructureDefinitionSummary be ? 
-                    be : 
+            Definition.Type[0] is IStructureDefinitionSummary be ?
+                    be :
                     Provider.Provide(InstanceType);
 
 
@@ -89,8 +92,66 @@ namespace Hl7.Fhir.ElementModel
                         (mySummary.IsCollection ?
                             $"{ShortPath}.{child.ElementName}[{arrayIndex}]" :
                             $"{ShortPath}.{child.ElementName}");
+                    var commonPath = child.ElementName;
+                    if (CommonPath != null)
+                    {
+                        if (mySummary.IsCollection)
+                        {
+                            commonPath = $"{CommonPath}.{child.ElementName}[{arrayIndex}]";
 
-                    yield return new PocoElementNode(child.Value, this, location, shortPath, arrayIndex, mySummary);
+                            Base fhirValue = child.Value as Base; // ((PocoElementNode)child.Value).FhirValue;
+                            if (fhirValue is Identifier ident)
+                            {
+                                // Need to construct a where clause for this property
+                                if (!string.IsNullOrEmpty(ident.System))
+                                    commonPath = $"{CommonPath}.{child.ElementName}.where(system='{ident.System}')";
+                            }
+                            else if (fhirValue is ContactPoint cp)
+                            {
+                                // Need to construct a where clause for this property
+                                if (cp.System.HasValue)
+                                    commonPath = $"{CommonPath}.{child.ElementName}.where(system='{cp.System.Value.GetLiteral()}')";
+                            }
+                            else if (fhirValue is Coding cd)
+                            {
+                                // Need to construct a where clause for this property
+                                if (!string.IsNullOrEmpty(cd.System))
+                                    commonPath = $"{CommonPath}.{child.ElementName}.where(system='{cd.System}')";
+                            }
+                            else if (fhirValue is Address addr)
+                            {
+                                // Need to construct a where clause for this property
+                                if (addr.Use.HasValue)
+                                    commonPath = $"{CommonPath}.{child.ElementName}.where(use='{addr.Use.Value.GetLiteral()}')";
+                            }
+                            else if (fhirValue is Questionnaire.ItemComponent ic)
+                            {
+                                // Need to construct a where clause for this property
+                                if (!string.IsNullOrEmpty(ic.LinkId))
+                                    commonPath = $"{CommonPath}.{child.ElementName}.where(linkId='{ic.LinkId}')";
+                            }
+                            else if (fhirValue is QuestionnaireResponse.ItemComponent ric)
+                            {
+                                // Need to construct a where clause for this property
+                                if (!string.IsNullOrEmpty(ric.LinkId))
+                                    commonPath = $"{CommonPath}.{child.ElementName}.where(linkId='{ric.LinkId}')";
+                            }
+                            else if (fhirValue is Extension ext)
+                            {
+                                // Need to construct a where clause for this property
+                                // The extension is different as with fhirpath there
+                                // is a shortcut format of .extension('url'), and since
+                                // all extensions have a property name of extension, can just at the brackets and string name
+                                commonPath = $"{CommonPath}.{child.ElementName}('{ext.Url}')";
+                            }
+                        }
+                        else
+                        {
+                            commonPath = $"{CommonPath}.{child.ElementName}";
+                        }
+                    }
+
+                    yield return new PocoElementNode(child.Value, this, location, shortPath, commonPath, arrayIndex, mySummary);
                 }
 
                 oldElementName = child.ElementName;
