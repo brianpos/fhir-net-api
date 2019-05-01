@@ -39,7 +39,7 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
@@ -444,7 +444,7 @@ namespace Hl7.Fhir.Model
         private Hl7.Fhir.Model.CodeableConcept _ClinicalStatus;
         
         /// <summary>
-        /// unconfirmed | confirmed | refuted | entered-in-error
+        /// unconfirmed | presumed | confirmed | refuted | entered-in-error
         /// </summary>
         [FhirElement("verificationStatus", InSummary=true, Order=110)]
         [DataMember]

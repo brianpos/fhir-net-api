@@ -39,7 +39,7 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
@@ -399,7 +399,7 @@ namespace Hl7.Fhir.Model
         private Hl7.Fhir.Model.ResourceReference _Subject;
         
         /// <summary>
-        /// Encounter created as part of
+        /// The Encounter during which this Condition was created
         /// </summary>
         [FhirElement("encounter", InSummary=true, Order=170)]
         [CLSCompliant(false)]

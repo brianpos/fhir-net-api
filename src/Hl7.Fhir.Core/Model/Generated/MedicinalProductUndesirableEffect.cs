@@ -39,7 +39,7 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
@@ -60,7 +60,7 @@ namespace Hl7.Fhir.Model
         /// </summary>
         [FhirElement("subject", InSummary=true, Order=90)]
         [CLSCompliant(false)]
-		[References("MedicinalProduct","Medication")]
+		[References("RegulatedMedicinalProduct","Medication")]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
         public List<Hl7.Fhir.Model.ResourceReference> Subject

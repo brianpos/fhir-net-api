@@ -39,12 +39,12 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
     /// <summary>
-    /// Planned participants in the coordination and delivery of care for a patient or group
+    /// Planned participants in the coordination and delivery of care
     /// </summary>
     [FhirType("CareTeam", IsResource=true)]
     [DataContract]
@@ -347,7 +347,7 @@ namespace Hl7.Fhir.Model
         private Hl7.Fhir.Model.ResourceReference _Subject;
         
         /// <summary>
-        /// Encounter created as part of
+        /// The Encounter during which this CareTeam was created
         /// </summary>
         [FhirElement("encounter", InSummary=true, Order=140)]
         [CLSCompliant(false)]

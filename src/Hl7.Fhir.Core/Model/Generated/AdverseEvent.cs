@@ -39,7 +39,7 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
@@ -86,18 +86,18 @@ namespace Hl7.Fhir.Model
             /// <summary>
             /// Refers to the specific entity that caused the adverse event
             /// </summary>
-            [FhirElement("instance", InSummary=true, Order=40)]
+            [FhirElement("instance", InSummary=true, Order=40, Choice=ChoiceType.DatatypeChoice)]
             [CLSCompliant(false)]
-			[References("Immunization","Procedure","Substance","Medication","MedicationAdministration","MedicationStatement","Device")]
+			[AllowedTypes(typeof(Hl7.Fhir.Model.CodeableConcept),typeof(Hl7.Fhir.Model.ResourceReference))]
             [Cardinality(Min=1,Max=1)]
             [DataMember]
-            public Hl7.Fhir.Model.ResourceReference Instance
+            public Hl7.Fhir.Model.Element Instance
             {
                 get { return _Instance; }
                 set { _Instance = value; OnPropertyChanged("Instance"); }
             }
             
-            private Hl7.Fhir.Model.ResourceReference _Instance;
+            private Hl7.Fhir.Model.Element _Instance;
             
             /// <summary>
             /// Information on the possible cause of the event
@@ -120,7 +120,7 @@ namespace Hl7.Fhir.Model
                 if (dest != null)
                 {
                     base.CopyTo(dest);
-                    if(Instance != null) dest.Instance = (Hl7.Fhir.Model.ResourceReference)Instance.DeepCopy();
+                    if(Instance != null) dest.Instance = (Hl7.Fhir.Model.Element)Instance.DeepCopy();
                     if(Causality != null) dest.Causality = new List<Hl7.Fhir.Model.AdverseEvent.CausalityComponent>(Causality.DeepCopy());
                     return dest;
                 }
@@ -349,14 +349,15 @@ namespace Hl7.Fhir.Model
         /// Business identifier for the event
         /// </summary>
         [FhirElement("identifier", InSummary=true, Order=90)]
+        [Cardinality(Min=0,Max=-1)]
         [DataMember]
-        public Hl7.Fhir.Model.Identifier Identifier
+        public List<Hl7.Fhir.Model.Identifier> Identifier
         {
-            get { return _Identifier; }
+            get { if(_Identifier==null) _Identifier = new List<Hl7.Fhir.Model.Identifier>(); return _Identifier; }
             set { _Identifier = value; OnPropertyChanged("Identifier"); }
         }
         
-        private Hl7.Fhir.Model.Identifier _Identifier;
+        private List<Hl7.Fhir.Model.Identifier> _Identifier;
         
         /// <summary>
         /// actual | potential
@@ -435,7 +436,7 @@ namespace Hl7.Fhir.Model
         private Hl7.Fhir.Model.ResourceReference _Subject;
         
         /// <summary>
-        /// Encounter created as part of
+        /// The Encounter during which this AdverseEvent was created
         /// </summary>
         [FhirElement("encounter", InSummary=true, Order=140)]
         [CLSCompliant(false)]
@@ -647,9 +648,25 @@ namespace Hl7.Fhir.Model
         private List<Hl7.Fhir.Model.ResourceReference> _Contributor;
         
         /// <summary>
+        /// Who or what identified a change in physiological state or condition
+        /// </summary>
+        [FhirElement("detector", InSummary=true, Order=250)]
+        [CLSCompliant(false)]
+		[References("Patient","RelatedPerson","Practitioner","PractitionerRole","Device")]
+        [Cardinality(Min=0,Max=-1)]
+        [DataMember]
+        public List<Hl7.Fhir.Model.ResourceReference> Detector
+        {
+            get { if(_Detector==null) _Detector = new List<Hl7.Fhir.Model.ResourceReference>(); return _Detector; }
+            set { _Detector = value; OnPropertyChanged("Detector"); }
+        }
+        
+        private List<Hl7.Fhir.Model.ResourceReference> _Detector;
+        
+        /// <summary>
         /// The suspected agent causing the adverse event
         /// </summary>
-        [FhirElement("suspectEntity", InSummary=true, Order=250)]
+        [FhirElement("suspectEntity", InSummary=true, Order=260)]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
         public List<Hl7.Fhir.Model.AdverseEvent.SuspectEntityComponent> SuspectEntity
@@ -663,7 +680,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// AdverseEvent.subjectMedicalHistory
         /// </summary>
-        [FhirElement("subjectMedicalHistory", InSummary=true, Order=260)]
+        [FhirElement("subjectMedicalHistory", InSummary=true, Order=270)]
         [CLSCompliant(false)]
 		[References("Condition","Observation","AllergyIntolerance","FamilyMemberHistory","Immunization","Procedure","Media","DocumentReference")]
         [Cardinality(Min=0,Max=-1)]
@@ -679,7 +696,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// AdverseEvent.referenceDocument
         /// </summary>
-        [FhirElement("referenceDocument", InSummary=true, Order=270)]
+        [FhirElement("referenceDocument", InSummary=true, Order=280)]
         [CLSCompliant(false)]
 		[References("DocumentReference")]
         [Cardinality(Min=0,Max=-1)]
@@ -695,7 +712,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// AdverseEvent.study
         /// </summary>
-        [FhirElement("study", InSummary=true, Order=280)]
+        [FhirElement("study", InSummary=true, Order=290)]
         [CLSCompliant(false)]
 		[References("ResearchStudy")]
         [Cardinality(Min=0,Max=-1)]
@@ -722,7 +739,7 @@ namespace Hl7.Fhir.Model
             if (dest != null)
             {
                 base.CopyTo(dest);
-                if(Identifier != null) dest.Identifier = (Hl7.Fhir.Model.Identifier)Identifier.DeepCopy();
+                if(Identifier != null) dest.Identifier = new List<Hl7.Fhir.Model.Identifier>(Identifier.DeepCopy());
                 if(ActualityElement != null) dest.ActualityElement = (Code<Hl7.Fhir.Model.AdverseEvent.AdverseEventActuality>)ActualityElement.DeepCopy();
                 if(Category != null) dest.Category = new List<Hl7.Fhir.Model.CodeableConcept>(Category.DeepCopy());
                 if(Event != null) dest.Event = (Hl7.Fhir.Model.CodeableConcept)Event.DeepCopy();
@@ -738,6 +755,7 @@ namespace Hl7.Fhir.Model
                 if(Outcome != null) dest.Outcome = (Hl7.Fhir.Model.CodeableConcept)Outcome.DeepCopy();
                 if(Recorder != null) dest.Recorder = (Hl7.Fhir.Model.ResourceReference)Recorder.DeepCopy();
                 if(Contributor != null) dest.Contributor = new List<Hl7.Fhir.Model.ResourceReference>(Contributor.DeepCopy());
+                if(Detector != null) dest.Detector = new List<Hl7.Fhir.Model.ResourceReference>(Detector.DeepCopy());
                 if(SuspectEntity != null) dest.SuspectEntity = new List<Hl7.Fhir.Model.AdverseEvent.SuspectEntityComponent>(SuspectEntity.DeepCopy());
                 if(SubjectMedicalHistory != null) dest.SubjectMedicalHistory = new List<Hl7.Fhir.Model.ResourceReference>(SubjectMedicalHistory.DeepCopy());
                 if(ReferenceDocument != null) dest.ReferenceDocument = new List<Hl7.Fhir.Model.ResourceReference>(ReferenceDocument.DeepCopy());
@@ -775,6 +793,7 @@ namespace Hl7.Fhir.Model
             if( !DeepComparable.Matches(Outcome, otherT.Outcome)) return false;
             if( !DeepComparable.Matches(Recorder, otherT.Recorder)) return false;
             if( !DeepComparable.Matches(Contributor, otherT.Contributor)) return false;
+            if( !DeepComparable.Matches(Detector, otherT.Detector)) return false;
             if( !DeepComparable.Matches(SuspectEntity, otherT.SuspectEntity)) return false;
             if( !DeepComparable.Matches(SubjectMedicalHistory, otherT.SubjectMedicalHistory)) return false;
             if( !DeepComparable.Matches(ReferenceDocument, otherT.ReferenceDocument)) return false;
@@ -805,6 +824,7 @@ namespace Hl7.Fhir.Model
             if( !DeepComparable.IsExactly(Outcome, otherT.Outcome)) return false;
             if( !DeepComparable.IsExactly(Recorder, otherT.Recorder)) return false;
             if( !DeepComparable.IsExactly(Contributor, otherT.Contributor)) return false;
+            if( !DeepComparable.IsExactly(Detector, otherT.Detector)) return false;
             if( !DeepComparable.IsExactly(SuspectEntity, otherT.SuspectEntity)) return false;
             if( !DeepComparable.IsExactly(SubjectMedicalHistory, otherT.SubjectMedicalHistory)) return false;
             if( !DeepComparable.IsExactly(ReferenceDocument, otherT.ReferenceDocument)) return false;
@@ -819,7 +839,7 @@ namespace Hl7.Fhir.Model
             get
             {
                 foreach (var item in base.Children) yield return item;
-				if (Identifier != null) yield return Identifier;
+				foreach (var elem in Identifier) { if (elem != null) yield return elem; }
 				if (ActualityElement != null) yield return ActualityElement;
 				foreach (var elem in Category) { if (elem != null) yield return elem; }
 				if (Event != null) yield return Event;
@@ -835,6 +855,7 @@ namespace Hl7.Fhir.Model
 				if (Outcome != null) yield return Outcome;
 				if (Recorder != null) yield return Recorder;
 				foreach (var elem in Contributor) { if (elem != null) yield return elem; }
+				foreach (var elem in Detector) { if (elem != null) yield return elem; }
 				foreach (var elem in SuspectEntity) { if (elem != null) yield return elem; }
 				foreach (var elem in SubjectMedicalHistory) { if (elem != null) yield return elem; }
 				foreach (var elem in ReferenceDocument) { if (elem != null) yield return elem; }
@@ -848,7 +869,7 @@ namespace Hl7.Fhir.Model
             get
             {
                 foreach (var item in base.NamedChildren) yield return item;
-                if (Identifier != null) yield return new ElementValue("identifier", Identifier);
+                foreach (var elem in Identifier) { if (elem != null) yield return new ElementValue("identifier", elem); }
                 if (ActualityElement != null) yield return new ElementValue("actuality", ActualityElement);
                 foreach (var elem in Category) { if (elem != null) yield return new ElementValue("category", elem); }
                 if (Event != null) yield return new ElementValue("event", Event);
@@ -864,6 +885,7 @@ namespace Hl7.Fhir.Model
                 if (Outcome != null) yield return new ElementValue("outcome", Outcome);
                 if (Recorder != null) yield return new ElementValue("recorder", Recorder);
                 foreach (var elem in Contributor) { if (elem != null) yield return new ElementValue("contributor", elem); }
+                foreach (var elem in Detector) { if (elem != null) yield return new ElementValue("detector", elem); }
                 foreach (var elem in SuspectEntity) { if (elem != null) yield return new ElementValue("suspectEntity", elem); }
                 foreach (var elem in SubjectMedicalHistory) { if (elem != null) yield return new ElementValue("subjectMedicalHistory", elem); }
                 foreach (var elem in ReferenceDocument) { if (elem != null) yield return new ElementValue("referenceDocument", elem); }

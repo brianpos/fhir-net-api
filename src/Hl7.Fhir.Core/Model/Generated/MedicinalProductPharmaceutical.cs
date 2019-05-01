@@ -39,7 +39,7 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
@@ -620,9 +620,25 @@ namespace Hl7.Fhir.Model
         private List<Hl7.Fhir.Model.Identifier> _Identifier;
         
         /// <summary>
+        /// The product that this is a pharmaceutical product of
+        /// </summary>
+        [FhirElement("subject", InSummary=true, Order=100)]
+        [CLSCompliant(false)]
+		[References("RegulatedMedicinalProduct")]
+        [Cardinality(Min=0,Max=-1)]
+        [DataMember]
+        public List<Hl7.Fhir.Model.ResourceReference> Subject
+        {
+            get { if(_Subject==null) _Subject = new List<Hl7.Fhir.Model.ResourceReference>(); return _Subject; }
+            set { _Subject = value; OnPropertyChanged("Subject"); }
+        }
+        
+        private List<Hl7.Fhir.Model.ResourceReference> _Subject;
+        
+        /// <summary>
         /// The administrable dose form, after necessary reconstitution
         /// </summary>
-        [FhirElement("administrableDoseForm", InSummary=true, Order=100)]
+        [FhirElement("administrableDoseForm", InSummary=true, Order=110)]
         [Cardinality(Min=1,Max=1)]
         [DataMember]
         public Hl7.Fhir.Model.CodeableConcept AdministrableDoseForm
@@ -636,7 +652,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// Todo
         /// </summary>
-        [FhirElement("unitOfPresentation", InSummary=true, Order=110)]
+        [FhirElement("unitOfPresentation", InSummary=true, Order=120)]
         [DataMember]
         public Hl7.Fhir.Model.CodeableConcept UnitOfPresentation
         {
@@ -649,7 +665,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// Ingredient
         /// </summary>
-        [FhirElement("ingredient", InSummary=true, Order=120)]
+        [FhirElement("ingredient", InSummary=true, Order=130)]
         [CLSCompliant(false)]
 		[References("MedicinalProductIngredient")]
         [Cardinality(Min=0,Max=-1)]
@@ -665,7 +681,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// Accompanying device
         /// </summary>
-        [FhirElement("device", InSummary=true, Order=130)]
+        [FhirElement("device", InSummary=true, Order=140)]
         [CLSCompliant(false)]
 		[References("DeviceDefinition")]
         [Cardinality(Min=0,Max=-1)]
@@ -681,7 +697,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// Characteristics e.g. a products onset of action
         /// </summary>
-        [FhirElement("characteristics", InSummary=true, Order=140)]
+        [FhirElement("characteristics", InSummary=true, Order=150)]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
         public List<Hl7.Fhir.Model.MedicinalProductPharmaceutical.CharacteristicsComponent> Characteristics
@@ -695,7 +711,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// The path by which the pharmaceutical product is taken into or makes contact with the body
         /// </summary>
-        [FhirElement("routeOfAdministration", InSummary=true, Order=150)]
+        [FhirElement("routeOfAdministration", InSummary=true, Order=160)]
         [Cardinality(Min=1,Max=-1)]
         [DataMember]
         public List<Hl7.Fhir.Model.MedicinalProductPharmaceutical.RouteOfAdministrationComponent> RouteOfAdministration
@@ -721,6 +737,7 @@ namespace Hl7.Fhir.Model
             {
                 base.CopyTo(dest);
                 if(Identifier != null) dest.Identifier = new List<Hl7.Fhir.Model.Identifier>(Identifier.DeepCopy());
+                if(Subject != null) dest.Subject = new List<Hl7.Fhir.Model.ResourceReference>(Subject.DeepCopy());
                 if(AdministrableDoseForm != null) dest.AdministrableDoseForm = (Hl7.Fhir.Model.CodeableConcept)AdministrableDoseForm.DeepCopy();
                 if(UnitOfPresentation != null) dest.UnitOfPresentation = (Hl7.Fhir.Model.CodeableConcept)UnitOfPresentation.DeepCopy();
                 if(Ingredient != null) dest.Ingredient = new List<Hl7.Fhir.Model.ResourceReference>(Ingredient.DeepCopy());
@@ -745,6 +762,7 @@ namespace Hl7.Fhir.Model
             
             if(!base.Matches(otherT)) return false;
             if( !DeepComparable.Matches(Identifier, otherT.Identifier)) return false;
+            if( !DeepComparable.Matches(Subject, otherT.Subject)) return false;
             if( !DeepComparable.Matches(AdministrableDoseForm, otherT.AdministrableDoseForm)) return false;
             if( !DeepComparable.Matches(UnitOfPresentation, otherT.UnitOfPresentation)) return false;
             if( !DeepComparable.Matches(Ingredient, otherT.Ingredient)) return false;
@@ -762,6 +780,7 @@ namespace Hl7.Fhir.Model
             
             if(!base.IsExactly(otherT)) return false;
             if( !DeepComparable.IsExactly(Identifier, otherT.Identifier)) return false;
+            if( !DeepComparable.IsExactly(Subject, otherT.Subject)) return false;
             if( !DeepComparable.IsExactly(AdministrableDoseForm, otherT.AdministrableDoseForm)) return false;
             if( !DeepComparable.IsExactly(UnitOfPresentation, otherT.UnitOfPresentation)) return false;
             if( !DeepComparable.IsExactly(Ingredient, otherT.Ingredient)) return false;
@@ -779,6 +798,7 @@ namespace Hl7.Fhir.Model
             {
                 foreach (var item in base.Children) yield return item;
 				foreach (var elem in Identifier) { if (elem != null) yield return elem; }
+				foreach (var elem in Subject) { if (elem != null) yield return elem; }
 				if (AdministrableDoseForm != null) yield return AdministrableDoseForm;
 				if (UnitOfPresentation != null) yield return UnitOfPresentation;
 				foreach (var elem in Ingredient) { if (elem != null) yield return elem; }
@@ -795,6 +815,7 @@ namespace Hl7.Fhir.Model
             {
                 foreach (var item in base.NamedChildren) yield return item;
                 foreach (var elem in Identifier) { if (elem != null) yield return new ElementValue("identifier", elem); }
+                foreach (var elem in Subject) { if (elem != null) yield return new ElementValue("subject", elem); }
                 if (AdministrableDoseForm != null) yield return new ElementValue("administrableDoseForm", AdministrableDoseForm);
                 if (UnitOfPresentation != null) yield return new ElementValue("unitOfPresentation", UnitOfPresentation);
                 foreach (var elem in Ingredient) { if (elem != null) yield return new ElementValue("ingredient", elem); }

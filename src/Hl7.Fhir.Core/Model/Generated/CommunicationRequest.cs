@@ -39,7 +39,7 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
@@ -67,7 +67,7 @@ namespace Hl7.Fhir.Model
             /// </summary>
             [FhirElement("content", Order=40, Choice=ChoiceType.DatatypeChoice)]
             [CLSCompliant(false)]
-			[AllowedTypes(typeof(Hl7.Fhir.Model.FhirString),typeof(Hl7.Fhir.Model.Attachment),typeof(Hl7.Fhir.Model.ResourceReference))]
+			[AllowedTypes(typeof(Hl7.Fhir.Model.Attachment),typeof(Hl7.Fhir.Model.ResourceReference),typeof(Hl7.Fhir.Model.CodeableConcept))]
             [Cardinality(Min=1,Max=1)]
             [DataMember]
             public Hl7.Fhir.Model.Element Content
@@ -373,7 +373,7 @@ namespace Hl7.Fhir.Model
         private List<Hl7.Fhir.Model.ResourceReference> _About;
         
         /// <summary>
-        /// Encounter created as part of
+        /// The Encounter during which this CommunicationRequest was created
         /// </summary>
         [FhirElement("encounter", InSummary=true, Order=210)]
         [CLSCompliant(false)]
@@ -513,7 +513,7 @@ namespace Hl7.Fhir.Model
         /// </summary>
         [FhirElement("reasonReference", InSummary=true, Order=290)]
         [CLSCompliant(false)]
-		[References("Condition","Observation","DiagnosticReport","DocumentReference")]
+		[References()]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
         public List<Hl7.Fhir.Model.ResourceReference> ReasonReference

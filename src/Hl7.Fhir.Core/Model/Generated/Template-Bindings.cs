@@ -29,7 +29,7 @@
 */
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
@@ -389,6 +389,12 @@ namespace Hl7.Fhir.Model
         /// </summary>
         [EnumLiteral("4.0.0", "http://hl7.org/fhir/FHIR-version"), Description("4.0.0")]
         N4_0_0,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/FHIR-version)
+        /// </summary>
+        [EnumLiteral("4.1.0", "http://hl7.org/fhir/FHIR-version"), Description("4.1.0")]
+        N4_1_0,
     }
 
     /// <summary>
@@ -524,6 +530,12 @@ namespace Hl7.Fhir.Model
         /// </summary>
         [EnumLiteral("ClinicalImpression", "http://hl7.org/fhir/resource-types"), Description("ClinicalImpression")]
         ClinicalImpression,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
+        [EnumLiteral("ClinicalParticulars", "http://hl7.org/fhir/resource-types"), Description("ClinicalParticulars")]
+        ClinicalParticulars,
         /// <summary>
         /// MISSING DESCRIPTION<br/>
         /// (system: http://hl7.org/fhir/resource-types)
@@ -888,12 +900,6 @@ namespace Hl7.Fhir.Model
         /// MISSING DESCRIPTION<br/>
         /// (system: http://hl7.org/fhir/resource-types)
         /// </summary>
-        [EnumLiteral("MedicinalProduct", "http://hl7.org/fhir/resource-types"), Description("MedicinalProduct")]
-        MedicinalProduct,
-        /// <summary>
-        /// MISSING DESCRIPTION<br/>
-        /// (system: http://hl7.org/fhir/resource-types)
-        /// </summary>
         [EnumLiteral("MedicinalProductAuthorization", "http://hl7.org/fhir/resource-types"), Description("MedicinalProductAuthorization")]
         MedicinalProductAuthorization,
         /// <summary>
@@ -1086,6 +1092,30 @@ namespace Hl7.Fhir.Model
         /// MISSING DESCRIPTION<br/>
         /// (system: http://hl7.org/fhir/resource-types)
         /// </summary>
+        [EnumLiteral("RegulatedAdministrableProduct", "http://hl7.org/fhir/resource-types"), Description("RegulatedAdministrableProduct")]
+        RegulatedAdministrableProduct,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
+        [EnumLiteral("RegulatedManufacturedItem", "http://hl7.org/fhir/resource-types"), Description("RegulatedManufacturedItem")]
+        RegulatedManufacturedItem,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
+        [EnumLiteral("RegulatedMedicinalProduct", "http://hl7.org/fhir/resource-types"), Description("RegulatedMedicinalProduct")]
+        RegulatedMedicinalProduct,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
+        [EnumLiteral("RegulatedPackagedProduct", "http://hl7.org/fhir/resource-types"), Description("RegulatedPackagedProduct")]
+        RegulatedPackagedProduct,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
         [EnumLiteral("RelatedPerson", "http://hl7.org/fhir/resource-types"), Description("RelatedPerson")]
         RelatedPerson,
         /// <summary>
@@ -1200,6 +1230,12 @@ namespace Hl7.Fhir.Model
         /// MISSING DESCRIPTION<br/>
         /// (system: http://hl7.org/fhir/resource-types)
         /// </summary>
+        [EnumLiteral("SubstanceDefinition", "http://hl7.org/fhir/resource-types"), Description("SubstanceDefinition")]
+        SubstanceDefinition,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
         [EnumLiteral("SubstanceNucleicAcid", "http://hl7.org/fhir/resource-types"), Description("SubstanceNucleicAcid")]
         SubstanceNucleicAcid,
         /// <summary>
@@ -1226,12 +1262,6 @@ namespace Hl7.Fhir.Model
         /// </summary>
         [EnumLiteral("SubstanceSourceMaterial", "http://hl7.org/fhir/resource-types"), Description("SubstanceSourceMaterial")]
         SubstanceSourceMaterial,
-        /// <summary>
-        /// MISSING DESCRIPTION<br/>
-        /// (system: http://hl7.org/fhir/resource-types)
-        /// </summary>
-        [EnumLiteral("SubstanceSpecification", "http://hl7.org/fhir/resource-types"), Description("SubstanceSpecification")]
-        SubstanceSpecification,
         /// <summary>
         /// MISSING DESCRIPTION<br/>
         /// (system: http://hl7.org/fhir/resource-types)
@@ -2640,6 +2670,12 @@ namespace Hl7.Fhir.Model
         /// MISSING DESCRIPTION<br/>
         /// (system: http://hl7.org/fhir/resource-types)
         /// </summary>
+        [EnumLiteral("ClinicalParticulars", "http://hl7.org/fhir/resource-types"), Description("ClinicalParticulars")]
+        ClinicalParticulars,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
         [EnumLiteral("CodeSystem", "http://hl7.org/fhir/resource-types"), Description("CodeSystem")]
         CodeSystem,
         /// <summary>
@@ -3000,12 +3036,6 @@ namespace Hl7.Fhir.Model
         /// MISSING DESCRIPTION<br/>
         /// (system: http://hl7.org/fhir/resource-types)
         /// </summary>
-        [EnumLiteral("MedicinalProduct", "http://hl7.org/fhir/resource-types"), Description("MedicinalProduct")]
-        MedicinalProduct,
-        /// <summary>
-        /// MISSING DESCRIPTION<br/>
-        /// (system: http://hl7.org/fhir/resource-types)
-        /// </summary>
         [EnumLiteral("MedicinalProductAuthorization", "http://hl7.org/fhir/resource-types"), Description("MedicinalProductAuthorization")]
         MedicinalProductAuthorization,
         /// <summary>
@@ -3198,6 +3228,30 @@ namespace Hl7.Fhir.Model
         /// MISSING DESCRIPTION<br/>
         /// (system: http://hl7.org/fhir/resource-types)
         /// </summary>
+        [EnumLiteral("RegulatedAdministrableProduct", "http://hl7.org/fhir/resource-types"), Description("RegulatedAdministrableProduct")]
+        RegulatedAdministrableProduct,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
+        [EnumLiteral("RegulatedManufacturedItem", "http://hl7.org/fhir/resource-types"), Description("RegulatedManufacturedItem")]
+        RegulatedManufacturedItem,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
+        [EnumLiteral("RegulatedMedicinalProduct", "http://hl7.org/fhir/resource-types"), Description("RegulatedMedicinalProduct")]
+        RegulatedMedicinalProduct,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
+        [EnumLiteral("RegulatedPackagedProduct", "http://hl7.org/fhir/resource-types"), Description("RegulatedPackagedProduct")]
+        RegulatedPackagedProduct,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
         [EnumLiteral("RelatedPerson", "http://hl7.org/fhir/resource-types"), Description("RelatedPerson")]
         RelatedPerson,
         /// <summary>
@@ -3312,6 +3366,12 @@ namespace Hl7.Fhir.Model
         /// MISSING DESCRIPTION<br/>
         /// (system: http://hl7.org/fhir/resource-types)
         /// </summary>
+        [EnumLiteral("SubstanceDefinition", "http://hl7.org/fhir/resource-types"), Description("SubstanceDefinition")]
+        SubstanceDefinition,
+        /// <summary>
+        /// MISSING DESCRIPTION<br/>
+        /// (system: http://hl7.org/fhir/resource-types)
+        /// </summary>
         [EnumLiteral("SubstanceNucleicAcid", "http://hl7.org/fhir/resource-types"), Description("SubstanceNucleicAcid")]
         SubstanceNucleicAcid,
         /// <summary>
@@ -3338,12 +3398,6 @@ namespace Hl7.Fhir.Model
         /// </summary>
         [EnumLiteral("SubstanceSourceMaterial", "http://hl7.org/fhir/resource-types"), Description("SubstanceSourceMaterial")]
         SubstanceSourceMaterial,
-        /// <summary>
-        /// MISSING DESCRIPTION<br/>
-        /// (system: http://hl7.org/fhir/resource-types)
-        /// </summary>
-        [EnumLiteral("SubstanceSpecification", "http://hl7.org/fhir/resource-types"), Description("SubstanceSpecification")]
-        SubstanceSpecification,
         /// <summary>
         /// MISSING DESCRIPTION<br/>
         /// (system: http://hl7.org/fhir/resource-types)

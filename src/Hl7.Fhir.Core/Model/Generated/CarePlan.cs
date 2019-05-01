@@ -39,7 +39,7 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
@@ -264,7 +264,7 @@ namespace Hl7.Fhir.Model
             /// </summary>
             [FhirElement("reference", Order=70)]
             [CLSCompliant(false)]
-			[References("Appointment","CommunicationRequest","DeviceRequest","MedicationRequest","NutritionOrder","Task","ServiceRequest","VisionPrescription","RequestGroup")]
+			[References("Appointment","CommunicationRequest","DeviceRequest","MedicationRequest","NutritionOrder","Task","ServiceRequest","VisionPrescription","RequestGroup","ImmunizationRecommendation")]
             [DataMember]
             public Hl7.Fhir.Model.ResourceReference Reference
             {
@@ -646,9 +646,24 @@ namespace Hl7.Fhir.Model
             private Hl7.Fhir.Model.ResourceReference _Location;
             
             /// <summary>
+            /// Reported rather than primary record
+            /// </summary>
+            [FhirElement("reported", Order=160, Choice=ChoiceType.DatatypeChoice)]
+            [CLSCompliant(false)]
+			[AllowedTypes(typeof(Hl7.Fhir.Model.FhirBoolean),typeof(Hl7.Fhir.Model.ResourceReference))]
+            [DataMember]
+            public Hl7.Fhir.Model.Element Reported
+            {
+                get { return _Reported; }
+                set { _Reported = value; OnPropertyChanged("Reported"); }
+            }
+            
+            private Hl7.Fhir.Model.Element _Reported;
+            
+            /// <summary>
             /// Who will be responsible?
             /// </summary>
-            [FhirElement("performer", Order=160)]
+            [FhirElement("performer", Order=170)]
             [CLSCompliant(false)]
 			[References("Practitioner","PractitionerRole","Organization","RelatedPerson","Patient","CareTeam","HealthcareService","Device")]
             [Cardinality(Min=0,Max=-1)]
@@ -664,7 +679,7 @@ namespace Hl7.Fhir.Model
             /// <summary>
             /// What is to be administered/supplied
             /// </summary>
-            [FhirElement("product", Order=170, Choice=ChoiceType.DatatypeChoice)]
+            [FhirElement("product", Order=180, Choice=ChoiceType.DatatypeChoice)]
             [CLSCompliant(false)]
 			[AllowedTypes(typeof(Hl7.Fhir.Model.CodeableConcept),typeof(Hl7.Fhir.Model.ResourceReference))]
             [DataMember]
@@ -679,7 +694,7 @@ namespace Hl7.Fhir.Model
             /// <summary>
             /// How to consume/day?
             /// </summary>
-            [FhirElement("dailyAmount", Order=180)]
+            [FhirElement("dailyAmount", Order=190)]
             [DataMember]
             public Hl7.Fhir.Model.SimpleQuantity DailyAmount
             {
@@ -692,7 +707,7 @@ namespace Hl7.Fhir.Model
             /// <summary>
             /// How much to administer/supply/consume
             /// </summary>
-            [FhirElement("quantity", Order=190)]
+            [FhirElement("quantity", Order=200)]
             [DataMember]
             public Hl7.Fhir.Model.SimpleQuantity Quantity
             {
@@ -705,7 +720,7 @@ namespace Hl7.Fhir.Model
             /// <summary>
             /// Extra info describing activity to perform
             /// </summary>
-            [FhirElement("description", Order=200)]
+            [FhirElement("description", Order=210)]
             [DataMember]
             public Hl7.Fhir.Model.FhirString DescriptionElement
             {
@@ -753,6 +768,7 @@ namespace Hl7.Fhir.Model
                     if(DoNotPerformElement != null) dest.DoNotPerformElement = (Hl7.Fhir.Model.FhirBoolean)DoNotPerformElement.DeepCopy();
                     if(Scheduled != null) dest.Scheduled = (Hl7.Fhir.Model.Element)Scheduled.DeepCopy();
                     if(Location != null) dest.Location = (Hl7.Fhir.Model.ResourceReference)Location.DeepCopy();
+                    if(Reported != null) dest.Reported = (Hl7.Fhir.Model.Element)Reported.DeepCopy();
                     if(Performer != null) dest.Performer = new List<Hl7.Fhir.Model.ResourceReference>(Performer.DeepCopy());
                     if(Product != null) dest.Product = (Hl7.Fhir.Model.Element)Product.DeepCopy();
                     if(DailyAmount != null) dest.DailyAmount = (Hl7.Fhir.Model.SimpleQuantity)DailyAmount.DeepCopy();
@@ -787,6 +803,7 @@ namespace Hl7.Fhir.Model
                 if( !DeepComparable.Matches(DoNotPerformElement, otherT.DoNotPerformElement)) return false;
                 if( !DeepComparable.Matches(Scheduled, otherT.Scheduled)) return false;
                 if( !DeepComparable.Matches(Location, otherT.Location)) return false;
+                if( !DeepComparable.Matches(Reported, otherT.Reported)) return false;
                 if( !DeepComparable.Matches(Performer, otherT.Performer)) return false;
                 if( !DeepComparable.Matches(Product, otherT.Product)) return false;
                 if( !DeepComparable.Matches(DailyAmount, otherT.DailyAmount)) return false;
@@ -814,6 +831,7 @@ namespace Hl7.Fhir.Model
                 if( !DeepComparable.IsExactly(DoNotPerformElement, otherT.DoNotPerformElement)) return false;
                 if( !DeepComparable.IsExactly(Scheduled, otherT.Scheduled)) return false;
                 if( !DeepComparable.IsExactly(Location, otherT.Location)) return false;
+                if( !DeepComparable.IsExactly(Reported, otherT.Reported)) return false;
                 if( !DeepComparable.IsExactly(Performer, otherT.Performer)) return false;
                 if( !DeepComparable.IsExactly(Product, otherT.Product)) return false;
                 if( !DeepComparable.IsExactly(DailyAmount, otherT.DailyAmount)) return false;
@@ -842,6 +860,7 @@ namespace Hl7.Fhir.Model
                     if (DoNotPerformElement != null) yield return DoNotPerformElement;
                     if (Scheduled != null) yield return Scheduled;
                     if (Location != null) yield return Location;
+                    if (Reported != null) yield return Reported;
                     foreach (var elem in Performer) { if (elem != null) yield return elem; }
                     if (Product != null) yield return Product;
                     if (DailyAmount != null) yield return DailyAmount;
@@ -868,6 +887,7 @@ namespace Hl7.Fhir.Model
                     if (DoNotPerformElement != null) yield return new ElementValue("doNotPerform", DoNotPerformElement);
                     if (Scheduled != null) yield return new ElementValue("scheduled", Scheduled);
                     if (Location != null) yield return new ElementValue("location", Location);
+                    if (Reported != null) yield return new ElementValue("reported", Reported);
                     foreach (var elem in Performer) { if (elem != null) yield return new ElementValue("performer", elem); }
                     if (Product != null) yield return new ElementValue("product", Product);
                     if (DailyAmount != null) yield return new ElementValue("dailyAmount", DailyAmount);
@@ -1169,7 +1189,7 @@ namespace Hl7.Fhir.Model
         private Hl7.Fhir.Model.ResourceReference _Subject;
         
         /// <summary>
-        /// Encounter created as part of
+        /// The Encounter during which this CarePlan was created
         /// </summary>
         [FhirElement("encounter", InSummary=true, Order=210)]
         [CLSCompliant(false)]
@@ -1278,23 +1298,37 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// Health issues this plan addresses
         /// </summary>
-        [FhirElement("addresses", InSummary=true, Order=270)]
+        [FhirElement("addressesCode", InSummary=true, Order=270)]
+        [Cardinality(Min=0,Max=-1)]
+        [DataMember]
+        public List<Hl7.Fhir.Model.CodeableConcept> AddressesCode
+        {
+            get { if(_AddressesCode==null) _AddressesCode = new List<Hl7.Fhir.Model.CodeableConcept>(); return _AddressesCode; }
+            set { _AddressesCode = value; OnPropertyChanged("AddressesCode"); }
+        }
+        
+        private List<Hl7.Fhir.Model.CodeableConcept> _AddressesCode;
+        
+        /// <summary>
+        /// Health issues this plan addresses
+        /// </summary>
+        [FhirElement("addressesReference", InSummary=true, Order=280)]
         [CLSCompliant(false)]
 		[References("Condition")]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
-        public List<Hl7.Fhir.Model.ResourceReference> Addresses
+        public List<Hl7.Fhir.Model.ResourceReference> AddressesReference
         {
-            get { if(_Addresses==null) _Addresses = new List<Hl7.Fhir.Model.ResourceReference>(); return _Addresses; }
-            set { _Addresses = value; OnPropertyChanged("Addresses"); }
+            get { if(_AddressesReference==null) _AddressesReference = new List<Hl7.Fhir.Model.ResourceReference>(); return _AddressesReference; }
+            set { _AddressesReference = value; OnPropertyChanged("AddressesReference"); }
         }
         
-        private List<Hl7.Fhir.Model.ResourceReference> _Addresses;
+        private List<Hl7.Fhir.Model.ResourceReference> _AddressesReference;
         
         /// <summary>
         /// Information considered as part of plan
         /// </summary>
-        [FhirElement("supportingInfo", Order=280)]
+        [FhirElement("supportingInfo", Order=290)]
         [CLSCompliant(false)]
 		[References()]
         [Cardinality(Min=0,Max=-1)]
@@ -1310,7 +1344,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// Desired outcome of plan
         /// </summary>
-        [FhirElement("goal", Order=290)]
+        [FhirElement("goal", Order=300)]
         [CLSCompliant(false)]
 		[References("Goal")]
         [Cardinality(Min=0,Max=-1)]
@@ -1326,7 +1360,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// Action to occur as part of plan
         /// </summary>
-        [FhirElement("activity", Order=300)]
+        [FhirElement("activity", Order=310)]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
         public List<Hl7.Fhir.Model.CarePlan.ActivityComponent> Activity
@@ -1340,7 +1374,7 @@ namespace Hl7.Fhir.Model
         /// <summary>
         /// Comments about the plan
         /// </summary>
-        [FhirElement("note", Order=310)]
+        [FhirElement("note", Order=320)]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
         public List<Hl7.Fhir.Model.Annotation> Note
@@ -1393,7 +1427,8 @@ namespace Hl7.Fhir.Model
                 if(Author != null) dest.Author = (Hl7.Fhir.Model.ResourceReference)Author.DeepCopy();
                 if(Contributor != null) dest.Contributor = new List<Hl7.Fhir.Model.ResourceReference>(Contributor.DeepCopy());
                 if(CareTeam != null) dest.CareTeam = new List<Hl7.Fhir.Model.ResourceReference>(CareTeam.DeepCopy());
-                if(Addresses != null) dest.Addresses = new List<Hl7.Fhir.Model.ResourceReference>(Addresses.DeepCopy());
+                if(AddressesCode != null) dest.AddressesCode = new List<Hl7.Fhir.Model.CodeableConcept>(AddressesCode.DeepCopy());
+                if(AddressesReference != null) dest.AddressesReference = new List<Hl7.Fhir.Model.ResourceReference>(AddressesReference.DeepCopy());
                 if(SupportingInfo != null) dest.SupportingInfo = new List<Hl7.Fhir.Model.ResourceReference>(SupportingInfo.DeepCopy());
                 if(Goal != null) dest.Goal = new List<Hl7.Fhir.Model.ResourceReference>(Goal.DeepCopy());
                 if(Activity != null) dest.Activity = new List<Hl7.Fhir.Model.CarePlan.ActivityComponent>(Activity.DeepCopy());
@@ -1433,7 +1468,8 @@ namespace Hl7.Fhir.Model
             if( !DeepComparable.Matches(Author, otherT.Author)) return false;
             if( !DeepComparable.Matches(Contributor, otherT.Contributor)) return false;
             if( !DeepComparable.Matches(CareTeam, otherT.CareTeam)) return false;
-            if( !DeepComparable.Matches(Addresses, otherT.Addresses)) return false;
+            if( !DeepComparable.Matches(AddressesCode, otherT.AddressesCode)) return false;
+            if( !DeepComparable.Matches(AddressesReference, otherT.AddressesReference)) return false;
             if( !DeepComparable.Matches(SupportingInfo, otherT.SupportingInfo)) return false;
             if( !DeepComparable.Matches(Goal, otherT.Goal)) return false;
             if( !DeepComparable.Matches(Activity, otherT.Activity)) return false;
@@ -1466,7 +1502,8 @@ namespace Hl7.Fhir.Model
             if( !DeepComparable.IsExactly(Author, otherT.Author)) return false;
             if( !DeepComparable.IsExactly(Contributor, otherT.Contributor)) return false;
             if( !DeepComparable.IsExactly(CareTeam, otherT.CareTeam)) return false;
-            if( !DeepComparable.IsExactly(Addresses, otherT.Addresses)) return false;
+            if( !DeepComparable.IsExactly(AddressesCode, otherT.AddressesCode)) return false;
+            if( !DeepComparable.IsExactly(AddressesReference, otherT.AddressesReference)) return false;
             if( !DeepComparable.IsExactly(SupportingInfo, otherT.SupportingInfo)) return false;
             if( !DeepComparable.IsExactly(Goal, otherT.Goal)) return false;
             if( !DeepComparable.IsExactly(Activity, otherT.Activity)) return false;
@@ -1499,7 +1536,8 @@ namespace Hl7.Fhir.Model
 				if (Author != null) yield return Author;
 				foreach (var elem in Contributor) { if (elem != null) yield return elem; }
 				foreach (var elem in CareTeam) { if (elem != null) yield return elem; }
-				foreach (var elem in Addresses) { if (elem != null) yield return elem; }
+				foreach (var elem in AddressesCode) { if (elem != null) yield return elem; }
+				foreach (var elem in AddressesReference) { if (elem != null) yield return elem; }
 				foreach (var elem in SupportingInfo) { if (elem != null) yield return elem; }
 				foreach (var elem in Goal) { if (elem != null) yield return elem; }
 				foreach (var elem in Activity) { if (elem != null) yield return elem; }
@@ -1531,7 +1569,8 @@ namespace Hl7.Fhir.Model
                 if (Author != null) yield return new ElementValue("author", Author);
                 foreach (var elem in Contributor) { if (elem != null) yield return new ElementValue("contributor", elem); }
                 foreach (var elem in CareTeam) { if (elem != null) yield return new ElementValue("careTeam", elem); }
-                foreach (var elem in Addresses) { if (elem != null) yield return new ElementValue("addresses", elem); }
+                foreach (var elem in AddressesCode) { if (elem != null) yield return new ElementValue("addressesCode", elem); }
+                foreach (var elem in AddressesReference) { if (elem != null) yield return new ElementValue("addressesReference", elem); }
                 foreach (var elem in SupportingInfo) { if (elem != null) yield return new ElementValue("supportingInfo", elem); }
                 foreach (var elem in Goal) { if (elem != null) yield return new ElementValue("goal", elem); }
                 foreach (var elem in Activity) { if (elem != null) yield return new ElementValue("activity", elem); }

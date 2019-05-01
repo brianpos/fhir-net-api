@@ -39,7 +39,7 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
@@ -2173,75 +2173,6 @@ namespace Hl7.Fhir.Model
             Generated,
         }
 
-        /// <summary>
-        /// Code of parameter that is input to the guide.
-        /// (url: http://hl7.org/fhir/ValueSet/guide-parameter-code)
-        /// </summary>
-        [FhirEnumeration("GuideParameterCode")]
-        public enum GuideParameterCode
-        {
-            /// <summary>
-            /// MISSING DESCRIPTION
-            /// (system: http://hl7.org/fhir/guide-parameter-code)
-            /// </summary>
-            [EnumLiteral("apply", "http://hl7.org/fhir/guide-parameter-code"), Description("Apply Metadata Value")]
-            Apply,
-            /// <summary>
-            /// MISSING DESCRIPTION
-            /// (system: http://hl7.org/fhir/guide-parameter-code)
-            /// </summary>
-            [EnumLiteral("path-resource", "http://hl7.org/fhir/guide-parameter-code"), Description("Resource Path")]
-            PathResource,
-            /// <summary>
-            /// MISSING DESCRIPTION
-            /// (system: http://hl7.org/fhir/guide-parameter-code)
-            /// </summary>
-            [EnumLiteral("path-pages", "http://hl7.org/fhir/guide-parameter-code"), Description("Pages Path")]
-            PathPages,
-            /// <summary>
-            /// MISSING DESCRIPTION
-            /// (system: http://hl7.org/fhir/guide-parameter-code)
-            /// </summary>
-            [EnumLiteral("path-tx-cache", "http://hl7.org/fhir/guide-parameter-code"), Description("Terminology Cache Path")]
-            PathTxCache,
-            /// <summary>
-            /// MISSING DESCRIPTION
-            /// (system: http://hl7.org/fhir/guide-parameter-code)
-            /// </summary>
-            [EnumLiteral("expansion-parameter", "http://hl7.org/fhir/guide-parameter-code"), Description("Expansion Profile")]
-            ExpansionParameter,
-            /// <summary>
-            /// MISSING DESCRIPTION
-            /// (system: http://hl7.org/fhir/guide-parameter-code)
-            /// </summary>
-            [EnumLiteral("rule-broken-links", "http://hl7.org/fhir/guide-parameter-code"), Description("Broken Links Rule")]
-            RuleBrokenLinks,
-            /// <summary>
-            /// MISSING DESCRIPTION
-            /// (system: http://hl7.org/fhir/guide-parameter-code)
-            /// </summary>
-            [EnumLiteral("generate-xml", "http://hl7.org/fhir/guide-parameter-code"), Description("Generate XML")]
-            GenerateXml,
-            /// <summary>
-            /// MISSING DESCRIPTION
-            /// (system: http://hl7.org/fhir/guide-parameter-code)
-            /// </summary>
-            [EnumLiteral("generate-json", "http://hl7.org/fhir/guide-parameter-code"), Description("Generate JSON")]
-            GenerateJson,
-            /// <summary>
-            /// MISSING DESCRIPTION
-            /// (system: http://hl7.org/fhir/guide-parameter-code)
-            /// </summary>
-            [EnumLiteral("generate-turtle", "http://hl7.org/fhir/guide-parameter-code"), Description("Generate Turtle")]
-            GenerateTurtle,
-            /// <summary>
-            /// MISSING DESCRIPTION
-            /// (system: http://hl7.org/fhir/guide-parameter-code)
-            /// </summary>
-            [EnumLiteral("html-template", "http://hl7.org/fhir/guide-parameter-code"), Description("HTML Template")]
-            HtmlTemplate,
-        }
-
         [FhirType("DependsOnComponent", NamedBackboneElement=true)]
         [DataContract]
         public partial class DependsOnComponent : Hl7.Fhir.Model.BackboneElement, System.ComponentModel.INotifyPropertyChanged
@@ -3326,13 +3257,13 @@ namespace Hl7.Fhir.Model
             [FhirElement("code", Order=40)]
             [Cardinality(Min=1,Max=1)]
             [DataMember]
-            public Code<Hl7.Fhir.Model.ImplementationGuide.GuideParameterCode> CodeElement
+            public Hl7.Fhir.Model.FhirString CodeElement
             {
                 get { return _CodeElement; }
                 set { _CodeElement = value; OnPropertyChanged("CodeElement"); }
             }
             
-            private Code<Hl7.Fhir.Model.ImplementationGuide.GuideParameterCode> _CodeElement;
+            private Hl7.Fhir.Model.FhirString _CodeElement;
             
             /// <summary>
             /// apply | path-resource | path-pages | path-tx-cache | expansion-parameter | rule-broken-links | generate-xml | generate-json | generate-turtle | html-template
@@ -3340,15 +3271,15 @@ namespace Hl7.Fhir.Model
             /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
             [NotMapped]
             [IgnoreDataMemberAttribute]
-            public Hl7.Fhir.Model.ImplementationGuide.GuideParameterCode? Code
+            public string Code
             {
                 get { return CodeElement != null ? CodeElement.Value : null; }
                 set
                 {
-                    if (!value.HasValue)
+                    if (value == null)
                         CodeElement = null; 
                     else
-                        CodeElement = new Code<Hl7.Fhir.Model.ImplementationGuide.GuideParameterCode>(value);
+                        CodeElement = new Hl7.Fhir.Model.FhirString(value);
                     OnPropertyChanged("Code");
                 }
             }
@@ -3393,7 +3324,7 @@ namespace Hl7.Fhir.Model
                 if (dest != null)
                 {
                     base.CopyTo(dest);
-                    if(CodeElement != null) dest.CodeElement = (Code<Hl7.Fhir.Model.ImplementationGuide.GuideParameterCode>)CodeElement.DeepCopy();
+                    if(CodeElement != null) dest.CodeElement = (Hl7.Fhir.Model.FhirString)CodeElement.DeepCopy();
                     if(ValueElement != null) dest.ValueElement = (Hl7.Fhir.Model.FhirString)ValueElement.DeepCopy();
                     return dest;
                 }

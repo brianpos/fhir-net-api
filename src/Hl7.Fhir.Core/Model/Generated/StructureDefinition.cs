@@ -39,7 +39,7 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
@@ -1351,7 +1351,7 @@ namespace Hl7.Fhir.Model
 
         public static ElementDefinition.ConstraintComponent StructureDefinition_SDF_16 = new ElementDefinition.ConstraintComponent()
         {
-            Expression = "snapshot.element.all(id) and snapshot.element.id.trace('ids').isDistinct()",
+            Expression = "snapshot.element.all(id.exists()) and snapshot.element.id.trace('ids').isDistinct()",
             Key = "sdf-16",
             Severity = ElementDefinition.ConstraintSeverity.Warning,
             Human = "All element definitions must have unique ids (snapshot)",
@@ -1378,7 +1378,7 @@ namespace Hl7.Fhir.Model
 
         public static ElementDefinition.ConstraintComponent StructureDefinition_SDF_17 = new ElementDefinition.ConstraintComponent()
         {
-            Expression = "differential.element.all(id) and differential.element.id.trace('ids').isDistinct()",
+            Expression = "differential.element.all(id.exists()) and differential.element.id.trace('ids').isDistinct()",
             Key = "sdf-17",
             Severity = ElementDefinition.ConstraintSeverity.Warning,
             Human = "All element definitions must have unique ids (diff)",
@@ -1531,7 +1531,7 @@ namespace Hl7.Fhir.Model
 
         public static ElementDefinition.ConstraintComponent StructureDefinition_SDF_8A = new ElementDefinition.ConstraintComponent()
         {
-            Expression = "differential.all((%resource.kind = 'logical' or element.first().path.startsWith(%resource.type)) and (element.tail().not() or  element.tail().all(path.startsWith(%resource.differential.element.first().path.replaceMatches('\\\\..*','')&'.'))))",
+            Expression = "differential.all((%resource.kind = 'logical' or element.first().path.startsWith(%resource.type)) and (element.tail().empty() or  element.tail().all(path.startsWith(%resource.differential.element.first().path.replaceMatches('\\\\..*','')&'.'))))",
             Key = "sdf-8a",
             Severity = ElementDefinition.ConstraintSeverity.Warning,
             Human = "In any differential, all the elements must start with the StructureDefinition's specified type for non-logical models, or with the same type name for logical models",

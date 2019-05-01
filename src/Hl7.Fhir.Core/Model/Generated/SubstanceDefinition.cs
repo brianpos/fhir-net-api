@@ -39,21 +39,21 @@ using Hl7.Fhir.Utility;
 #pragma warning disable 1591 // suppress XML summary warnings 
 
 //
-// Generated for FHIR v4.0.0
+// Generated for FHIR v4.1.0
 //
 namespace Hl7.Fhir.Model
 {
     /// <summary>
     /// The detailed description of a substance, typically at a level beyond what is used for prescribing
     /// </summary>
-    [FhirType("SubstanceSpecification", IsResource=true)]
+    [FhirType("SubstanceDefinition", IsResource=true)]
     [DataContract]
-    public partial class SubstanceSpecification : Hl7.Fhir.Model.DomainResource, System.ComponentModel.INotifyPropertyChanged
+    public partial class SubstanceDefinition : Hl7.Fhir.Model.DomainResource, System.ComponentModel.INotifyPropertyChanged
     {
         [NotMapped]
-        public override ResourceType ResourceType { get { return ResourceType.SubstanceSpecification; } }
+        public override ResourceType ResourceType { get { return ResourceType.SubstanceDefinition; } }
         [NotMapped]
-        public override string TypeName { get { return "SubstanceSpecification"; } }
+        public override string TypeName { get { return "SubstanceDefinition"; } }
         
         [FhirType("MoietyComponent", NamedBackboneElement=true)]
         [DataContract]
@@ -573,26 +573,26 @@ namespace Hl7.Fhir.Model
             [FhirElement("isotope", InSummary=true, Order=80)]
             [Cardinality(Min=0,Max=-1)]
             [DataMember]
-            public List<Hl7.Fhir.Model.SubstanceSpecification.IsotopeComponent> Isotope
+            public List<Hl7.Fhir.Model.SubstanceDefinition.IsotopeComponent> Isotope
             {
-                get { if(_Isotope==null) _Isotope = new List<Hl7.Fhir.Model.SubstanceSpecification.IsotopeComponent>(); return _Isotope; }
+                get { if(_Isotope==null) _Isotope = new List<Hl7.Fhir.Model.SubstanceDefinition.IsotopeComponent>(); return _Isotope; }
                 set { _Isotope = value; OnPropertyChanged("Isotope"); }
             }
             
-            private List<Hl7.Fhir.Model.SubstanceSpecification.IsotopeComponent> _Isotope;
+            private List<Hl7.Fhir.Model.SubstanceDefinition.IsotopeComponent> _Isotope;
             
             /// <summary>
             /// The molecular weight or weight range (for proteins, polymers or nucleic acids)
             /// </summary>
             [FhirElement("molecularWeight", InSummary=true, Order=90)]
             [DataMember]
-            public Hl7.Fhir.Model.SubstanceSpecification.MolecularWeightComponent MolecularWeight
+            public Hl7.Fhir.Model.SubstanceDefinition.MolecularWeightComponent MolecularWeight
             {
                 get { return _MolecularWeight; }
                 set { _MolecularWeight = value; OnPropertyChanged("MolecularWeight"); }
             }
             
-            private Hl7.Fhir.Model.SubstanceSpecification.MolecularWeightComponent _MolecularWeight;
+            private Hl7.Fhir.Model.SubstanceDefinition.MolecularWeightComponent _MolecularWeight;
             
             /// <summary>
             /// Supporting literature
@@ -616,13 +616,13 @@ namespace Hl7.Fhir.Model
             [FhirElement("representation", InSummary=true, Order=110)]
             [Cardinality(Min=0,Max=-1)]
             [DataMember]
-            public List<Hl7.Fhir.Model.SubstanceSpecification.RepresentationComponent> Representation
+            public List<Hl7.Fhir.Model.SubstanceDefinition.RepresentationComponent> Representation
             {
-                get { if(_Representation==null) _Representation = new List<Hl7.Fhir.Model.SubstanceSpecification.RepresentationComponent>(); return _Representation; }
+                get { if(_Representation==null) _Representation = new List<Hl7.Fhir.Model.SubstanceDefinition.RepresentationComponent>(); return _Representation; }
                 set { _Representation = value; OnPropertyChanged("Representation"); }
             }
             
-            private List<Hl7.Fhir.Model.SubstanceSpecification.RepresentationComponent> _Representation;
+            private List<Hl7.Fhir.Model.SubstanceDefinition.RepresentationComponent> _Representation;
             
             public override IDeepCopyable CopyTo(IDeepCopyable other)
             {
@@ -635,10 +635,10 @@ namespace Hl7.Fhir.Model
                     if(OpticalActivity != null) dest.OpticalActivity = (Hl7.Fhir.Model.CodeableConcept)OpticalActivity.DeepCopy();
                     if(MolecularFormulaElement != null) dest.MolecularFormulaElement = (Hl7.Fhir.Model.FhirString)MolecularFormulaElement.DeepCopy();
                     if(MolecularFormulaByMoietyElement != null) dest.MolecularFormulaByMoietyElement = (Hl7.Fhir.Model.FhirString)MolecularFormulaByMoietyElement.DeepCopy();
-                    if(Isotope != null) dest.Isotope = new List<Hl7.Fhir.Model.SubstanceSpecification.IsotopeComponent>(Isotope.DeepCopy());
-                    if(MolecularWeight != null) dest.MolecularWeight = (Hl7.Fhir.Model.SubstanceSpecification.MolecularWeightComponent)MolecularWeight.DeepCopy();
+                    if(Isotope != null) dest.Isotope = new List<Hl7.Fhir.Model.SubstanceDefinition.IsotopeComponent>(Isotope.DeepCopy());
+                    if(MolecularWeight != null) dest.MolecularWeight = (Hl7.Fhir.Model.SubstanceDefinition.MolecularWeightComponent)MolecularWeight.DeepCopy();
                     if(Source != null) dest.Source = new List<Hl7.Fhir.Model.ResourceReference>(Source.DeepCopy());
-                    if(Representation != null) dest.Representation = new List<Hl7.Fhir.Model.SubstanceSpecification.RepresentationComponent>(Representation.DeepCopy());
+                    if(Representation != null) dest.Representation = new List<Hl7.Fhir.Model.SubstanceDefinition.RepresentationComponent>(Representation.DeepCopy());
                     return dest;
                 }
                 else
@@ -789,13 +789,13 @@ namespace Hl7.Fhir.Model
             /// </summary>
             [FhirElement("molecularWeight", InSummary=true, Order=80)]
             [DataMember]
-            public Hl7.Fhir.Model.SubstanceSpecification.MolecularWeightComponent MolecularWeight
+            public Hl7.Fhir.Model.SubstanceDefinition.MolecularWeightComponent MolecularWeight
             {
                 get { return _MolecularWeight; }
                 set { _MolecularWeight = value; OnPropertyChanged("MolecularWeight"); }
             }
             
-            private Hl7.Fhir.Model.SubstanceSpecification.MolecularWeightComponent _MolecularWeight;
+            private Hl7.Fhir.Model.SubstanceDefinition.MolecularWeightComponent _MolecularWeight;
             
             public override IDeepCopyable CopyTo(IDeepCopyable other)
             {
@@ -808,7 +808,7 @@ namespace Hl7.Fhir.Model
                     if(Name != null) dest.Name = (Hl7.Fhir.Model.CodeableConcept)Name.DeepCopy();
                     if(Substitution != null) dest.Substitution = (Hl7.Fhir.Model.CodeableConcept)Substitution.DeepCopy();
                     if(HalfLife != null) dest.HalfLife = (Quantity)HalfLife.DeepCopy();
-                    if(MolecularWeight != null) dest.MolecularWeight = (Hl7.Fhir.Model.SubstanceSpecification.MolecularWeightComponent)MolecularWeight.DeepCopy();
+                    if(MolecularWeight != null) dest.MolecularWeight = (Hl7.Fhir.Model.SubstanceDefinition.MolecularWeightComponent)MolecularWeight.DeepCopy();
                     return dest;
                 }
                 else
@@ -1491,13 +1491,13 @@ namespace Hl7.Fhir.Model
             [FhirElement("synonym", InSummary=true, Order=110)]
             [Cardinality(Min=0,Max=-1)]
             [DataMember]
-            public List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent> Synonym
+            public List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent> Synonym
             {
-                get { if(_Synonym==null) _Synonym = new List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent>(); return _Synonym; }
+                get { if(_Synonym==null) _Synonym = new List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent>(); return _Synonym; }
                 set { _Synonym = value; OnPropertyChanged("Synonym"); }
             }
             
-            private List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent> _Synonym;
+            private List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent> _Synonym;
             
             /// <summary>
             /// A translation for this name
@@ -1505,13 +1505,13 @@ namespace Hl7.Fhir.Model
             [FhirElement("translation", InSummary=true, Order=120)]
             [Cardinality(Min=0,Max=-1)]
             [DataMember]
-            public List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent> Translation
+            public List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent> Translation
             {
-                get { if(_Translation==null) _Translation = new List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent>(); return _Translation; }
+                get { if(_Translation==null) _Translation = new List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent>(); return _Translation; }
                 set { _Translation = value; OnPropertyChanged("Translation"); }
             }
             
-            private List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent> _Translation;
+            private List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent> _Translation;
             
             /// <summary>
             /// Details of the official nature of this name
@@ -1519,13 +1519,13 @@ namespace Hl7.Fhir.Model
             [FhirElement("official", InSummary=true, Order=130)]
             [Cardinality(Min=0,Max=-1)]
             [DataMember]
-            public List<Hl7.Fhir.Model.SubstanceSpecification.OfficialComponent> Official
+            public List<Hl7.Fhir.Model.SubstanceDefinition.OfficialComponent> Official
             {
-                get { if(_Official==null) _Official = new List<Hl7.Fhir.Model.SubstanceSpecification.OfficialComponent>(); return _Official; }
+                get { if(_Official==null) _Official = new List<Hl7.Fhir.Model.SubstanceDefinition.OfficialComponent>(); return _Official; }
                 set { _Official = value; OnPropertyChanged("Official"); }
             }
             
-            private List<Hl7.Fhir.Model.SubstanceSpecification.OfficialComponent> _Official;
+            private List<Hl7.Fhir.Model.SubstanceDefinition.OfficialComponent> _Official;
             
             /// <summary>
             /// Supporting literature
@@ -1557,9 +1557,9 @@ namespace Hl7.Fhir.Model
                     if(Language != null) dest.Language = new List<Hl7.Fhir.Model.CodeableConcept>(Language.DeepCopy());
                     if(Domain != null) dest.Domain = new List<Hl7.Fhir.Model.CodeableConcept>(Domain.DeepCopy());
                     if(Jurisdiction != null) dest.Jurisdiction = new List<Hl7.Fhir.Model.CodeableConcept>(Jurisdiction.DeepCopy());
-                    if(Synonym != null) dest.Synonym = new List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent>(Synonym.DeepCopy());
-                    if(Translation != null) dest.Translation = new List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent>(Translation.DeepCopy());
-                    if(Official != null) dest.Official = new List<Hl7.Fhir.Model.SubstanceSpecification.OfficialComponent>(Official.DeepCopy());
+                    if(Synonym != null) dest.Synonym = new List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent>(Synonym.DeepCopy());
+                    if(Translation != null) dest.Translation = new List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent>(Translation.DeepCopy());
+                    if(Official != null) dest.Official = new List<Hl7.Fhir.Model.SubstanceDefinition.OfficialComponent>(Official.DeepCopy());
                     if(Source != null) dest.Source = new List<Hl7.Fhir.Model.ResourceReference>(Source.DeepCopy());
                     return dest;
                 }
@@ -2158,13 +2158,13 @@ namespace Hl7.Fhir.Model
         [FhirElement("moiety", InSummary=true, Order=160)]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
-        public List<Hl7.Fhir.Model.SubstanceSpecification.MoietyComponent> Moiety
+        public List<Hl7.Fhir.Model.SubstanceDefinition.MoietyComponent> Moiety
         {
-            get { if(_Moiety==null) _Moiety = new List<Hl7.Fhir.Model.SubstanceSpecification.MoietyComponent>(); return _Moiety; }
+            get { if(_Moiety==null) _Moiety = new List<Hl7.Fhir.Model.SubstanceDefinition.MoietyComponent>(); return _Moiety; }
             set { _Moiety = value; OnPropertyChanged("Moiety"); }
         }
         
-        private List<Hl7.Fhir.Model.SubstanceSpecification.MoietyComponent> _Moiety;
+        private List<Hl7.Fhir.Model.SubstanceDefinition.MoietyComponent> _Moiety;
         
         /// <summary>
         /// General specifications for this substance, including how it is related to other substances
@@ -2172,13 +2172,13 @@ namespace Hl7.Fhir.Model
         [FhirElement("property", InSummary=true, Order=170)]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
-        public List<Hl7.Fhir.Model.SubstanceSpecification.PropertyComponent> Property
+        public List<Hl7.Fhir.Model.SubstanceDefinition.PropertyComponent> Property
         {
-            get { if(_Property==null) _Property = new List<Hl7.Fhir.Model.SubstanceSpecification.PropertyComponent>(); return _Property; }
+            get { if(_Property==null) _Property = new List<Hl7.Fhir.Model.SubstanceDefinition.PropertyComponent>(); return _Property; }
             set { _Property = value; OnPropertyChanged("Property"); }
         }
         
-        private List<Hl7.Fhir.Model.SubstanceSpecification.PropertyComponent> _Property;
+        private List<Hl7.Fhir.Model.SubstanceDefinition.PropertyComponent> _Property;
         
         /// <summary>
         /// General information detailing this substance
@@ -2200,13 +2200,13 @@ namespace Hl7.Fhir.Model
         /// </summary>
         [FhirElement("structure", InSummary=true, Order=190)]
         [DataMember]
-        public Hl7.Fhir.Model.SubstanceSpecification.StructureComponent Structure
+        public Hl7.Fhir.Model.SubstanceDefinition.StructureComponent Structure
         {
             get { return _Structure; }
             set { _Structure = value; OnPropertyChanged("Structure"); }
         }
         
-        private Hl7.Fhir.Model.SubstanceSpecification.StructureComponent _Structure;
+        private Hl7.Fhir.Model.SubstanceDefinition.StructureComponent _Structure;
         
         /// <summary>
         /// Codes associated with the substance
@@ -2214,13 +2214,13 @@ namespace Hl7.Fhir.Model
         [FhirElement("code", InSummary=true, Order=200)]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
-        public List<Hl7.Fhir.Model.SubstanceSpecification.CodeComponent> Code
+        public List<Hl7.Fhir.Model.SubstanceDefinition.CodeComponent> Code
         {
-            get { if(_Code==null) _Code = new List<Hl7.Fhir.Model.SubstanceSpecification.CodeComponent>(); return _Code; }
+            get { if(_Code==null) _Code = new List<Hl7.Fhir.Model.SubstanceDefinition.CodeComponent>(); return _Code; }
             set { _Code = value; OnPropertyChanged("Code"); }
         }
         
-        private List<Hl7.Fhir.Model.SubstanceSpecification.CodeComponent> _Code;
+        private List<Hl7.Fhir.Model.SubstanceDefinition.CodeComponent> _Code;
         
         /// <summary>
         /// Names applicable to this substance
@@ -2228,13 +2228,13 @@ namespace Hl7.Fhir.Model
         [FhirElement("name", InSummary=true, Order=210)]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
-        public List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent> Name
+        public List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent> Name
         {
-            get { if(_Name==null) _Name = new List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent>(); return _Name; }
+            get { if(_Name==null) _Name = new List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent>(); return _Name; }
             set { _Name = value; OnPropertyChanged("Name"); }
         }
         
-        private List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent> _Name;
+        private List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent> _Name;
         
         /// <summary>
         /// The molecular weight or weight range (for proteins, polymers or nucleic acids)
@@ -2242,13 +2242,13 @@ namespace Hl7.Fhir.Model
         [FhirElement("molecularWeight", InSummary=true, Order=220)]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
-        public List<Hl7.Fhir.Model.SubstanceSpecification.MolecularWeightComponent> MolecularWeight
+        public List<Hl7.Fhir.Model.SubstanceDefinition.MolecularWeightComponent> MolecularWeight
         {
-            get { if(_MolecularWeight==null) _MolecularWeight = new List<Hl7.Fhir.Model.SubstanceSpecification.MolecularWeightComponent>(); return _MolecularWeight; }
+            get { if(_MolecularWeight==null) _MolecularWeight = new List<Hl7.Fhir.Model.SubstanceDefinition.MolecularWeightComponent>(); return _MolecularWeight; }
             set { _MolecularWeight = value; OnPropertyChanged("MolecularWeight"); }
         }
         
-        private List<Hl7.Fhir.Model.SubstanceSpecification.MolecularWeightComponent> _MolecularWeight;
+        private List<Hl7.Fhir.Model.SubstanceDefinition.MolecularWeightComponent> _MolecularWeight;
         
         /// <summary>
         /// A link between this substance and another, with details of the relationship
@@ -2256,13 +2256,13 @@ namespace Hl7.Fhir.Model
         [FhirElement("relationship", InSummary=true, Order=230)]
         [Cardinality(Min=0,Max=-1)]
         [DataMember]
-        public List<Hl7.Fhir.Model.SubstanceSpecification.RelationshipComponent> Relationship
+        public List<Hl7.Fhir.Model.SubstanceDefinition.RelationshipComponent> Relationship
         {
-            get { if(_Relationship==null) _Relationship = new List<Hl7.Fhir.Model.SubstanceSpecification.RelationshipComponent>(); return _Relationship; }
+            get { if(_Relationship==null) _Relationship = new List<Hl7.Fhir.Model.SubstanceDefinition.RelationshipComponent>(); return _Relationship; }
             set { _Relationship = value; OnPropertyChanged("Relationship"); }
         }
         
-        private List<Hl7.Fhir.Model.SubstanceSpecification.RelationshipComponent> _Relationship;
+        private List<Hl7.Fhir.Model.SubstanceDefinition.RelationshipComponent> _Relationship;
         
         /// <summary>
         /// Data items specific to nucleic acids
@@ -2333,7 +2333,7 @@ namespace Hl7.Fhir.Model
 
         public override IDeepCopyable CopyTo(IDeepCopyable other)
         {
-            var dest = other as SubstanceSpecification;
+            var dest = other as SubstanceDefinition;
             
             if (dest != null)
             {
@@ -2345,14 +2345,14 @@ namespace Hl7.Fhir.Model
                 if(DescriptionElement != null) dest.DescriptionElement = (Hl7.Fhir.Model.FhirString)DescriptionElement.DeepCopy();
                 if(Source != null) dest.Source = new List<Hl7.Fhir.Model.ResourceReference>(Source.DeepCopy());
                 if(CommentElement != null) dest.CommentElement = (Hl7.Fhir.Model.FhirString)CommentElement.DeepCopy();
-                if(Moiety != null) dest.Moiety = new List<Hl7.Fhir.Model.SubstanceSpecification.MoietyComponent>(Moiety.DeepCopy());
-                if(Property != null) dest.Property = new List<Hl7.Fhir.Model.SubstanceSpecification.PropertyComponent>(Property.DeepCopy());
+                if(Moiety != null) dest.Moiety = new List<Hl7.Fhir.Model.SubstanceDefinition.MoietyComponent>(Moiety.DeepCopy());
+                if(Property != null) dest.Property = new List<Hl7.Fhir.Model.SubstanceDefinition.PropertyComponent>(Property.DeepCopy());
                 if(ReferenceInformation != null) dest.ReferenceInformation = (Hl7.Fhir.Model.ResourceReference)ReferenceInformation.DeepCopy();
-                if(Structure != null) dest.Structure = (Hl7.Fhir.Model.SubstanceSpecification.StructureComponent)Structure.DeepCopy();
-                if(Code != null) dest.Code = new List<Hl7.Fhir.Model.SubstanceSpecification.CodeComponent>(Code.DeepCopy());
-                if(Name != null) dest.Name = new List<Hl7.Fhir.Model.SubstanceSpecification.NameComponent>(Name.DeepCopy());
-                if(MolecularWeight != null) dest.MolecularWeight = new List<Hl7.Fhir.Model.SubstanceSpecification.MolecularWeightComponent>(MolecularWeight.DeepCopy());
-                if(Relationship != null) dest.Relationship = new List<Hl7.Fhir.Model.SubstanceSpecification.RelationshipComponent>(Relationship.DeepCopy());
+                if(Structure != null) dest.Structure = (Hl7.Fhir.Model.SubstanceDefinition.StructureComponent)Structure.DeepCopy();
+                if(Code != null) dest.Code = new List<Hl7.Fhir.Model.SubstanceDefinition.CodeComponent>(Code.DeepCopy());
+                if(Name != null) dest.Name = new List<Hl7.Fhir.Model.SubstanceDefinition.NameComponent>(Name.DeepCopy());
+                if(MolecularWeight != null) dest.MolecularWeight = new List<Hl7.Fhir.Model.SubstanceDefinition.MolecularWeightComponent>(MolecularWeight.DeepCopy());
+                if(Relationship != null) dest.Relationship = new List<Hl7.Fhir.Model.SubstanceDefinition.RelationshipComponent>(Relationship.DeepCopy());
                 if(NucleicAcid != null) dest.NucleicAcid = (Hl7.Fhir.Model.ResourceReference)NucleicAcid.DeepCopy();
                 if(Polymer != null) dest.Polymer = (Hl7.Fhir.Model.ResourceReference)Polymer.DeepCopy();
                 if(Protein != null) dest.Protein = (Hl7.Fhir.Model.ResourceReference)Protein.DeepCopy();
@@ -2365,12 +2365,12 @@ namespace Hl7.Fhir.Model
         
         public override IDeepCopyable DeepCopy()
         {
-            return CopyTo(new SubstanceSpecification());
+            return CopyTo(new SubstanceDefinition());
         }
         
         public override bool Matches(IDeepComparable other)
         {
-            var otherT = other as SubstanceSpecification;
+            var otherT = other as SubstanceDefinition;
             if(otherT == null) return false;
             
             if(!base.Matches(otherT)) return false;
@@ -2399,7 +2399,7 @@ namespace Hl7.Fhir.Model
         
         public override bool IsExactly(IDeepComparable other)
         {
-            var otherT = other as SubstanceSpecification;
+            var otherT = other as SubstanceDefinition;
             if(otherT == null) return false;
             
             if(!base.IsExactly(otherT)) return false;
