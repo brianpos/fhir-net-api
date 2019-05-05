@@ -235,6 +235,6 @@ namespace Hl7.Fhir.Rest
         /// - This may also be applicable in prior versions (though not part of that stamdard)
         /// </summary>
         [EnumLiteral("respond-async")]
-        ResponsdAsync
+        RespondAsync
     }
 }

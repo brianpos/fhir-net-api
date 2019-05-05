@@ -54,7 +54,7 @@ namespace Hl7.Fhir.Rest
 
             if (interactionType == TransactionBuilder.InteractionType.Create && returnPreference != null)
             {
-                if (returnPreference == Prefer.ResponsdAsync)
+                if (returnPreference == Prefer.RespondAsync)
                     request.Headers["Prefer"] = PrimitiveTypeConverter.ConvertTo<string>(returnPreference);
                 else
                     request.Headers["Prefer"] = "return=" + PrimitiveTypeConverter.ConvertTo<string>(returnPreference);
