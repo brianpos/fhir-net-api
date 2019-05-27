@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using System;
@@ -24,13 +24,6 @@ namespace Hl7.Fhir.Validation
             return cc.Expression;
         }
 
-
-//#if NETSTANDARD1_1
-//        public static int Count(this string s, Func<char, bool> predicate)
-//        {
-//            return s.ToCharArray().Where(predicate).Count();
-//        }
-//#endif
 
         public static bool IsPrimitiveValueConstraint(this ElementDefinition ed)
         {

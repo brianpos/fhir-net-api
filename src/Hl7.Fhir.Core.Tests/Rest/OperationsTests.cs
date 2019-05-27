@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.Model;
@@ -110,6 +110,7 @@ namespace Hl7.Fhir.Tests.Rest
 
             var result = client.ValidateCode("c80-facilitycodes", coding: coding, @abstract: new FhirBoolean(false));
             Assert.IsTrue(result.Result?.Value == true);
+            
         }
 
         [TestMethod]

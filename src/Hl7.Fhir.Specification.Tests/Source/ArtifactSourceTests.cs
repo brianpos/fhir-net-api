@@ -3,20 +3,20 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
-using System;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Hl7.Fhir.Model;
-using System.Diagnostics;
-using System.IO;
 using Hl7.Fhir.Serialization;
 using Hl7.Fhir.Specification.Source;
 using Hl7.Fhir.Utility;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
 using ssac = System.Security.AccessControl;
-using System.Collections.Generic;
 
 namespace Hl7.Fhir.Specification.Tests
 {
@@ -112,7 +112,10 @@ namespace Hl7.Fhir.Specification.Tests
             var fourthRun = sw.ElapsedMilliseconds;
             Assert.IsTrue(fourthRun > secondRun);
 
-            File.SetLastWriteTime(zipFile, DateTime.Now);
+            // Something fishy going on here.
+            // if I do not wait before the statement File.SetLastWriteTimeUtc fa.IsActual returns true
+            Thread.Sleep(500);
+            File.SetLastWriteTimeUtc(zipFile, DateTimeOffset.UtcNow.DateTime);
             Assert.IsFalse(fa.IsActual());
         }
 
@@ -156,6 +159,24 @@ namespace Hl7.Fhir.Specification.Tests
         }
 
         [TestMethod]
+        public void ExcludeSubdirectory()
+        {
+            var fa = new DirectorySource(_testPath)
+            {
+                Includes = new[] { "*.json" },
+                IncludeSubDirectories = true
+            };
+
+            var names = fa.ListArtifactNames();
+            Assert.AreEqual(1, names.Count());
+
+            fa.Excludes = new[] { "/sub/" };
+
+            names = fa.ListArtifactNames();
+            Assert.AreEqual(0, names.Count());
+        }
+
+        [TestMethod]
         public void FileSourceSkipsInvalidXml()
         {
             var fa = new DirectorySource(_testPath);
@@ -174,10 +195,10 @@ namespace Hl7.Fhir.Specification.Tests
             var sd = fa.FindStructureDefinition("http://hl7.org/fhir/StructureDefinition/patient-birthTime");
             Assert.IsNotNull(sd);
 
-            var errors = fa.Errors().ToList();
+            var errors = fa.ListSummaryErrors().ToList();
             Assert.AreEqual(1, errors.Count);
             var error = errors[0];
-            Debug.Print($"{error.Origin} : {error.Error.Message}");
+            Debug.Print($"Error in file '{error.Origin}': {error.Error.Message}");
             Assert.AreEqual("invalid.xml", Path.GetFileName(error.Origin));
         }
 
@@ -237,7 +258,7 @@ namespace Hl7.Fhir.Specification.Tests
             Assert.IsNotNull(resourceIds);
             Assert.IsTrue(resourceIds.Count > 0);
             Assert.IsTrue(resourceIds.All(url => url.StartsWith("http://hl7.org/fhir/StructureDefinition/")));
-            resourceIds.Remove("http://hl7.org/fhir/StructureDefinition/xhtml");  // xhtml is not represented in the pocos
+            //resourceIds.Remove("http://hl7.org/fhir/StructureDefinition/xhtml");  // xhtml is not represented in the pocos
 
             // + total number of known FHIR core types
             // - total number of known (concrete) resources
@@ -263,7 +284,7 @@ namespace Hl7.Fhir.Specification.Tests
         }
 
         // [WMR 20170817] NEW
-        // https://github.com/ewoutkramer/fhir-net-api/issues/410
+        // https://github.com/FirelyTeam/fhir-net-api/issues/410
         // DirectorySource should gracefully handle insufficient access permissions
         // i.e. silently ignore all inaccessible files & folders
 
@@ -281,7 +302,7 @@ namespace Hl7.Fhir.Specification.Tests
             var subPath3 = Path.Combine(testPath, "sub3");
             Directory.CreateDirectory(subPath3);
 
-            const string srcPath = @"TestData\snapshot-test\WMR\";
+            string srcPath = Path.Combine("TestData", "snapshot-test", "WMR");
             const string srcFile1 = "MyBasic.structuredefinition.xml";
             const string srcFile2 = "MyBundle.structuredefinition.xml";
 
@@ -391,5 +412,70 @@ namespace Hl7.Fhir.Specification.Tests
             }
         }
 
-   }
+        // LoadByName should handle duplicate filenames in (different subfolders of) the contentdirectory
+        // https://github.com/FirelyTeam/fhir-net-api/issues/875
+
+        [TestMethod]
+        public void OpenDuplicateFileNames()
+        {
+            var testPath = prepareExampleDirectory(out int numFiles);
+
+            // Additional temporary folder without read permissions
+            const string subFolderName = "sub";
+            var fullSubFolderPath = Path.Combine(testPath, subFolderName);
+            Directory.CreateDirectory(fullSubFolderPath);
+
+            string srcPath = Path.Combine("TestData", "snapshot-test", "WMR");
+            const string srcFile = "MyBasic.structuredefinition.xml";
+
+            // Create duplicate files in content directory and subfolder
+            copy(srcPath, srcFile, testPath);
+            copy(srcPath, srcFile, fullSubFolderPath);
+
+            var dirSource = new DirectorySource(testPath, new DirectorySourceSettings() { IncludeSubDirectories = true });
+
+            Resource OpenStream(string filePath)
+            {
+                using (var stream = dirSource.LoadArtifactByName(filePath))
+                {
+                    return new FhirXmlParser().Parse<Resource>(SerializationUtil.XmlReaderFromStream(stream));
+                }
+            }
+
+            // Retrieve artifacts by full path
+
+            var rootFilePath = Path.Combine(testPath, srcFile);
+            Assert.IsTrue(File.Exists(rootFilePath));
+            var res = OpenStream(rootFilePath);
+            Assert.IsNotNull(res);
+            // Modify the resource id and save back
+            var dupId = res.Id;
+            var rootId = Guid.NewGuid().ToString();
+            res.Id = rootId;
+            var xml = new FhirXmlSerializer().SerializeToString(res);
+
+            var dupFilePath = Path.Combine(fullSubFolderPath, srcFile);
+            Assert.IsTrue(File.Exists(dupFilePath));
+            res = OpenStream(dupFilePath);
+            Assert.IsNotNull(res);
+            // Verify that we received the duplicate file from subfolder,
+            // not the modified file in the root content directory
+            Assert.AreEqual(dupId, res.Id);
+            Assert.AreNotEqual(rootId, res.Id);
+
+            // Retrieve artifact by file name
+            // Should return nearest match, i.e. from content directory
+            res = OpenStream(srcFile);
+            Assert.IsNotNull(res);
+            Assert.AreEqual(dupId, res.Id);
+
+            // Retrieve artifact by relative path
+            // Should return duplicate from subfolder
+            var relPath = Path.Combine(subFolderName, srcFile);
+            res = OpenStream(relPath);
+            Assert.IsNotNull(res);
+            Assert.AreEqual(dupId, res.Id);
+        }
+
+    }
 }

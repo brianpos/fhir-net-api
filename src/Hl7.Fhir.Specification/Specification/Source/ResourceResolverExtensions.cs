@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://github.com/ewoutkramer/fhir-net-api/blob/master/LICENSE
+ * available at https://github.com/FirelyTeam/fhir-net-api/blob/master/LICENSE
  */
 
 using Hl7.Fhir.Introspection;
@@ -13,6 +13,7 @@ using Hl7.Fhir.Support;
 using Hl7.Fhir.Utility;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Hl7.Fhir.Specification.Source
@@ -86,12 +87,14 @@ namespace Hl7.Fhir.Specification.Source
             if (type != null)
             {
                 var resourceType = EnumUtility.ParseLiteral<ResourceType>(type);
-                // for some reason there is an issue with this StructureDefinition (needs fixing)
-                // EK: What needs fixing?   Re-enabling to see whether the bug still turns up.
-                // var uris = source.ListResourceUris(resourceType).Where(u => u != "http://hl7.org/fhir/us/sdc/StructureDefinition/sdc-questionnaire");
                 var uris = source.ListResourceUris(resourceType);
-                return uris.Select(u => source.ResolveByCanonicalUri(u) as T).Where(r => r != null);
-                
+                // [WMR 20180914] OBSOLETE
+                // For some reason there is an issue with this StructureDefinition (needs fixing)
+                // .Where(u => u != "http://hl7.org/fhir/us/sdc/StructureDefinition/sdc-questionnaire");
+
+                // [WMR 20180824] FIXED
+                //return uris.Select(u => source.ResolveByCanonicalUri(u) as T).Where(r => r != null);
+                return uris.Select(u => source.ResolveByUri(u) as T).Where(r => r != null);
             }
             else
                 return null;

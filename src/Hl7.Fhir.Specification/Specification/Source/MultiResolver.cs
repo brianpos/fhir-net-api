@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://github.com/ewoutkramer/fhir-net-api/blob/master/LICENSE
+ * available at https://github.com/FirelyTeam/fhir-net-api/blob/master/LICENSE
  */
 
 using System;
@@ -18,6 +18,7 @@ namespace Hl7.Fhir.Specification.Source
     /// <summary>
     /// Reads FHIR artifacts (Profiles, ValueSets, ...) from a list of other IArtifactSources
     /// </summary>
+    [DebuggerDisplay(@"\{{DebuggerDisplay,nq}}")]
     public class MultiResolver : IResourceResolver
     {
         private readonly List<IResourceResolver> _sources = new List<IResourceResolver>();

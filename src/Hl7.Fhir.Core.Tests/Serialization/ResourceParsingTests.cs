@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using System;
@@ -13,6 +13,7 @@ using System.IO;
 using Hl7.Fhir.Model;
 using System.Diagnostics;
 using System.Collections.Generic;
+using Hl7.Fhir.ElementModel;
 
 namespace Hl7.Fhir.Tests.Serialization
 {
@@ -78,7 +79,7 @@ namespace Hl7.Fhir.Tests.Serialization
         public void RequiresHl7Namespace()
         {
             var xml = "<Patient><active value='false' /></Patient>";
-            var parser = new FhirXmlParser();
+            var parser = new FhirXmlParser(new ParserSettings() { PermissiveParsing = false});
 
             try
             {
@@ -87,7 +88,7 @@ namespace Hl7.Fhir.Tests.Serialization
             }
             catch (FormatException fe)
             {
-                Assert.IsTrue(fe.Message.Contains("Cannot derive type"));
+                Assert.IsTrue(fe.Message.Contains("expected the HL7 FHIR namespace"));
             }
 
             xml = "<Patient xmlns='http://hl7.org/fhir'><f:active value='false' xmlns:f='http://somehwere.else.nl' /></Patient>";
@@ -99,7 +100,7 @@ namespace Hl7.Fhir.Tests.Serialization
             }
             catch (FormatException fe)
             {
-                Assert.IsTrue(fe.Message.Contains("unsupported namespace"));
+                Assert.IsTrue(fe.Message.Contains("which is not allowed"));
             }
         }
 
@@ -107,7 +108,7 @@ namespace Hl7.Fhir.Tests.Serialization
         public void AcceptXsiStuffOnRoot()
         {
             var xml = "<Patient xmlns='http://hl7.org/fhir' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' " +
-                            "xsi:schemaLocation='http://hl7.org/fhir ../../schema/fhir-all.xsd'></Patient>";
+                            "xsi:schemaLocation='http://hl7.org/fhir ../../schema/fhir-all.xsd'><active value='true' /></Patient>";
             var parser = new FhirXmlParser();
 
             // By default, parser will accept xsi: elements
@@ -257,7 +258,8 @@ namespace Hl7.Fhir.Tests.Serialization
 
             List<string> errors = new List<string>();
             JsonAssert.AreSame("edgecase.json", json, json2, errors);
-            Assert.AreEqual(0, errors.Count, "Errors were encountered comparing converted content\r\n" + String.Join("\r\n", errors));
+            Console.WriteLine(String.Join("\r\n", errors));
+            Assert.AreEqual(0, errors.Count, "Errors were encountered comparing converted content");
         }
 
         [TestMethod]
@@ -277,6 +279,57 @@ namespace Hl7.Fhir.Tests.Serialization
             Assert.IsTrue(xml.Contains("value=\"#jaap\""));
         }
 
+
+        [TestMethod]
+        public void EmptyRoundTrip()
+        {
+            var patient = new Patient
+            {
+                Identifier = new List<Identifier>
+                {
+                    new Identifier("https://mydomain.com/identifiers/Something", "123"),
+                    new Identifier("https://mydomain.com/identifiers/Spaces", "   "),
+                    new Identifier("https://mydomain.com/identifiers/Empty", string.Empty),
+                    new Identifier("https://mydomain.com/identifiers/Null", null)
+                }
+            };
+
+            var json = FhirJsonSerializer.SerializeToString(patient);
+            var parsedPatient = FhirJsonParser.Parse<Patient>(json);
+
+            Assert.AreEqual(patient.Identifier.Count, parsedPatient.Identifier.Count);
+            for (var i = 0; i < patient.Identifier.Count; i++)
+            {
+                Assert.AreEqual(patient.Identifier[i].System, parsedPatient.Identifier[i].System);
+                if (string.IsNullOrWhiteSpace(patient.Identifier[i].Value))
+                {
+                    Assert.IsNull(parsedPatient.Identifier[i].Value);
+                }
+                else
+                {
+                    Assert.AreEqual(patient.Identifier[i].Value, parsedPatient.Identifier[i].Value);
+                }
+            }
+
+            var xml = FhirXmlSerializer.SerializeToString(patient);
+            parsedPatient = FhirXmlParser.Parse<Patient>(xml);
+
+            Assert.AreEqual(patient.Identifier.Count, parsedPatient.Identifier.Count);
+            for (var i = 0; i < patient.Identifier.Count; i++)
+            {
+                Assert.AreEqual(patient.Identifier[i].System, parsedPatient.Identifier[i].System);
+                if (string.IsNullOrWhiteSpace(patient.Identifier[i].Value))
+                {
+                    Assert.IsNull(parsedPatient.Identifier[i].Value);
+                }
+                else
+                {
+                    Assert.AreEqual(patient.Identifier[i].Value, parsedPatient.Identifier[i].Value);
+                }
+            }
+        }
+
+
         [TestMethod]
         public void SerializeNarrativeWithQuotes()
         {
@@ -287,6 +340,32 @@ namespace Hl7.Fhir.Tests.Serialization
             Assert.IsNotNull(FhirXmlParser.Parse<Resource>(xml));
             var json = FhirJsonSerializer.SerializeToString(p);
             Assert.IsNotNull(FhirJsonParser.Parse<Resource>(json));
+        }
+
+        [TestMethod]
+        public void NarrativeMustBeValidXml()
+        {
+            try
+            {
+                var json =
+                    "{\"resourceType\": \"Patient\", \"text\": {\"status\": \"generated\", \"div\": \"text without div\" } }";
+                var patient = new FhirJsonParser(new ParserSettings { PermissiveParsing = false }).Parse<Patient>(json);
+
+                Assert.Fail("Should have thrown on invalid Div format");
+            }
+            catch (FormatException fe)
+            {
+                Assert.IsTrue(fe.Message.Contains("Invalid Xml encountered"));
+            }
+        }
+
+        [TestMethod]
+        public void ParseEmptyContained()
+        {
+            var xml = "<Patient xmlns='http://hl7.org/fhir'><contained></contained></Patient>";
+            var parser = new FhirXmlParser();
+
+            Assert.ThrowsException<FormatException>(() => parser.Parse<Patient>(xml));
         }
     }
 }

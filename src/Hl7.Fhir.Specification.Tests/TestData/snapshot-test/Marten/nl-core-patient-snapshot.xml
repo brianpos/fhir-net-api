@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <StructureDefinition xmlns="http://hl7.org/fhir">
   <id value="nl-core-patient" />
   <meta>
@@ -34,8 +34,8 @@
     <name value="Zorginformatiebouwsteen Zorgverlener" />
   </mapping>
   <kind value="resource" />
-  <type value="Patient" />
   <abstract value="false" />
+  <type value="Patient" />
   <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Patient" />
   <snapshot>
     <element>
@@ -385,7 +385,9 @@
     <element>
       <path value="Patient.identifier" />
       <slicing>
-        <discriminator><type value="value" /><path value="" /></discriminator>
+        <discriminator>
+          <type value="value" />
+        </discriminator>
         <rules value="openAtEnd" />
       </slicing>
       <short value="An identifier for this patient" />
@@ -1085,7 +1087,6 @@
       <type>
         <code value="uri" />
       </type>
-      <example><valueUri /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -1129,7 +1130,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -2265,7 +2265,6 @@
         <code value="uri" />
       </type>
       <fixedUri value="http://fhir.nl/fhir/NamingSystem/bsn" />
-      <example><valueUri /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -2309,7 +2308,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -3387,7 +3385,9 @@
     <element>
       <path value="Patient.telecom" />
       <slicing>
-        <discriminator><type value="value" /><path value="" /></discriminator>
+        <discriminator>
+          <type value="value" />
+        </discriminator>
         <rules value="openAtEnd" />
       </slicing>
       <short value="A contact detail for the individual" />
@@ -5304,7 +5304,6 @@
       <type>
         <code value="code" />
       </type>
-      <example><valueCode /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -5356,7 +5355,6 @@
       <type>
         <code value="code" />
       </type>
-      <example><valueCode /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -5408,7 +5406,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -5453,7 +5450,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -5502,7 +5498,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -5551,7 +5546,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -5641,7 +5635,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -5737,8 +5730,6 @@
       <type>
         <code value="Period" />
       </type>
-      <example><valuePeriod>
-        </valuePeriod></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -6643,7 +6634,6 @@
       <type>
         <code value="code" />
       </type>
-      <example><valueCode /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -6689,7 +6679,6 @@
       <type>
         <code value="code" />
       </type>
-      <example><valueCode /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -6771,7 +6760,6 @@
       <type>
         <code value="uri" />
       </type>
-      <example><valueUri /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -6884,7 +6872,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -7103,7 +7090,9 @@
     <element>
       <path value="Patient.contact.relationship" />
       <slicing>
-        <discriminator><type value="value" /><path value="" /></discriminator>
+        <discriminator>
+          <type value="value" />
+        </discriminator>
         <rules value="openAtEnd" />
       </slicing>
       <short value="The kind of relationship" />
@@ -9262,7 +9251,9 @@
     <element>
       <path value="Patient.contact.telecom" />
       <slicing>
-        <discriminator><type value="value" /><path value="" /></discriminator>
+        <discriminator>
+          <type value="value" />
+        </discriminator>
         <rules value="openAtEnd" />
       </slicing>
       <short value="A contact detail for the person" />
@@ -11015,7 +11006,6 @@
       <type>
         <code value="code" />
       </type>
-      <example><valueCode /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -11067,7 +11057,6 @@
       <type>
         <code value="code" />
       </type>
-      <example><valueCode /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -11119,7 +11108,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -11164,7 +11152,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -11213,7 +11200,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -11262,7 +11248,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -11352,7 +11337,6 @@
       <type>
         <code value="string" />
       </type>
-      <example><valueString /></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -11448,8 +11432,6 @@
       <type>
         <code value="Period" />
       </type>
-      <example><valuePeriod>
-        </valuePeriod></example>
       <condition value="ele-1" />
       <constraint>
         <extension url="http://hl7.org/fhir/StructureDefinition/structuredefinition-expression">
@@ -15136,7 +15118,9 @@
     <element>
       <path value="Patient.identifier" />
       <slicing>
-        <discriminator><type value="value" /><path value="" /></discriminator>
+        <discriminator>
+          <type value="value" />
+        </discriminator>
         <rules value="openAtEnd" />
       </slicing>
       <short value="An identifier for this patient" />
@@ -15163,7 +15147,6 @@
       <path value="Patient.identifier.value" />
       <short value="BSN (Burgerservicenummer (Dutch person identification number))" />
       <min value="1" />
-      <example><valueString /></example>
     </element>
     <element>
       <path value="Patient.name" />
@@ -15181,7 +15164,9 @@
     <element>
       <path value="Patient.telecom" />
       <slicing>
-        <discriminator><type value="value" /><path value="" /></discriminator>
+        <discriminator>
+          <type value="value" />
+        </discriminator>
         <rules value="openAtEnd" />
       </slicing>
       <short value="A contact detail for the individual" />
@@ -15347,7 +15332,9 @@
     <element>
       <path value="Patient.contact.relationship" />
       <slicing>
-        <discriminator><type value="value" /><path value="" /></discriminator>
+        <discriminator>
+          <type value="value" />
+        </discriminator>
         <rules value="openAtEnd" />
       </slicing>
       <short value="The kind of relationship" />
@@ -15404,7 +15391,9 @@
     <element>
       <path value="Patient.contact.telecom" />
       <slicing>
-        <discriminator><type value="value" /><path value="" /></discriminator>
+        <discriminator>
+          <type value="value" />
+        </discriminator>
         <rules value="openAtEnd" />
       </slicing>
       <short value="A contact detail for the person" />

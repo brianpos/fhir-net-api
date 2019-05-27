@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.Model;
@@ -12,13 +12,14 @@ using System;
 using System.Net;
 using System.Reflection;
 using Hl7.Fhir.Utility;
-using System.Text;
+using System.Collections.Generic;
+using System.Net.Http;
 
 namespace Hl7.Fhir.Rest
 {
     internal static class EntryToHttpExtensions
     {
-        public static HttpWebRequest ToHttpRequest(this Bundle.EntryComponent entry, 
+        public static HttpWebRequest ToHttpRequest(this Bundle.EntryComponent entry, Uri baseUrl,
             SearchParameterHandling? handlingPreference, Prefer? returnPreference, ResourceFormat format, bool useFormatParameter, bool CompressRequestBody, out byte[] body)
         {
             System.Diagnostics.Debug.WriteLine("{0}: {1}", entry.Request.Method, entry.Request.Url);
@@ -29,7 +30,13 @@ namespace Hl7.Fhir.Rest
             if (entry.Resource != null && !(interaction.Method == Bundle.HTTPVerb.POST || interaction.Method == Bundle.HTTPVerb.PUT))
                 throw Error.InvalidOperation("Cannot have a body on an Http " + interaction.Method.ToString());
 
-            var location = new RestUrl(interaction.Url);
+            // Create an absolute uri when the interaction.Url is relative.
+            var uri = new Uri(interaction.Url, UriKind.RelativeOrAbsolute);
+            if (!uri.IsAbsoluteUri)
+            {
+                uri = HttpUtil.MakeAbsoluteToBase(uri, baseUrl);
+            }
+            var location = new RestUrl(uri);
 
             if (useFormatParameter)
                 location.AddParam(HttpUtil.RESTPARAM_FORMAT, Hl7.Fhir.Rest.ContentType.BuildFormatParam(format));
@@ -43,24 +50,37 @@ namespace Hl7.Fhir.Rest
 
             if (interaction.IfMatch != null) request.Headers["If-Match"] = interaction.IfMatch;
             if (interaction.IfNoneMatch != null) request.Headers["If-None-Match"] = interaction.IfNoneMatch;
-#if DOTNETFW
-            if (interaction.IfModifiedSince != null) request.IfModifiedSince = interaction.IfModifiedSince.Value.UtcDateTime;
-#else
+#if NETSTANDARD1_1
             if (interaction.IfModifiedSince != null) request.Headers["If-Modified-Since"] = interaction.IfModifiedSince.Value.UtcDateTime.ToString();
+#else
+            if (interaction.IfModifiedSince != null) request.IfModifiedSince = interaction.IfModifiedSince.Value.UtcDateTime;
+            
 #endif
             if (interaction.IfNoneExist != null) request.Headers["If-None-Exist"] = interaction.IfNoneExist;
 
             var interactionType = entry.Annotation<TransactionBuilder.InteractionType>();
 
-            if (interactionType == TransactionBuilder.InteractionType.Create && returnPreference != null)
+            if (canHaveReturnPreference() && returnPreference.HasValue)
             {
                 if (returnPreference == Prefer.RespondAsync)
                     request.Headers["Prefer"] = PrimitiveTypeConverter.ConvertTo<string>(returnPreference);
                 else
                     request.Headers["Prefer"] = "return=" + PrimitiveTypeConverter.ConvertTo<string>(returnPreference);
             }
-            else if (interactionType == TransactionBuilder.InteractionType.Search && handlingPreference != null)
-                request.Headers["Prefer"] = "handling=" + PrimitiveTypeConverter.ConvertTo<string>(handlingPreference);
+            else if (interactionType == TransactionBuilder.InteractionType.Search)
+            {
+                List<string> preferHeader = new List<string>();
+                if (handlingPreference.HasValue)
+                    preferHeader.Add("handling=" + handlingPreference.GetLiteral());
+                if (returnPreference.HasValue && returnPreference == Prefer.RespondAsync)
+                    preferHeader.Add(returnPreference.GetLiteral());
+                if (preferHeader.Count > 0)
+                    request.Headers["Prefer"] = String.Join("; ", preferHeader);
+            }
+
+            bool canHaveReturnPreference() => interactionType == TransactionBuilder.InteractionType.Create ||
+                interactionType == TransactionBuilder.InteractionType.Update ||
+                interactionType == TransactionBuilder.InteractionType.Patch;
 
             if (entry.Resource != null)
             {
@@ -73,7 +93,7 @@ namespace Hl7.Fhir.Rest
             }
 
             // PCL doesn't support setting the length (and in this case will be empty anyway)
-#if DOTNETFW
+#if !NETSTANDARD1_1
             else
                 request.ContentLength = 0;
 #endif
@@ -135,13 +155,21 @@ namespace Hl7.Fhir.Rest
             }
             else if (searchUsingPost)
             {
-                string bodyParameters = null;
+                IDictionary<string, string> bodyParameters = new Dictionary<string, string>();
                 foreach(Parameters.ParameterComponent parameter in ((Parameters)data).Parameter)
                 {
-                    if (!string.IsNullOrEmpty(bodyParameters)) bodyParameters += "&";
-                    bodyParameters += $"{parameter.Name}={parameter.Value}";
+                    bodyParameters.Add(parameter.Name, parameter.Value.ToString());
                 }
-                body = Encoding.UTF8.GetBytes(Uri.EscapeDataString(bodyParameters));
+                if (bodyParameters.Count > 0)
+                {
+                    FormUrlEncodedContent content = new FormUrlEncodedContent(bodyParameters);
+                    body = content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                }
+                else
+                {
+                    body = null;
+                }
+
                 request.ContentType = "application/x-www-form-urlencoded";
             }
             else

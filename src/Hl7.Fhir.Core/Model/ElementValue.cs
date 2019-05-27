@@ -8,15 +8,13 @@ namespace Hl7.Fhir.Model
 {
     internal struct ElementValue
     {
-        public ElementValue(string name, bool isMember, object value)
+        public ElementValue(string name, Base value)
         {
             ElementName = name;
-            IsCollectionMember = isMember;
             Value = value;
         }
 
         public string ElementName;
-        public bool IsCollectionMember;
-        public object Value;
+        public Base Value;
     }
 }

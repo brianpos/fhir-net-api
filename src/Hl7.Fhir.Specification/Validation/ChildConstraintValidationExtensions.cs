@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.ElementModel;
@@ -19,7 +19,7 @@ namespace Hl7.Fhir.Validation
     internal static class ChildConstraintValidationExtensions
     {
         internal static OperationOutcome ValidateChildConstraints(this Validator validator, ElementDefinitionNavigator definition, 
-            ScopedNavigator instance, bool allowAdditionalChildren)
+            ScopedNode instance, bool allowAdditionalChildren)
         {
             var outcome = new OperationOutcome();
             if (!definition.HasChildren) return outcome;
@@ -47,7 +47,7 @@ namespace Hl7.Fhir.Validation
             return outcome;
         }
 
-        private static OperationOutcome ValidateMatch(this Validator validator, Match match, ScopedNavigator parent)
+        private static OperationOutcome ValidateMatch(this Validator validator, Match match, ScopedNode parent)
         {
             var outcome = new OperationOutcome();
 

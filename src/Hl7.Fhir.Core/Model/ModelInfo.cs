@@ -348,6 +348,9 @@ namespace Hl7.Fhir.Model
         public static bool IsCoreModelTypeUri(Uri uri)
         {
             return uri != null
+                // [WMR 20181025] Issue #746
+                // Note: FhirCoreProfileBaseUri.IsBaseOf(new Uri("Dummy", UriKind.RelativeOrAbsolute)) = true...?!
+                && uri.IsAbsoluteUri 
                 && FhirCoreProfileBaseUri.IsBaseOf(uri)
                 && IsCoreModelType(FhirCoreProfileBaseUri.MakeRelativeUri(uri).ToString());
         }
@@ -380,13 +383,33 @@ namespace Hl7.Fhir.Model
 
         public static bool IsProfiledQuantity(FHIRAllTypes type)
         {
-            return
-                type == FHIRAllTypes.Age ||
-                type == FHIRAllTypes.Distance ||
-                type == FHIRAllTypes.SimpleQuantity ||
-                type == FHIRAllTypes.Duration ||
-                type == FHIRAllTypes.Count ||
-                type == FHIRAllTypes.Money;
+            return type == FHIRAllTypes.SimpleQuantity;
+        }
+
+        public static bool IsBindable(string type)
+        {
+            switch (type)
+            {
+                // This is the fixed list, for all FHIR versions
+                case "code":
+                case "Coding":
+                case "CodeableConcept":
+                case "Quantity":
+                case "string":
+                case "uri":
+                case "Extension":       // for backwards compat with DSTU2
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        public static bool IsProfiledQuantity(string type)
+        {
+            var definedType = FhirTypeNameToFhirType(type);
+            if (definedType == null) return false;
+
+            return IsProfiledQuantity(definedType.Value);
         }
 
         public static bool IsInstanceTypeFor(string superclass, string subclass)
@@ -446,6 +469,7 @@ namespace Hl7.Fhir.Model
 
     public static class ModelInfoExtensions
     {
+        [Obsolete("Use ModelInfo.GetFhirTypeNameForType() instead.")]       // Obsoleted on 20181213 by EK
         public static string GetCollectionName(this Type type)
         {
             if (type.CanBeTreatedAsType(typeof(Resource)))

@@ -14,7 +14,7 @@ namespace Hl7.Fhir.Core.AsyncTests
         private string _endpoint = FhirClientTests.testEndpoint.OriginalString;
 
         //private string _endpointSupportingSearchUsingPost = "http://localhost:49911/fhir";
-        private string _endpointSupportingSearchUsingPost = "http://nde-fhir-ehelse.azurewebsites.net/fhir";
+        private readonly string _endpointSupportingSearchUsingPost = "http://nde-fhir-ehelse.azurewebsites.net/fhir";
 
         [TestMethod]
         [TestCategory("IntegrationTest")]

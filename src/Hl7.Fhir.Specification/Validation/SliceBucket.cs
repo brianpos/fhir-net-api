@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.Model;
@@ -45,7 +45,7 @@ namespace Hl7.Fhir.Validation
         private List<OperationOutcome> _successes = new List<OperationOutcome>();
         private List<OperationOutcome> _failures = new List<OperationOutcome>();
 
-        public override bool Add(ScopedNavigator candidate)
+        public override bool Add(ITypedElement candidate)
         {
             var report = Validator.Validate(candidate, Root);
 
@@ -113,7 +113,7 @@ namespace Hl7.Fhir.Validation
             return false;
         }
 
-        public override OperationOutcome Validate(Validator validator, IElementNavigator errorLocation)
+        public override OperationOutcome Validate(Validator validator, ITypedElement errorLocation)
         {
             OperationOutcome outcome = new OperationOutcome();
 

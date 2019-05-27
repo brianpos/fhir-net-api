@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using System;
@@ -465,7 +465,18 @@ namespace Hl7.Fhir.Specification.Tests
             Assert.IsFalse(diffNav.MoveToNext());
         }
 
+#if false
+        // [WMR 20180604] Disabled; no longer possible due to fix for issue #611
+        // Does FHIR even allow this? Relevant discussion on Zulip:
+        // https://chat.fhir.org/#narrow/stream/23-conformance/subject/Can.20a.20derived.20profile.20insert.20new.20named.20slices.3F
+        // Grahame Grieve:
+        //   "have you seen build\tests\resources\snapshot-generation-tests.xml ?
+        //   it doesn't include that, so we can say with confidence that it's not tested behaviour
+        //   certainly if the slice is ordered, you cannot insert
+        //   if the slicing is not ordered, I don't see what the need for inseertion is"
+        // => Derived profile is NOT allowed to *insert* named slices into an existing slice group
         [TestMethod]
+        [Ignore]
         public void TestElementMatcher_ComplexExtension_Insert()
         {
             // Insert a child extension element into an existing complex extension definition
@@ -566,6 +577,7 @@ namespace Hl7.Fhir.Specification.Tests
             assertMatch(matches[2], ElementMatcher.MatchAction.Merge, snapNav, diffNav);    // Merge extension child element "age"
             Assert.IsFalse(diffNav.MoveToNext());
         }
+#endif
 
         [TestMethod]
         public void TestElementMatcher_ComplexExtension_ConstrainChild()

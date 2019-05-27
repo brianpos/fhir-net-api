@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.Model;
@@ -20,7 +20,7 @@ namespace Hl7.Fhir.Rest
         public const string OPERATIONPREFIX = "$";
 
         private Bundle _result;
-        private string _baseUrl;
+        private readonly Uri _baseUrl;
 
         public TransactionBuilder(string baseUrl, Bundle.BundleType type = Bundle.BundleType.Batch)
         {
@@ -29,7 +29,7 @@ namespace Hl7.Fhir.Rest
                 Type = type
             };
 
-            _baseUrl = baseUrl;
+            _baseUrl = new Uri(baseUrl);
         }
 
         public TransactionBuilder(Uri baseUri, Bundle.BundleType type = Bundle.BundleType.Batch)
@@ -50,7 +50,8 @@ namespace Hl7.Fhir.Rest
             Capabilities,
             History,
             Operation,
-            Transaction
+            Transaction,
+            Patch
         }
 
         private Bundle.EntryComponent newEntry(Bundle.HTTPVerb method, InteractionType interactionType)
@@ -65,7 +66,7 @@ namespace Hl7.Fhir.Rest
 
         private void addEntry(Bundle.EntryComponent newEntry, RestUrl path)
         {
-            newEntry.Request.Url = path.Uri.ToString();
+            newEntry.Request.Url = HttpUtil.MakeRelativeFromBase(path.Uri, _baseUrl).ToString();
             _result.Entry.Add(newEntry);
         }
 
@@ -88,12 +89,9 @@ namespace Hl7.Fhir.Rest
                 addEntry(entry, new RestUrl(url));
             else
             {
-                var absoluteUrl = _baseUrl;
-                if(!absoluteUrl.EndsWith("/")) absoluteUrl += "/";
-                absoluteUrl += url;
+                var absoluteUrl = HttpUtil.MakeAbsoluteToBase(uri, _baseUrl);
                 addEntry(entry, new RestUrl(absoluteUrl));
             }
-
             return this;
         }
 
@@ -354,7 +352,10 @@ namespace Hl7.Fhir.Rest
         {
             var entry = newEntry(Bundle.HTTPVerb.POST, InteractionType.Transaction);
             entry.Resource = transaction;
-            addEntry(entry, newRestUrl());
+            var url = _baseUrl.ToString();
+            if (url.EndsWith("/"))  // in case of a transaction the url cannot end with a forward slash. Remove it here.
+                url = url.TrimEnd('/');
+            addEntry(entry, new RestUrl(url));
 
             return this;
         }

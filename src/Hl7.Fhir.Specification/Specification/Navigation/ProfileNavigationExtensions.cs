@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.Model;
@@ -216,6 +216,18 @@ namespace Hl7.Fhir.Specification.Navigation
             // return primaryType != null && primaryType.Code.HasValue && ModelInfo.IsReference(primaryType.Code.Value);
             return primaryType != null && IsReference(primaryType);
         }
+
+        /// <summary>
+        /// Determines if the specified element is a backbone element
+        /// </summary>
+        /// <param name="defn"></param>
+        /// <returns></returns>
+        /// <remarks>Backbone elements are nested groups of elements, that appear within resources (of type BackboneElement) or as
+        /// within datatypes (of type Element).
+        ///</remarks>
+        public static bool IsBackboneElement(this ElementDefinition defn) => defn.Path.Contains('.') && defn.Type.Count == 1 && 
+            (defn.Type[0].Code == "BackboneElement" || defn.Type[0].Code == "Element");
+
 
         /// <summary>Determines if the specified type reference represents a <see cref="ResourceReference"/>.</summary>
         /// <param name="typeRef">A <see cref="ElementDefinition.TypeRefComponent"/> instance.</param>

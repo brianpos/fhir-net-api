@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 // [WMR 20161219] Save and reuse existing instance, so generator can detect & handle recursion
@@ -14,6 +14,7 @@ using Hl7.Fhir.FhirPath;
 using Hl7.Fhir.Model;
 using Hl7.Fhir.Serialization;
 using Hl7.Fhir.Specification.Navigation;
+using Hl7.Fhir.Specification.Schema;
 using Hl7.Fhir.Specification.Snapshot;
 using Hl7.Fhir.Specification.Source;
 using Hl7.Fhir.Specification.Terminology;
@@ -26,7 +27,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Xml;
 
 namespace Hl7.Fhir.Validation
 {
@@ -63,10 +63,10 @@ namespace Hl7.Fhir.Validation
 
         public Validator(ValidationSettings settings)
         {
-            Settings = settings;
+            Settings = settings.Clone();
         }
 
-        public Validator() : this(ValidationSettings.Default)
+        public Validator() : this(ValidationSettings.CreateDefault())
         {
         }
 
@@ -84,56 +84,80 @@ namespace Hl7.Fhir.Validation
         }
 
 
-        public OperationOutcome Validate(IElementNavigator instance)
+        public OperationOutcome Validate(ITypedElement instance)
         {
             return Validate(instance, declaredTypeProfile: null, statedCanonicals: null, statedProfiles: null);
         }
 
-        public OperationOutcome Validate(IElementNavigator instance, params string[] definitionUris)
+        public OperationOutcome Validate(ITypedElement instance, params string[] definitionUris)
         {
             return Validate(instance, (IEnumerable<string>)definitionUris);
         }
 
-        public OperationOutcome Validate(IElementNavigator instance, IEnumerable<string> definitionUris)
+        public OperationOutcome Validate(ITypedElement instance, IEnumerable<string> definitionUris)
         {
             return Validate(instance, declaredTypeProfile: null, statedCanonicals: definitionUris, statedProfiles: null);
         }
 
-        public OperationOutcome Validate(IElementNavigator instance, params StructureDefinition[] structureDefinitions)
+        public OperationOutcome Validate(ITypedElement instance, params StructureDefinition[] structureDefinitions)
         {
             return Validate(instance, (IEnumerable<StructureDefinition>)structureDefinitions);
         }
 
-        public OperationOutcome Validate(IElementNavigator instance, IEnumerable<StructureDefinition> structureDefinitions)
+        public OperationOutcome Validate(ITypedElement instance, IEnumerable<StructureDefinition> structureDefinitions)
         {
             return Validate(instance, declaredTypeProfile: null, statedCanonicals: null, statedProfiles: structureDefinitions);
         }
 
+        #region Obsolete public methods
+        [Obsolete("Use Validate(ITypedElement instance) instead")]
+        public OperationOutcome Validate(IElementNavigator instance)
+        {
+            return Validate(instance.ToTypedElement(), declaredTypeProfile: null, statedCanonicals: null, statedProfiles: null);
+        }
+
+        [Obsolete("Use Validate(ITypedElement instance, params string[] definitionUris) instead")]
+        public OperationOutcome Validate(IElementNavigator instance, params string[] definitionUris)
+        {
+            return Validate(instance.ToTypedElement(), (IEnumerable<string>)definitionUris);
+        }
+
+        [Obsolete("Use Validate(ITypedElement instance, IEnumerable<string> definitionUris) instead")]
+        public OperationOutcome Validate(IElementNavigator instance, IEnumerable<string> definitionUris)
+        {
+            return Validate(instance.ToTypedElement(), declaredTypeProfile: null, statedCanonicals: definitionUris, statedProfiles: null);
+        }
+
+        [Obsolete("Use Validate(ITypedElement instance, params StructureDefinition[] structureDefinitions) instead")]
+        public OperationOutcome Validate(IElementNavigator instance, params StructureDefinition[] structureDefinitions)
+        {
+            return Validate(instance.ToTypedElement(), (IEnumerable<StructureDefinition>)structureDefinitions);
+        }
+
+        [Obsolete("Use Validate(ITypedElement instance, IEnumerable<StructureDefinition> structureDefinitions) instead")]
+        public OperationOutcome Validate(IElementNavigator instance, IEnumerable<StructureDefinition> structureDefinitions)
+        {
+            return Validate(instance.ToTypedElement(), declaredTypeProfile: null, statedCanonicals: null, statedProfiles: structureDefinitions);
+        }
+        #endregion
 
         // This is the one and only main entry point for all external validation calls (i.e. invoked by the user of the API)
-        internal OperationOutcome Validate(IElementNavigator instance, string declaredTypeProfile, IEnumerable<string> statedCanonicals, IEnumerable<StructureDefinition> statedProfiles)
+        internal OperationOutcome Validate(ITypedElement instance, string declaredTypeProfile, IEnumerable<string> statedCanonicals, IEnumerable<StructureDefinition> statedProfiles)
         {
-            if (!(instance is ScopedNavigator)) instance = new ScopedNavigator(instance);
-
-            var processor = new ProfilePreprocessor(profileResolutionNeeded, snapshotGenerationNeeded, instance, declaredTypeProfile, statedProfiles, statedCanonicals);
+            var processor = new ProfilePreprocessor(profileResolutionNeeded, snapshotGenerationNeeded, instance, declaredTypeProfile, statedProfiles, statedCanonicals, Settings.ResourceMapping);
             var outcome = processor.Process();
 
             // Note: only start validating if the profiles are complete and consistent
             if (outcome.Success)
-                outcome.Add(Validate((ScopedNavigator)instance, processor.Result));
+                outcome.Add(Validate(instance, processor.Result));
 
             return outcome;
 
-            StructureDefinition profileResolutionNeeded(string canonical)
-            {
-                if (Settings.ResourceResolver != null)
-                    return Settings.ResourceResolver.FindStructureDefinition(canonical);
-                else
-                    return null;
-            }
+            StructureDefinition profileResolutionNeeded(string canonical) =>
+                Settings.ResourceResolver?.FindStructureDefinition(canonical);
         }
 
-        internal OperationOutcome Validate(ScopedNavigator instance, ElementDefinitionNavigator definition)
+        internal OperationOutcome Validate(ITypedElement instance, ElementDefinitionNavigator definition)
         {
             return Validate(instance, new[] { definition });
         }
@@ -141,9 +165,11 @@ namespace Hl7.Fhir.Validation
 
         // This is the one and only main internal entry point for all validations, which in its term
         // will call step 1 in the validator, the function validateElement
-        internal OperationOutcome Validate(ScopedNavigator instance, IEnumerable<ElementDefinitionNavigator> definitions)
+        internal OperationOutcome Validate(ITypedElement elementNav, IEnumerable<ElementDefinitionNavigator> definitions)
         {
             var outcome = new OperationOutcome();
+
+            var instance = elementNav as ScopedNode ?? new ScopedNode(elementNav);
 
             try
             {
@@ -166,7 +192,7 @@ namespace Hl7.Fhir.Validation
         }
 
 
-        private Func<OperationOutcome> createValidator(ElementDefinitionNavigator nav, ScopedNavigator instance)
+        private Func<OperationOutcome> createValidator(ElementDefinitionNavigator nav, ScopedNode instance)
         {
             return () => validateElement(nav, instance);
         }
@@ -174,7 +200,7 @@ namespace Hl7.Fhir.Validation
 
         //   private OperationOutcome validateElement(ElementDefinitionNavigator definition, IElementNavigator instance)
 
-        private OperationOutcome validateElement(ElementDefinitionNavigator definition, ScopedNavigator instance)
+        private OperationOutcome validateElement(ElementDefinitionNavigator definition, ScopedNode instance)
         {
             var outcome = new OperationOutcome();
 
@@ -187,8 +213,9 @@ namespace Hl7.Fhir.Validation
                 return outcome;
             }
 
-            // Any node must either have a value, or children, or both (e.g. extensions on primitives)
-            if (instance.Value == null && !instance.HasChildren())
+            // This does not work, since the children might still be empty, we need something better
+            //// Any node must either have a value, or children, or both (e.g. extensions on primitives)
+            if (instance.Value == null && !instance.Children().Any())
             {
                 outcome.AddIssue("Element must not be empty", Issue.CONTENT_ELEMENT_MUST_HAVE_VALUE_OR_CHILDREN, instance);
                 return outcome;
@@ -249,16 +276,45 @@ namespace Hl7.Fhir.Validation
             outcome.Add(this.ValidateMinMaxValue(elementConstraints, instance));
             outcome.Add(ValidateMaxLength(elementConstraints, instance));
             outcome.Add(this.ValidateFp(definition.StructureDefinition.Url, elementConstraints, instance));
-            outcome.Add(this.ValidateBinding(elementConstraints, instance));
             outcome.Add(this.ValidateExtension(elementConstraints, instance, "http://hl7.org/fhir/StructureDefinition/regex"));
 
+            // new style validator - has a configure and then execute step.
+            // will be separated when all logic has been converted.
+            var ts = Settings.TerminologyService;
+            if (ts == null)
+            {
+                if (Settings.ResourceResolver == null)
+                {
+                    Trace(outcome, $"Cannot resolve binding references since neither TerminologyService nor ResourceResolver is given in the settings",
+                        Issue.UNAVAILABLE_TERMINOLOGY_SERVER, instance);
+                    return outcome;
+                }
+
+                ts = new LocalTerminologyService(Settings.ResourceResolver);
+            }
+
+            ValidationContext vc = new ValidationContext() { TerminologyService = ts };
+
+            try
+            {
+                if (elementConstraints.Binding != null)
+                {
+                    Binding b = elementConstraints.Binding.ToValidatable();
+                    outcome.Add(b.Validate(instance, vc));
+                }
+            }
+            catch(IncorrectElementDefinitionException iede)
+            {
+                Trace(outcome, "Incorrect ElementDefinition: " + iede.Message, Issue.PROFILE_ELEMENTDEF_INCORRECT, elementConstraints.Path);
+            }
+            
             // If the report only has partial information, no use to show the hierarchy, so flatten it.
             if (Settings.Trace == false) outcome.Flatten();
 
             return outcome;
         }
 
-        private OperationOutcome ValidateExtension(IExtendable elementDef, IElementNavigator instance, string uri)
+        private OperationOutcome ValidateExtension(IExtendable elementDef, ITypedElement instance, string uri)
         {
             var outcome = new OperationOutcome();
 
@@ -302,44 +358,44 @@ namespace Hl7.Fhir.Validation
             }
         }
 
-        internal OperationOutcome ValidateBinding(ElementDefinition definition, IElementNavigator instance)
-        {
-            var outcome = new OperationOutcome();
-            if (definition.Binding == null) return outcome;
+        //internal OperationOutcome ValidateBinding(ElementDefinition definition, ITypedElement instance)
+        //{
+        //    var outcome = new OperationOutcome();
+        //    if (definition.Binding == null) return outcome;
 
-            var ts = Settings.TerminologyService;
-            if (ts == null)
-            {
-                if (Settings.ResourceResolver == null)
-                {
-                    Trace(outcome, $"Cannot resolve binding references since neither TerminologyService nor ResourceResolver is given in the settings",
-                        Issue.UNAVAILABLE_TERMINOLOGY_SERVER, instance);
-                    return outcome;
-                }
+        //    var ts = Settings.TerminologyService;
+        //    if (ts == null)
+        //    {
+        //        if (Settings.ResourceResolver == null)
+        //        {
+        //            Trace(outcome, $"Cannot resolve binding references since neither TerminologyService nor ResourceResolver is given in the settings",
+        //                Issue.UNAVAILABLE_TERMINOLOGY_SERVER, instance);
+        //            return outcome;
+        //        }
 
-                ts = new LocalTerminologyService(Settings.ResourceResolver);
-            }
+        //        ts = new LocalTerminologyService(Settings.ResourceResolver);
+        //    }
 
-            var bindingValidator = new BindingValidator(ts, instance.Location);
+        //    var bindingValidator = new BindingValidator(ts, instance.Location);
 
-            try
-            {
-                Element bindable = instance.ParseBindable();
+        //    try
+        //    {
+        //        Element bindable = instance.ParseBindable();
 
-                // If the instance is not bindeable, ignore the Binding specified on the element, 
-                // it's simply not applicable
-                if (bindable != null)
-                    return bindingValidator.ValidateBinding(bindable, definition.Binding);
-            }
-            catch (Exception e)
-            {
-                Trace(outcome, $"Terminology service call failed for binding at {definition.Path}: {e.Message}", Issue.TERMINOLOGY_SERVICE_FAILED, instance);
-            }
+        //        // If the instance is not bindeable, ignore the Binding specified on the element, 
+        //        // it's simply not applicable
+        //        if (bindable != null)
+        //            return bindingValidator.ValidateBinding(bindable, definition.Binding);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Trace(outcome, $"Terminology service call failed for binding at {definition.Path}: {e.Message}", Issue.TERMINOLOGY_SERVICE_FAILED, instance);
+        //    }
 
-            return outcome;
-        }
+        //    return outcome;
+        //}
 
-        internal OperationOutcome ValidateNameReference(ElementDefinition definition, ElementDefinitionNavigator allDefinitions, ScopedNavigator instance)
+        internal OperationOutcome ValidateNameReference(ElementDefinition definition, ElementDefinitionNavigator allDefinitions, ScopedNode instance)
         {
             var outcome = new OperationOutcome();
 
@@ -359,7 +415,7 @@ namespace Hl7.Fhir.Validation
             return outcome;
         }
 
-        internal OperationOutcome VerifyPrimitiveContents(ElementDefinition definition, IElementNavigator instance)
+        internal OperationOutcome VerifyPrimitiveContents(ElementDefinition definition, ITypedElement instance)
         {
             var outcome = new OperationOutcome();
 
@@ -382,16 +438,13 @@ namespace Hl7.Fhir.Validation
             // type? Would it convert it to a .NET native type? How to check?
 
             // The spec has no regexes for the primitives mentioned below, so don't check them
-            if  (definition.Type.Count() == 1)
-            {
-                return ValidateExtension(definition.Type.Single(), instance, "http://hl7.org/fhir/StructureDefinition/structuredefinition-regex");
-            }
-
-            return outcome;
+            return definition.Type.Count() == 1
+                ? ValidateExtension(definition.Type.Single(), instance, "http://hl7.org/fhir/StructureDefinition/structuredefinition-regex")
+                : outcome;
         }
 
 
-        internal OperationOutcome ValidateMaxLength(ElementDefinition definition, IElementNavigator instance)
+        internal OperationOutcome ValidateMaxLength(ElementDefinition definition, ITypedElement instance)
         {
             var outcome = new OperationOutcome();
 
@@ -421,24 +474,26 @@ namespace Hl7.Fhir.Validation
 
         internal OperationOutcome.IssueComponent Trace(OperationOutcome outcome, string message, Issue issue, string location)
         {
-            if (Settings.Trace || issue.Severity != OperationOutcome.IssueSeverity.Information)
-                return outcome.AddIssue(message, issue, location);
-            return null;
+            return Settings.Trace || issue.Severity != OperationOutcome.IssueSeverity.Information
+                ? outcome.AddIssue(message, issue, location)
+                : null;
         }
 
-        internal OperationOutcome.IssueComponent Trace(OperationOutcome outcome, string message, Issue issue, IElementNavigator location)
+        internal OperationOutcome.IssueComponent Trace(OperationOutcome outcome, string message, Issue issue, ITypedElement location)
         {
-            return Trace(outcome, message, issue, location.Location);
+            return Settings.Trace || issue.Severity != OperationOutcome.IssueSeverity.Information
+                ? Trace(outcome, message, issue, location.Location)
+                : null;
         }
 
-        private string toStringRepresentation(IElementNavigator vp)
+        private string toStringRepresentation(ITypedElement vp)
         {
-            if (vp == null || vp.Value == null) return null;
-
-            return PrimitiveTypeConverter.ConvertTo<string>(vp.Value);
+            return vp == null || vp.Value == null ? 
+                null : 
+                PrimitiveTypeConverter.ConvertTo<string>(vp.Value);
         }
 
-        internal IElementNavigator ExternalReferenceResolutionNeeded(string reference, OperationOutcome outcome, string path)
+        internal ITypedElement ExternalReferenceResolutionNeeded(string reference, OperationOutcome outcome, string path)
         {
             if (!Settings.ResolveExteralReferences) return null;
 
@@ -465,7 +520,7 @@ namespace Hl7.Fhir.Validation
                 {
                     var poco = Settings.ResourceResolver.ResolveByUri(reference);
                     if (poco != null)
-                        return new PocoNavigator(poco);
+                        return poco.ToTypedElement();
                 }
                 catch (Exception e)
                 {
@@ -582,7 +637,7 @@ namespace Hl7.Fhir.Validation
 
         public string Reference { get; }
 
-        public IElementNavigator Result { get; set; }
+        public ITypedElement Result { get; set; }
     }
 
 

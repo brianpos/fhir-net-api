@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using System;
@@ -19,6 +19,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Hl7.Fhir.Utility;
 using static Hl7.Fhir.Model.Bundle;
+using System.Drawing;
 
 namespace Hl7.Fhir.Tests.Rest
 {
@@ -29,8 +30,8 @@ namespace Hl7.Fhir.Tests.Rest
         //public static Uri testEndpoint = new Uri("http://localhost.fiddler:1396/fhir");
         //public static Uri testEndpoint = new Uri("https://localhost:44346/fhir");
         //public static Uri testEndpoint = new Uri("http://localhost:1396/fhir");
-        public static Uri testEndpoint = new Uri("http://test.fhir.org/r3");
-        //public static Uri testEndpoint = new Uri("http://vonk.furore.com");
+        // public static Uri testEndpoint = new Uri("http://test.fhir.org/r3");
+        public static Uri testEndpoint = new Uri("http://vonk.fire.ly");
         //public static Uri testEndpoint = new Uri("https://api.fhir.me");
         //public static Uri testEndpoint = new Uri("http://fhirtest.uhn.ca/baseDstu3");
         //public static Uri testEndpoint = new Uri("http://localhost:49911/fhir");
@@ -78,7 +79,6 @@ namespace Hl7.Fhir.Tests.Rest
 
             var entry = client.CapabilityStatement();
 
-            Assert.IsNotNull(entry.Text);
             Assert.IsNotNull(entry);
             Assert.IsNotNull(entry.FhirVersion);
             // Assert.AreEqual("Spark.Service", c.Software.Name); // This is only for ewout's server
@@ -130,6 +130,14 @@ namespace Hl7.Fhir.Tests.Rest
             Assert.IsNotNull(loc);
         }
 
+        [TestMethod, TestCategory("FhirClient"), TestCategory("IntegrationTest")]
+        [ExpectedException(typeof(FhirOperationException))]
+        public void ReadWrongResourceType()
+        {
+            FhirClient client = new FhirClient(testEndpoint);
+
+            var loc = client.Read<Patient>("Location/1");
+        }
 
         [TestMethod, TestCategory("FhirClient"), TestCategory("IntegrationTest")]
         public void Read()
@@ -293,6 +301,14 @@ namespace Hl7.Fhir.Tests.Rest
             Assert.AreEqual("gzip", e.RawResponse.Headers[HttpResponseHeader.ContentEncoding]);
         }
 
+        [TestMethod, TestCategory("FhirClient")]
+        [ExpectedException(typeof(ArgumentException))]
+        public void SearchInvalidCriteria()
+        {
+            FhirClient client = new FhirClient(testEndpoint);
+            var result = client.Search<Patient>(new string[] { "test" });
+        }
+        
 #if NO_ASYNC_ANYMORE
         [TestMethod, TestCategory("FhirClient")]
         public void SearchAsync()
@@ -495,7 +511,7 @@ namespace Hl7.Fhir.Tests.Rest
 
         [TestMethod]
         [TestCategory("FhirClient"), TestCategory("IntegrationTest")]
-        //Test for github issue https://github.com/ewoutkramer/fhir-net-api/issues/145
+        //Test for github issue https://github.com/FirelyTeam/fhir-net-api/issues/145
         public void Create_ObservationWithValueAsSimpleQuantity_ReadReturnsValueAsQuantity()
         {
             FhirClient client = new FhirClient(testEndpoint);
@@ -1092,6 +1108,43 @@ namespace Hl7.Fhir.Tests.Rest
             {
                 Assert.IsTrue(ex.Status == HttpStatusCode.Forbidden || ex.Status == HttpStatusCode.Unauthorized, "Excpeted a security exception");
             }
+        }
+
+        /// <summary>
+        /// Test for showing issue https://github.com/FirelyTeam/fhir-net-api/issues/128
+        /// </summary>
+        [TestMethod, TestCategory("IntegrationTest"), TestCategory("FhirClient")]
+        public void TestCreatingBinaryResource()
+        {
+            Image img = Image.FromFile(TestDataHelper.GetFullPathForExample(@"fhir-logo.png"));
+            byte[] arr;
+            using (MemoryStream ms = new MemoryStream())
+            {
+                img.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                arr = ms.ToArray();
+            }
+
+            var client = new FhirClient(testEndpoint);
+
+            var binary = new Binary() { Content = arr, ContentType = "image/png" };
+            var result = client.Create(binary);
+
+            Assert.IsNotNull(result);
+
+            void Client_OnBeforeRequest(object sender, BeforeRequestEventArgs e)
+            {
+                // Removing the Accept part of the request. The server should send the resource back in the original Content-Type (in this case image/png)
+                e.RawRequest.Accept = null;
+            }
+
+            client.OnBeforeRequest += Client_OnBeforeRequest;
+
+            var result2 = client.Get($"Binary/{result.Id}");
+            Assert.IsNotNull(result2);
+            Assert.IsInstanceOfType(result2, typeof(Binary));
+            Assert.IsNotNull(result2.Id, "Binary resource should have an Id");
+            Assert.AreEqual(result2.Id, result.Id);
+            Assert.IsNotNull(result2.Meta?.VersionId, "Binary resource should have an Version"); 
         }
 
         [TestMethod, TestCategory("IntegrationTest"), TestCategory("FhirClient")]
