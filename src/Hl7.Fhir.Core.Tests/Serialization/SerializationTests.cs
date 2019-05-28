@@ -187,7 +187,7 @@ namespace Hl7.Fhir.Tests.Serialization
             Console.WriteLine(qData);
             Assert.IsFalse(qData.Contains("Test Questionnaire"));
             Assert.IsTrue(qData.Contains("<meta"));
-            Assert.IsFalse(qData.Contains("<text value=\"TEXT\""));
+            Assert.IsTrue(qData.Contains("<text value=\"TEXT\"")); // this isn't the narrative, its the text value in an item
             Assert.IsTrue(qData.Contains("<status value=\"active\""));
             Assert.IsTrue(qData.Contains("<date value=\"2015-09-27\""));
             Assert.IsTrue(qData.Contains("<title value=\"TITLE\""));
