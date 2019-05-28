@@ -58,10 +58,10 @@ namespace Hl7.Fhir.Support
             Type = type;
         }
         /// <summary>Factory method.</summary>
-        internal static Issue Create(int code, OperationOutcome.IssueSeverity severity, OperationOutcome.IssueType type) =>
+        public static Issue Create(int code, OperationOutcome.IssueSeverity severity, OperationOutcome.IssueType type) =>
             new Issue(code, severity, type);
 
-        // Validation resouce instance errors
+        // Validation resource instance errors
         public static readonly Issue CONTENT_ELEMENT_MUST_HAVE_VALUE_OR_CHILDREN = Create(1000, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Invalid);
         public static readonly Issue CONTENT_ELEMENT_HAS_UNKNOWN_CHILDREN = Create(1001, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Invalid);
         public static readonly Issue CONTENT_ELEMENT_HAS_INCORRECT_TYPE = Create(1003, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Invalid);

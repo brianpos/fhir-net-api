@@ -131,7 +131,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                 if (ContainsPath(child, path))
                 {
                     var pm = item.ClassMapping.FindMappedElementByName(child.FhirpathExpression);
-                    if (pm.ReturnType != pm.ElementType)
+                    if (pm.IsCollection)
                     {
                         // this is a collection
                         IEnumerable<Base> result = (IEnumerable<Base>)pm.GetValue(data);
@@ -297,7 +297,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     if (pm != null)
                     {
                         // skip over the raw values
-                        if (pm.ReturnType == pm.ElementType && !pm.ElementType.CanBeTreatedAsType(typeof(Base)))
+                        if (!pm.ImplementingType.CanBeTreatedAsType(typeof(Base))) // not sure if this is right, how to test for raw value now that element type and return type aren't there
                             continue;
                     }
                     if (slicingItem != null && slicingItem != item)
@@ -321,7 +321,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                         }
                         else if (pm.Choice == ChoiceType.ResourceChoice)
                         {
-                            if (pm.ElementType == typeof(Resource))
+                            if (pm.ImplementingType == typeof(Resource))
                             {
                                 // This is not a constrained set of choices
                                 continue;
@@ -332,10 +332,10 @@ namespace Hl7.Fhir.QuestionnaireServices
                             // Note that ReturnType would have the type of the collection
                             // where the ElementType is the type of the item in the collection
                             // or where not a collection, both are the same value
-                            item.ClassMapping = ClassMapping.Create(pm.ElementType);
+                            item.ClassMapping = ClassMapping.Create(pm.ImplementingType);
                         }
 
-                        if (pm.ReturnType != pm.ElementType)
+                        if (pm.IsCollection)
                             item.IsArray = true;
 
                         // Now process all the children

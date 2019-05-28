@@ -116,8 +116,8 @@ namespace Hl7.Fhir.QuestionnaireServices
                 {
                     Element fixedValue = item.ed.Fixed;
                     var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
-                    Type createElementType = pm.ReturnType;
-                    if (pm.ReturnType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
+                    Type createElementType = pm.ImplementingType;
+                    if (pm.ImplementingType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
                     {
                         // check the element definition for the types
                         createElementType = ModelInfo.FhirTypeToCsType[item.ed.PrimaryTypeCode().GetLiteral()];
@@ -125,7 +125,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     if (item.ed.Fixed.GetType() != createElementType)
                     {
                         // need to convert the data over
-                        fixedValue = (Element)fac.Create(pm.ReturnType);
+                        fixedValue = (Element)fac.Create(pm.ImplementingType);
                         if (fixedValue is Primitive && item.ed.Fixed is Code)
                         {
                             (fixedValue as Primitive).ObjectValue = (item.ed.Fixed as Code).Value;
@@ -145,16 +145,16 @@ namespace Hl7.Fhir.QuestionnaireServices
                         object value = pm.GetValue(instance);
                         if (value == null)
                         {
-                            value = fac.Create(pm.ReturnType);
+                            value = fac.Create(pm.ImplementingType);
                             pm.SetValue(instance, value);
                         }
-                        if (pm.ReturnType != pm.ElementType)
+                        if (pm.IsCollection)
                         {
                             // this is a collection
                             IList list = value as IList;
                             foreach (var g in filteredGroups)
                             {
-                                object elementValue = fac.Create(pm.ElementType);
+                                object elementValue = fac.Create(pm.ImplementingType);
                                 List<QuestionnaireResponse.ItemComponent> g1 = new List<QuestionnaireResponse.ItemComponent>();
                                 g1.Add(g);
                                 PopulateResourceInstance(elementValue, item, g1);
@@ -183,8 +183,8 @@ namespace Hl7.Fhir.QuestionnaireServices
                             if (answers.First().Value is Coding)
                             {
                                 Coding codedValue = answers.First().Value as Coding;
-                                Type createElementType = pm.ReturnType;
-                                if (pm.ReturnType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
+                                Type createElementType = pm.ImplementingType;
+                                if (pm.ImplementingType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
                                 {
                                     // check the element definition for the types
                                     createElementType = ModelInfo.FhirTypeToCsType[item.ed.PrimaryTypeCode().GetLiteral()];
@@ -216,15 +216,15 @@ namespace Hl7.Fhir.QuestionnaireServices
                             else
                             {
                                 // Check for type conversion if needed
-                                if (pm.ElementType == typeof(Code) && answers.First().Value is FhirString valueString)
+                                if (pm.ImplementingType == typeof(Code) && answers.First().Value is FhirString valueString)
                                     pm.SetValue(instance, new Code(valueString.Value));
-                                else if (pm.ElementType == typeof(Id) && answers.First().Value is FhirString)
+                                else if (pm.ImplementingType == typeof(Id) && answers.First().Value is FhirString)
                                     pm.SetValue(instance, new Id(((FhirString)answers.First().Value).Value));
                                 else if (pm.IsCollection)
                                 {
                                     IList col = pm.GetValue(instance) as IList;
                                     if (col == null)
-                                        col = fac.Create(pm.ReturnType) as IList;
+                                        col = fac.Create(pm.ImplementingType) as IList;
                                     foreach (var itemValue in answers.Select(v => v.Value))
                                     {
                                         col.Add(itemValue);
@@ -239,8 +239,8 @@ namespace Hl7.Fhir.QuestionnaireServices
                         {
                             // This item is on the way to one that DOES have a value, so create it and continue
                             var pm = parent.ClassMapping.FindMappedElementByName(item.FhirpathExpression);
-                            Type createElementType = pm.ReturnType;
-                            if (pm.ReturnType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
+                            Type createElementType = pm.ImplementingType;
+                            if (pm.ImplementingType == typeof(Element) && pm.Choice == ChoiceType.DatatypeChoice)
                             {
                                 // check the element definition for the types
                                 createElementType = ModelInfo.FhirTypeToCsType[item.ed.PrimaryTypeCode().GetLiteral()];
@@ -256,7 +256,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                                 IList list = value as IList;
                                 foreach (var g in groups)
                                 {
-                                    var arrayItem = fac.Create(pm.ElementType);
+                                    var arrayItem = fac.Create(pm.ImplementingType);
                                     if (arrayItem is Extension e && item.ExtensionUrl != null)
                                     {
                                         e.Url = item.ExtensionUrl;

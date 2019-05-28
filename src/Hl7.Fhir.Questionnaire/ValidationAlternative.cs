@@ -13,7 +13,7 @@ namespace Hl7.Fhir.QuestionnaireServices
         public OperationOutcome Validate(Base context, StructureDefinition sd)
         {
             StructureItem parent = StructureItemTree.CreateStructureTree(sd, null);
-            return parent.Validate(new PocoNavigator(context), new PocoNavigator(context));
+            return parent.Validate(context.ToTypedElement(), context.ToTypedElement());
         }
     }
 

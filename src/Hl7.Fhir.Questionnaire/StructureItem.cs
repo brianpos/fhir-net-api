@@ -59,14 +59,14 @@ namespace Hl7.Fhir.QuestionnaireServices
 
         public List<ElementDefinition> ValidationRules { get; set; } = new List<ElementDefinition>();
 
-        public OperationOutcome Validate(IElementNavigator ParentContext, IElementNavigator ContainerContext)
+        public OperationOutcome Validate(ITypedElement ParentContext, ITypedElement ContainerContext)
         {
             OperationOutcome result = new OperationOutcome();
-            IEnumerable<IElementNavigator> values;
+            IEnumerable<ITypedElement> values;
             if (!string.IsNullOrEmpty(FhirpathExpression))
                 values = new Hl7.FhirPath.FhirPathCompiler().Compile(FhirpathExpression).Invoke(ParentContext, new EvaluationContext(ContainerContext));
             else
-                values = new List<IElementNavigator>(new[] { ParentContext });
+                values = new List<ITypedElement>(new[] { ParentContext });
             if (ValidationRules != null)
             {
                 foreach (var rule in ValidationRules)
@@ -88,7 +88,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             return result;
         }
 
-        static private void ValidateRule(ElementDefinition rule, IElementNavigator ParentContext, IEnumerable<IElementNavigator> values, OperationOutcome result)
+        static private void ValidateRule(ElementDefinition rule, ITypedElement ParentContext, IEnumerable<ITypedElement> values, OperationOutcome result)
         {
             // Does not need to look at the slicing section as that is covered via the context tree and fhirpath expression
 
@@ -99,13 +99,13 @@ namespace Hl7.Fhir.QuestionnaireServices
                 {
                     // this is an error (no need to check how many there are without performance of counting them each time)
                     result.AddIssue("Need to have one of these! " + rule.Path,
-                        new Issue() { Code = 12, Severity = OperationOutcome.IssueSeverity.Error, Type = OperationOutcome.IssueType.Value },
+                        Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
                         ParentContext);
                 }
                 else if (values.Count() < rule.Min)
                 {
                     result.AddIssue("Need to have at least " + rule.Min.ToString() + " of these! " + rule.Path,
-                    new Issue() { Code = 12, Severity = OperationOutcome.IssueSeverity.Error, Type = OperationOutcome.IssueType.Value },
+                    Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
                     ParentContext);
                 }
             }
@@ -115,7 +115,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                 {
                     // this is an error (no need to check how many there are without performance of counting them each time)
                     result.AddIssue("Should not contain one of these!" + rule.Path,
-                        new Issue() { Code = 12, Severity = OperationOutcome.IssueSeverity.Error, Type = OperationOutcome.IssueType.Value },
+                        Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
                         ParentContext);
                 }
             }
@@ -129,7 +129,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     {
                         // this is an error (no need to check how many there are without performance of counting them each time)
                         result.AddIssue("Should only have " + rule.Max + " one of these!" + rule.Path,
-                            new Issue() { Code = 12, Severity = OperationOutcome.IssueSeverity.Error, Type = OperationOutcome.IssueType.Value },
+                            Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
                             ParentContext);
                     }
                 }
@@ -155,9 +155,9 @@ namespace Hl7.Fhir.QuestionnaireServices
                 if (!string.IsNullOrEmpty(expression))
                 {
                     // test this invariant rule
-                    foreach (var item in values)
+                    foreach (ITypedElement item in values)
                     {
-                        if (!item.Predicate(expression, ParentContext))
+                        if (!item.Predicate(expression, new FhirEvaluationContext(ParentContext)))
                         {
                             result.AddIssue(new OperationOutcome.IssueComponent()
                             {
@@ -165,7 +165,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                                 Severity = OperationOutcome.IssueSeverity.Error,
                                 Diagnostics = expression,
                                 Code = OperationOutcome.IssueType.Invariant,
-                                Location = new[] { (item as PocoNavigator).ShortPath }
+                                Location = new[] { item.Annotation<IShortPathGenerator>()?.ShortPath }
                             });
                         }
                     }
