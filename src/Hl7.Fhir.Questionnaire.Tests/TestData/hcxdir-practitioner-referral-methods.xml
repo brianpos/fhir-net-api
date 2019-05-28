@@ -9,68 +9,50 @@
   <name value="hcxdir-practitioner-referral-methods" />
   <title value="hcxdir-practitioner-referral-methods" />
   <status value="draft" />
-  <publisher value="Healthconnex" />
   <date value="2015-09-22T20:02:49+10:00" />
+  <publisher value="Healthconnex" />
   <description value="extension to provide a note on the referral methods for a practitioner" />
   <purpose value="The ability to add extensions in a structured way is what keeps FHIR resources simple." />
   <copyright value="Telstra Health" />
   <fhirVersion value="3.0.1" />
   <kind value="primitive-type" />
-  <type value="Extension" />
   <abstract value="false" />
   <contextType value="resource" />
   <context value="Practitioner" />
+  <type value="Extension" />
   <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
   <derivation value="constraint" />
   <differential>
-    <element id="1">
+    <element id="Extension">
       <path value="Extension" />
-      <sliceName value="extension" />
       <definition value="Optional Extensions Element - found in all resources." />
-      <min value="0" />
-      <max value="*" />
-      <base>
-        <path value="Extension" />
-        <min value="0" />
-        <max value="*" />
-      </base>
-      <mapping>
-        <identity value="rim" />
-        <map value="N/A" />
-      </mapping>
     </element>
-    <element id="3">
+    <element id="Extension.extension">
+      <path value="Extension.extension" />
+      <slicing>
+        <discriminator>
+          <type value="value" />
+          <path value="url" />
+        </discriminator>
+        <rules value="open" />
+      </slicing>
+    </element>
+    <element id="Extension.extension:preference">
       <path value="Extension.extension" />
       <sliceName value="preference" />
       <label value="Preference" />
+      <definition value="Coded preference for this Referral Method" />
       <min value="1" />
       <max value="1" />
-      <base>
-        <path value="Extension.extension" />
-        <min value="1" />
-        <max value="1" />
-      </base>
-      <type>
-        <code value="Extension" />
-      </type>
     </element>
-    <element id="4">
+    <element id="Extension.extension:preference.url">
       <path value="Extension.extension.url" />
-      <base>
-        <path value="Extension.extension.url" />
-        <min value="1" />
-        <max value="1" />
-      </base>
       <fixedUri value="preference" />
     </element>
-    <element id="5">
+    <element id="Extension.extension:preference.value[x]:valueCoding">
       <path value="Extension.extension.valueCoding" />
+      <sliceName value="valueCoding" />
       <min value="1" />
-      <base>
-        <path value="Extension.extension.value[x]" />
-        <min value="1" />
-        <max value="1" />
-      </base>
       <type>
         <code value="Coding" />
       </type>
@@ -82,37 +64,20 @@
         </valueSetReference>
       </binding>
     </element>
-    <element id="6">
+    <element id="Extension.extension:preference.url">
+      <path value="Extension.extension.url" />
+    </element>
+    <element id="Extension.value[x]">
       <path value="Extension.value[x]" />
-      <short value="Value of extension" />
-      <definition value="Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list)." />
-      <min value="0" />
       <max value="0" />
-      <base>
-        <path value="Extension.value[x]" />
-        <min value="0" />
-        <max value="1" />
-      </base>
-      <type>
-        <code value="boolean" />
-      </type>
-      <type>
-        <code value="integer" />
-      </type>
-      <type>
-        <code value="decimal" />
-      </type>
       <type>
         <code value="base64Binary" />
       </type>
       <type>
-        <code value="instant" />
+        <code value="boolean" />
       </type>
       <type>
-        <code value="string" />
-      </type>
-      <type>
-        <code value="uri" />
+        <code value="code" />
       </type>
       <type>
         <code value="date" />
@@ -121,25 +86,43 @@
         <code value="dateTime" />
       </type>
       <type>
-        <code value="time" />
-      </type>
-      <type>
-        <code value="code" />
-      </type>
-      <type>
-        <code value="oid" />
+        <code value="decimal" />
       </type>
       <type>
         <code value="id" />
       </type>
       <type>
-        <code value="unsignedInt" />
+        <code value="instant" />
+      </type>
+      <type>
+        <code value="integer" />
+      </type>
+      <type>
+        <code value="markdown" />
+      </type>
+      <type>
+        <code value="oid" />
       </type>
       <type>
         <code value="positiveInt" />
       </type>
       <type>
-        <code value="markdown" />
+        <code value="string" />
+      </type>
+      <type>
+        <code value="time" />
+      </type>
+      <type>
+        <code value="unsignedInt" />
+      </type>
+      <type>
+        <code value="uri" />
+      </type>
+      <type>
+        <code value="Address" />
+      </type>
+      <type>
+        <code value="Age" />
       </type>
       <type>
         <code value="Annotation" />
@@ -148,13 +131,34 @@
         <code value="Attachment" />
       </type>
       <type>
-        <code value="Identifier" />
-      </type>
-      <type>
         <code value="CodeableConcept" />
       </type>
       <type>
         <code value="Coding" />
+      </type>
+      <type>
+        <code value="ContactPoint" />
+      </type>
+      <type>
+        <code value="Count" />
+      </type>
+      <type>
+        <code value="Distance" />
+      </type>
+      <type>
+        <code value="Duration" />
+      </type>
+      <type>
+        <code value="HumanName" />
+      </type>
+      <type>
+        <code value="Identifier" />
+      </type>
+      <type>
+        <code value="Money" />
+      </type>
+      <type>
+        <code value="Period" />
       </type>
       <type>
         <code value="Quantity" />
@@ -163,10 +167,10 @@
         <code value="Range" />
       </type>
       <type>
-        <code value="Period" />
+        <code value="Ratio" />
       </type>
       <type>
-        <code value="Ratio" />
+        <code value="Reference" />
       </type>
       <type>
         <code value="SampledData" />
@@ -175,55 +179,8 @@
         <code value="Signature" />
       </type>
       <type>
-        <code value="HumanName" />
-      </type>
-      <type>
-        <code value="Address" />
-      </type>
-      <type>
-        <code value="ContactPoint" />
-      </type>
-      <type>
         <code value="Timing" />
       </type>
-      <type>
-        <code value="Reference" />
-      </type>
-      <type>
-        <code value="Meta" />
-      </type>
-      <mapping>
-        <identity value="rim" />
-        <map value="N/A" />
-      </mapping>
-    </element>
-    <element id="7">
-      <path value="Extension.extension.url" />
-      <base>
-        <path value="Extension.extension.url" />
-        <min value="0" />
-        <max value="1" />
-      </base>
-      <fixedUri value="method" />
-    </element>
-    <element id="8">
-      <path value="Extension.valueCoding" />
-      <min value="1" />
-      <base>
-        <path value="Extension.extension.value[x]" />
-        <min value="1" />
-        <max value="1" />
-      </base>
-      <type>
-        <code value="Coding" />
-      </type>
-      <binding>
-        <strength value="extensible" />
-        <description value="Referral Method" />
-        <valueSetReference>
-          <reference value="http://sqlonfhir-dstu2.azurewebsites.net/fhir/ValueSet/hcxdir-practitioner-referral-method-valueset" />
-        </valueSetReference>
-      </binding>
     </element>
   </differential>
 </StructureDefinition>
