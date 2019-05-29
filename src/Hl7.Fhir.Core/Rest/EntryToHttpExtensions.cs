@@ -75,7 +75,7 @@ namespace Hl7.Fhir.Rest
                 if (returnPreference.HasValue && returnPreference == Prefer.RespondAsync)
                     preferHeader.Add(returnPreference.GetLiteral());
                 if (preferHeader.Count > 0)
-                    request.Headers["Prefer"] = String.Join("; ", preferHeader);
+                    request.Headers["Prefer"] = String.Join(", ", preferHeader);
             }
 
             bool canHaveReturnPreference() => interactionType == TransactionBuilder.InteractionType.Create ||
