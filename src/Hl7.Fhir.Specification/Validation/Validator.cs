@@ -350,7 +350,6 @@ namespace Hl7.Fhir.Validation
 
                     _fpCompiler = new FhirPathCompiler(symbolTable);
 
-                    // Should this be exposed?
                     Settings.FhirPathCompiler = _fpCompiler;
                 }
 
