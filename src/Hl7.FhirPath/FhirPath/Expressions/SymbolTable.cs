@@ -122,6 +122,10 @@ namespace Hl7.FhirPath.Expressions
 
             return entry != null ? entry.Body : null;
         }
+
+        #region << Support Variables >>
+        public Func<string, bool> SupportsVariable { get; set; }
+        #endregion
     }
 
 

@@ -323,7 +323,7 @@ namespace Hl7.Fhir.Serialization
             else if (type == typeof(AdditionalStructuralRule) && !PermissiveParsing)
                 return additionalTypeRules();
 #pragma warning restore 612, 618
-            else if (type == typeof(JsonSerializationDetails))
+            else if (type == typeof(IPositionInfo) || type == typeof(JsonSerializationDetails))
             {
                 var (lineNumber, linePosition) = getPosition(JsonValue ?? (JToken)JsonObject);
 

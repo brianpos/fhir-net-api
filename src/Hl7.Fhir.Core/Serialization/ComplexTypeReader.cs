@@ -95,6 +95,12 @@ namespace Hl7.Fhir.Serialization
 
             try
             {
+                if (Settings.IncludeLineNumberAnnotations)
+                {
+                    var pos = (_current as IAnnotated)?.Annotation<IPositionInfo>();
+                    if (pos != null)
+                        existing.SetAnnotation<IPositionInfo>(new PocoPositionInfo(pos));
+                }
                 read(mapping, members, existing);
             }
             catch (StructuralTypeException ste)

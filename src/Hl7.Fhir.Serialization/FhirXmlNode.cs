@@ -261,7 +261,7 @@ namespace Hl7.Fhir.Serialization
 
 
             }
-            if (type == typeof(XmlSerializationDetails))
+            if (type == typeof(IPositionInfo) || type == typeof(XmlSerializationDetails))
             {
                 var (lineNumber, linePosition) = getPosition(Current);
 

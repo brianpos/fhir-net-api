@@ -60,10 +60,14 @@ namespace Hl7.FhirPath.Expressions
             if (expression.Name == "resource")
                 return InvokeeFactory.GetResource;
 
+            if (scope.SupportsVariable(expression.Name))
+                return (Closure ctx, IEnumerable<Invokee> args) =>
+                {
+                    return ctx.EvaluationContext.VariableResolver(expression.Name);
+                };
 
-            // Variables are still functions without arguments. For now variables are treated separately here,
-            //Functions are handled elsewhere.
-            return resolve(scope, expression.Name, Enumerable.Empty<Type>());
+            // This variable is not known to the Execution environment, so error out the expression compilation
+            throw Error.Argument("Unknown variable '{0}'".FormatWith(expression.Name));
         }
 
         private static Invokee resolve(SymbolTable scope, string name, IEnumerable<Type> argumentTypes)

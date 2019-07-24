@@ -26,6 +26,11 @@ namespace Hl7.Fhir.Serialization
         /// </summary>
         public bool IgnoreUnknownMembers { get; set; } // = false
 
+        /// <summary>
+        /// While parsing include the annotation for the line numbering information
+        /// </summary>
+        public bool IncludeLineNumberAnnotations { get; set; }
+
         /// <summary>Default constructor. Creates a new <see cref="PocoBuilderSettings"/> instance with default property values.</summary>
         public PocoBuilderSettings() { }
 
@@ -46,6 +51,7 @@ namespace Hl7.Fhir.Serialization
 
             other.AllowUnrecognizedEnums = AllowUnrecognizedEnums;
             other.IgnoreUnknownMembers = IgnoreUnknownMembers;
+            other.IncludeLineNumberAnnotations = IncludeLineNumberAnnotations;
         }
 
         /// <summary>Creates a new <see cref="PocoBuilderSettings"/> object that is a copy of the current instance.</summary>

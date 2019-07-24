@@ -50,7 +50,8 @@ namespace Hl7.Fhir.Serialization
             new PocoBuilderSettings
             {
                 AllowUnrecognizedEnums = ps.AllowUnrecognizedEnums,
-                IgnoreUnknownMembers = ps.AcceptUnknownMembers
+                IgnoreUnknownMembers = ps.AcceptUnknownMembers,
+                IncludeLineNumberAnnotations = ps.IncludeLineNumberAnnotations
             };
 
         public Base Parse(ITypedElement element) => element.ToPoco(buildPocoBuilderSettings(Settings));

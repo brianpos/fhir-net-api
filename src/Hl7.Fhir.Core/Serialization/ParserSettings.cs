@@ -38,6 +38,11 @@ namespace Hl7.Fhir.Serialization
         /// </summary>
         public bool PermissiveParsing { get; set; } = true;
 
+        /// <summary>
+        /// While parsing include the annotation for the line numbering information
+        /// </summary>
+        public bool IncludeLineNumberAnnotations { get; set; }
+
         /// <summary>Default constructor. Creates a new <see cref="ParserSettings"/> instance with default property values.</summary>
         public ParserSettings() { }
 
@@ -60,6 +65,7 @@ namespace Hl7.Fhir.Serialization
             other.AllowUnrecognizedEnums = AllowUnrecognizedEnums;
             other.AcceptUnknownMembers = AcceptUnknownMembers;
             other.PermissiveParsing = PermissiveParsing;
+            other.IncludeLineNumberAnnotations = IncludeLineNumberAnnotations;
         }
 
         /// <summary>
@@ -72,6 +78,7 @@ namespace Hl7.Fhir.Serialization
 
             settings.AllowUnrecognizedEnums = AllowUnrecognizedEnums;
             settings.IgnoreUnknownMembers = AcceptUnknownMembers;
+            settings.IncludeLineNumberAnnotations = IncludeLineNumberAnnotations;
         }
 
         /// <summary>Creates a new <see cref="ParserSettings"/> object that is a copy of the current instance.</summary>

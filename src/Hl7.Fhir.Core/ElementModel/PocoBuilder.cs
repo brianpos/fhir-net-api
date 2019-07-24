@@ -116,7 +116,8 @@ namespace Hl7.Fhir.Serialization
                 var settings = new ParserSettings
                 {
                     AcceptUnknownMembers = _settings.IgnoreUnknownMembers,
-                    AllowUnrecognizedEnums = _settings.AllowUnrecognizedEnums
+                    AllowUnrecognizedEnums = _settings.AllowUnrecognizedEnums,
+                    IncludeLineNumberAnnotations = _settings.IncludeLineNumberAnnotations
                 };
 
                 return typeToBuild.CanBeTreatedAsType(typeof(Resource))

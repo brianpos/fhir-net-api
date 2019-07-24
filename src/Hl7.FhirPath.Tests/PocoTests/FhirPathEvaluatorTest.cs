@@ -106,6 +106,113 @@ namespace Hl7.FhirPath.Tests
         }
 
         [Fact]
+        public void TestEnvironmentVariables()
+        {
+            var context = new FhirEvaluationContext(fixture.TestInput);
+            SymbolTable stWithVars = new SymbolTable(FhirPathCompiler.DefaultSymbolTable);
+            stWithVars.Add("interestingValue", () => ElementNode.ForPrimitive("42"));
+            var compiler = new FhirPathCompiler(stWithVars);
+            var expr = compiler.Compile("birthDate.toString()");
+            var result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("1974-12-25", result);
+
+            expr = compiler.Compile("%interestingValue");
+            result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("42", result);
+
+            expr = compiler.Compile("birthDate.toString() + %interestingValue");
+            result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("1974-12-2542", result);
+
+            // ensure that the repeated calls to the routine don't return the same value, and that it is evaluated as required.
+
+            stWithVars = new SymbolTable(FhirPathCompiler.DefaultSymbolTable);
+            stWithVars.Add("interestingValue", () => ElementNode.ForPrimitive("45"));
+            compiler = new FhirPathCompiler(stWithVars);
+
+            expr = compiler.Compile("birthDate.toString() + %interestingValue");
+            result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("1974-12-2545", result);
+        }
+
+        [Fact]
+        public void TestEnvironmentVariablesPart2()
+        {
+            var context = new FhirEvaluationContext(fixture.TestInput);
+            SymbolTable stWithVars = new SymbolTable(FhirPathCompiler.DefaultSymbolTable);
+            stWithVars.SupportsVariable = (string name) => { if (name == "interestingValue") return true; return false; };
+            context.VariableResolver = (string name) => { if (name == "interestingValue") return ElementNode.CreateList(ElementNode.ForPrimitive("42")); return ElementNode.EmptyList; };
+
+            var compiler = new FhirPathCompiler(stWithVars);
+
+            try
+            {
+                var badExpr = compiler.Compile("%interestingValue2");
+                Assert.False(false, "expected to have an argument exception thrown for an unknown variable");
+            }
+            catch (ArgumentException ex)
+            {
+                // expecting this exception to be thrown, and that it identifies the unknown variable
+                Assert.Contains("interestingValue2", ex.Message);
+            }
+
+            var expr = compiler.Compile("birthDate.toString()");
+            var result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("1974-12-25", result);
+
+            expr = compiler.Compile("%interestingValue");
+            result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("42", result);
+
+            expr = compiler.Compile("birthDate.toString() + %interestingValue");
+            result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("1974-12-2542", result);
+
+            // ensure that the repeated calls to the routine don't return the same value, and that it is evaluated as required.
+            context.VariableResolver = (string name) => { if (name == "interestingValue") return ElementNode.CreateList(ElementNode.ForPrimitive("45")); return ElementNode.EmptyList; };
+            expr = compiler.Compile("birthDate.toString() + %interestingValue");
+            result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("1974-12-2545", result);
+        }
+
+        [Fact]
+        public void TestEnvironmentVariablesPart3()
+        {
+            var context = new FhirEvaluationContext(fixture.TestInput);
+            SymbolTable stWithVars = new SymbolTable(FhirPathCompiler.DefaultSymbolTable);
+            var compiler = new FhirPathCompiler(stWithVars);
+            Dictionary<string, IEnumerable<ITypedElement>> variables = new Dictionary<string, IEnumerable<ITypedElement>>();
+
+            stWithVars.SupportsVariable = (string name) => { return variables.ContainsKey(name); };
+            context.VariableResolver = (string name) => { if (variables.ContainsKey(name)) return variables[name]; return ElementNode.EmptyList; };
+
+            string testExpression = "%x * %x + %y * %y = %z * %z";
+            try
+            {
+                var badExpr = compiler.Compile(testExpression);
+                Assert.False(false, "expected to have an argument exception thrown for an unknown variable");
+            }
+            catch (ArgumentException ex)
+            {
+                // expecting this exception to be thrown, and that it identifies the unknown variable
+                Assert.Contains("x", ex.Message);
+            }
+
+            variables.Add("x", ElementNode.CreateList(ElementNode.ForPrimitive(3)));
+            variables.Add("y", ElementNode.CreateList(ElementNode.ForPrimitive(4)));
+            variables.Add("z", ElementNode.CreateList(ElementNode.ForPrimitive(5)));
+
+            var expr = compiler.Compile(testExpression);
+            var result = expr.Predicate(fixture.TestInput, context);
+            Assert.True(result);
+
+            variables["z"] = ElementNode.CreateList(ElementNode.ForPrimitive(6));
+
+            result = expr.Predicate(fixture.TestInput, context);
+            Assert.False(result);
+        }
+
+        [Fact]
         public void TestTreeVisualizerVisitor()
         {
             var compiler = new FhirPathCompiler();
