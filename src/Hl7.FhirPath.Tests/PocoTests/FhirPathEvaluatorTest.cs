@@ -10,6 +10,7 @@
 // extern alias dstu2;
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -43,13 +44,13 @@ namespace Hl7.FhirPath.Tests
             var patient = parser.Parse<Patient>(tpXml);
             TestInput = patient.ToTypedElement();
 
-            tpXml = TestData.ReadTextFile("questionnaire-example.xml");
-            var quest = parser.Parse<Questionnaire>(tpXml);
-            Questionnaire = quest.ToTypedElement();
+            //tpXml = TestData.ReadTextFile("questionnaire-example.xml");
+            //var quest = parser.Parse<Questionnaire>(tpXml);
+            //Questionnaire = quest.ToTypedElement();
 
-            tpXml = TestData.ReadTextFile("uuid.profile.xml");
-            var uuid = parser.Parse<StructureDefinition>(tpXml);
-            UuidProfile = uuid.ToTypedElement();
+            //tpXml = TestData.ReadTextFile("uuid.profile.xml");
+            //var uuid = parser.Parse<StructureDefinition>(tpXml);
+            //UuidProfile = uuid.ToTypedElement();
 
             Xdoc = new XDocument(new XElement("group", new XAttribute("name", "CSharpTests")));
         }
@@ -96,13 +97,42 @@ namespace Hl7.FhirPath.Tests
 
         private readonly ITestOutputHelper output;
 
-
         public FhirPathEvaluatorTest(PatientFixture fixture, ITestOutputHelper output)
         {
             ElementNavFhirExtensions.PrepareFhirSymbolTableFunctions();
 
             this.fixture = fixture;
             this.output = output;
+        }
+
+        [Fact]
+        public void TestEnvironmentVariables()
+        {
+            var context = new FhirEvaluationContext(fixture.TestInput);
+            SymbolTable stWithVars = new SymbolTable(FhirPathCompiler.DefaultSymbolTable);
+            stWithVars.Add("interestingValue", () => ElementNode.ForPrimitive("42"));
+            var compiler = new FhirPathCompiler(stWithVars);
+            var expr = compiler.Compile("birthDate.toString()");
+            var result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("1974-12-25", result);
+
+            expr = compiler.Compile("%interestingValue");
+            result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("42", result);
+
+            expr = compiler.Compile("birthDate.toString() + %interestingValue");
+            result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("1974-12-2542", result);
+
+            // ensure that the repeated calls to the routine don't return the same value, and that it is evaluated as required.
+
+            stWithVars = new SymbolTable(FhirPathCompiler.DefaultSymbolTable);
+            stWithVars.Add("interestingValue", () => ElementNode.ForPrimitive("45"));
+            compiler = new FhirPathCompiler(stWithVars);
+
+            expr = compiler.Compile("birthDate.toString() + %interestingValue");
+            result = expr.Scalar(fixture.TestInput, context);
+            Assert.Equal("1974-12-2545", result);
         }
 
         [Fact]
