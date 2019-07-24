@@ -26,7 +26,7 @@ namespace Hl7.Fhir.ElementModel
     {
         /// <summary>
         /// Gets the short path of the node the <see cref="ITypedElement"/> represents.
-        /// Any single cardinality nodes will be stripped of their [0] array indexer
+        /// (any single cardinality nodes will be stripped of their [0] array indexer)
         /// </summary>
         /// <value>Returns the short path, which is a dotted path notation to the node</value>
         string ShortPath { get; }
