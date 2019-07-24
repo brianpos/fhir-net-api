@@ -10,6 +10,7 @@
 // extern alias dstu2;
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -43,13 +44,13 @@ namespace Hl7.FhirPath.Tests
             var patient = parser.Parse<Patient>(tpXml);
             TestInput = patient.ToTypedElement();
 
-            tpXml = TestData.ReadTextFile("questionnaire-example.xml");
-            var quest = parser.Parse<Questionnaire>(tpXml);
-            Questionnaire = quest.ToTypedElement();
+            //tpXml = TestData.ReadTextFile("questionnaire-example.xml");
+            //var quest = parser.Parse<Questionnaire>(tpXml);
+            //Questionnaire = quest.ToTypedElement();
 
-            tpXml = TestData.ReadTextFile("uuid.profile.xml");
-            var uuid = parser.Parse<StructureDefinition>(tpXml);
-            UuidProfile = uuid.ToTypedElement();
+            //tpXml = TestData.ReadTextFile("uuid.profile.xml");
+            //var uuid = parser.Parse<StructureDefinition>(tpXml);
+            //UuidProfile = uuid.ToTypedElement();
 
             Xdoc = new XDocument(new XElement("group", new XAttribute("name", "CSharpTests")));
         }
@@ -95,7 +96,6 @@ namespace Hl7.FhirPath.Tests
         PatientFixture fixture;
 
         private readonly ITestOutputHelper output;
-
 
         public FhirPathEvaluatorTest(PatientFixture fixture, ITestOutputHelper output)
         {
@@ -183,8 +183,17 @@ namespace Hl7.FhirPath.Tests
             var compiler = new FhirPathCompiler(stWithVars);
             Dictionary<string, IEnumerable<ITypedElement>> variables = new Dictionary<string, IEnumerable<ITypedElement>>();
 
-            stWithVars.SupportsVariable = (string name) => { return variables.ContainsKey(name); };
-            context.VariableResolver = (string name) => { if (variables.ContainsKey(name)) return variables[name]; return ElementNode.EmptyList; };
+            stWithVars.SupportsVariable = (string name) =>
+            {
+                return variables.ContainsKey(name);
+            };
+            context.VariableResolver = (string name) => 
+            {
+                if (variables.ContainsKey(name))
+                    return variables[name];
+                // throw new ArgumentException($"variable '{name}' was not defined");
+                return ElementNode.EmptyList;
+            };
 
             string testExpression = "%x * %x + %y * %y = %z * %z";
             try
@@ -203,12 +212,20 @@ namespace Hl7.FhirPath.Tests
             variables.Add("z", ElementNode.CreateList(ElementNode.ForPrimitive(5)));
 
             var expr = compiler.Compile(testExpression);
-            var result = expr.Predicate(fixture.TestInput, context);
+            var result = (bool)expr.Scalar(fixture.TestInput, context);
             Assert.True(result);
 
             variables["z"] = ElementNode.CreateList(ElementNode.ForPrimitive(6));
 
+            result = (bool)expr.Scalar(fixture.TestInput, context);
+            Assert.False(result);
+
+            // test what happens if the variable no longer exists (gasp!)
+            variables.Remove("z");
+
             result = expr.Predicate(fixture.TestInput, context);
+
+            result = (bool)expr.Scalar(fixture.TestInput, context);
             Assert.False(result);
         }
 
