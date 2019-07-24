@@ -1,6 +1,7 @@
 ﻿using Hl7.Fhir.ElementModel;
 using Hl7.Fhir.Specification;
 using Hl7.Fhir.Tests;
+using Hl7.Fhir.Utility;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Diagnostics;
@@ -84,6 +85,19 @@ namespace Hl7.Fhir.Serialization.Tests
             var tpXml = File.ReadAllText(Path.Combine("TestData", "fp-test-patient.xml"));
             var nav = getXmlNode(tpXml);
             ParseDemoPatient.HasLineNumbers<XmlSerializationDetails>(nav.ToSourceNode());
+        }
+
+        // serialization then check for line numbers from object model
+        [TestMethod]
+        public void ChekcObjectModelLineNumbering()
+        {
+            var tpXml = File.ReadAllText(Path.Combine("TestData", "fp-test-patient.xml"));
+            var nav = getXmlNode(tpXml);
+            ParseDemoPatient.HasLineNumbers<XmlSerializationDetails>(nav.ToSourceNode());
+            var pat = new FhirXmlParser(new ParserSettings() { IncludeLineNumberAnnotations = true }).Parse<Hl7.Fhir.Model.Patient>(tpXml);
+            var sdp = new PocoStructureDefinitionSummaryProvider();
+
+            ParseDemoPatient.HasLineNumbers<IPositionInfo>(pat.ToTypedElement().ToSourceNode());
         }
 
         [TestMethod]

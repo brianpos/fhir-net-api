@@ -82,12 +82,12 @@ namespace Hl7.Fhir.Serialization.Tests
         }
 
 
-        public static void HasLineNumbers<T>(ISourceNode nav) where T : class, IPositionInfo
+        public static void HasLineNumbers<T>(ISourceNode nav) where T : IPositionInfo
         {
             nav = nav.Children().FirstOrDefault();
             Assert.IsNotNull(nav);
 
-            var posInfo = (nav as IAnnotated)?.Annotation<T>();
+            var posInfo = (nav as IAnnotated).Annotation<T>();
             Assert.IsNotNull(posInfo);
             Assert.AreNotEqual(-1, posInfo.LineNumber);
             Assert.AreNotEqual(-1, posInfo.LinePosition);
