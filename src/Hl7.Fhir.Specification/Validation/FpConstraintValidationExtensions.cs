@@ -18,7 +18,8 @@ using System.Linq;
 
 namespace Hl7.Fhir.Validation
 {
-    internal class CompiledConstraintAnnotation
+    // TODO: Brian - made public so I can pre-compile these into the structure definition so that they are thread safe
+    public class CompiledConstraintAnnotation
     {
         public CompiledExpression Expression;
     }
