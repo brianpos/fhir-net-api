@@ -17,6 +17,9 @@
       <dependency id="Newtonsoft.Json" version="11.0.2" />
       <dependency id="System.ValueTuple" version="4.5.0" />
     </dependencies>
+    <contentFiles>
+      <files include="any/any/specification.zip" buildAction="Content" copyToOutput="true" flatten="true" />
+    </contentFiles>
   </metadata>
   <files>
     <file src="Hl7.Fhir.Questionnaire\bin\Release\net45\Hl7.*.*" target="lib/net462"/>
