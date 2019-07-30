@@ -21,6 +21,11 @@ namespace Hl7.FhirPath
         public static int MAX_FP_EXPRESSION_CACHE_SIZE = 500;
         private static readonly Cache<string, CompiledExpression> _cache = new Cache<string, CompiledExpression>(expr => Compile(expr), new CacheSettings() { MaxCacheSize = MAX_FP_EXPRESSION_CACHE_SIZE });
 
+        /// <summary>
+        /// Expose the cache publicly so that others may flush it if required (or check internal stats if needed)
+        /// </summary>
+        public static Cache<string, CompiledExpression> Cache {  get { return _cache; } }
+
         private static CompiledExpression Compile(string expression)
         {
             var compiler = new FhirPathCompiler();
