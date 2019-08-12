@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.Model;
@@ -24,9 +24,10 @@ namespace Hl7.Fhir.Validation
         {
             // TODO: Should check whether the discriminator is a valid child path of root. Wait until we have the
             // definition walker, which would walk across references if necessary.
+            // TODO: Brian I think Pattern is actually supported too
             foreach (var d in discriminator)
             {
-                if (d.Type != ElementDefinition.DiscriminatorType.Value)
+                if (d.Type != ElementDefinition.DiscriminatorType.Value && d.Type != ElementDefinition.DiscriminatorType.Pattern)
                     throw Error.NotImplemented($"Slicing with a discriminator of type '{d.Type}' is not yet supported by this validator.");
             }
 

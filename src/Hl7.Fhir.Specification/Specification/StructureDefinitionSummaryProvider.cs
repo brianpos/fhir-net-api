@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://github.com/ewoutkramer/fhir-net-api/blob/master/LICENSE
+ * available at https://github.com/FirelyTeam/fhir-net-api/blob/master/LICENSE
  */
 
 using Hl7.Fhir.Model;
@@ -71,7 +71,8 @@ namespace Hl7.Fhir.Specification
 
         public bool IsResource => false;
 
-        public IEnumerable<IElementDefinitionSummary> GetElements() => StructureDefinitionComplexTypeSerializationInfo.getElements(_nav);
+        public IReadOnlyCollection<IElementDefinitionSummary> GetElements() => 
+            StructureDefinitionComplexTypeSerializationInfo.getElements(_nav).ToList();
     }
 
     internal struct StructureDefinitionComplexTypeSerializationInfo : IStructureDefinitionSummary
@@ -89,12 +90,12 @@ namespace Hl7.Fhir.Specification
 
         public bool IsResource => _nav.StructureDefinition.Kind == StructureDefinition.StructureDefinitionKind.Resource;
 
-        public IEnumerable<IElementDefinitionSummary> GetElements()
+        public IReadOnlyCollection<IElementDefinitionSummary> GetElements()
         {
             if (_nav.Current == null && !_nav.MoveToFirstChild())
-                return Enumerable.Empty<IElementDefinitionSummary>();
+                return new IElementDefinitionSummary[0];
 
-            return getElements(_nav);
+            return getElements(_nav).ToList();
         }
 
         private static bool isPrimitiveValueConstraint(ElementDefinition ed) => ed.Path.EndsWith(".value") && ed.Type.All(t => t.Code == null);
@@ -190,7 +191,7 @@ namespace Hl7.Fhir.Specification
 
         public bool InSummary => _definition.IsSummary ?? false;
 
-        public bool IsRequired => (_definition.Min ?? 0) > 1;
+        public bool IsRequired => (_definition.Min ?? 0) >= 1;
 
         public XmlRepresentation Representation
         {

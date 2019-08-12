@@ -3,10 +3,11 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.ElementModel.Adapters;
+using Hl7.Fhir.Specification;
 using Hl7.Fhir.Utility;
 using System;
 using System.Collections.Generic;
@@ -75,12 +76,37 @@ namespace Hl7.Fhir.ElementModel
 
         public static IEnumerable<object> Annotations(this ITypedElement nav, Type type) =>
         nav is IAnnotated ann ? ann.Annotations(type) : Enumerable.Empty<object>();
-        public static T Annotation<T>(this ITypedElement nav) where T : class =>
-            nav is IAnnotated ann ? ann.Annotation<T>() : null;
+        public static T Annotation<T>(this ITypedElement nav) =>
+            nav is IAnnotated ann ? ann.Annotation<T>() : default;
 
-        [Obsolete("IElementNavigator should be replaced by the IElementNode interface, which is returned by the parsers")]
+        [Obsolete("IElementNavigator should be replaced by the ITypedElement interface, which is returned by the parsers")]
         public static IElementNavigator ToElementNavigator(this ITypedElement node) => new TypedElementToElementNavAdapter(node);
 
         public static ISourceNode ToSourceNode(this ITypedElement node) => new TypedElementToSourceNodeAdapter(node);
+
+        public static IReadOnlyCollection<IElementDefinitionSummary> ChildDefinitions(this ITypedElement me,
+            IStructureDefinitionSummaryProvider provider)
+        {
+            if (me.Definition != null)
+            {
+                // If this is a backbone element, the child type is the nested complex type
+                if (me.Definition.Type[0] is IStructureDefinitionSummary be)
+                    return be.GetElements();
+                else
+                {
+                    if (me.InstanceType != null)
+                    {
+                        var si = provider.Provide(me.InstanceType);
+                        if (si != null) return si.GetElements();
+                    }
+                }
+
+            }
+
+            // Note: fall-through in all failure cases - return empty collection
+            return new List<IElementDefinitionSummary>();
+        }
+
+
     }
 }

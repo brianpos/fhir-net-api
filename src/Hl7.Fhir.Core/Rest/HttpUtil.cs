@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.Model;
@@ -249,6 +249,14 @@ namespace Hl7.Fhir.Rest
         /// operation rather than the full resource
         /// </summary>
         [EnumLiteral("OperationOutcome")]
-        OperationOutcome
+        OperationOutcome,
+
+        /// <summary>
+        /// Prefer to run the operation as an asynchronous request
+        /// (http://hl7.org/fhir/r4/async.html)
+        /// - This may also be applicable in prior versions (though not part of that stamdard)
+        /// </summary>
+        [EnumLiteral("respond-async")]
+        RespondAsync
     }
 }

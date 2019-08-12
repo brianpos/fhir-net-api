@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.Model;
@@ -235,6 +235,21 @@ namespace Hl7.Fhir.Test.Rest
             CollectionAssert.AreEquivalent(q.Include.ToList(), q2.Include.ToList());
             CollectionAssert.AreEquivalent(q.Parameters.ToList(), q2.Parameters.ToList());
             CollectionAssert.AreEquivalent(q.Elements.ToList(), q2.Elements.ToList());
+        }
+
+        [TestMethod]
+        public void ParseAndSerializeSortParams()
+        {
+            var q = new SearchParams();
+      
+            q.Add("_sort", "-sorted,sorted2,_lastUpdated");
+      
+            var output = q.ToUriParamList().ToQueryString();
+            Assert.AreEqual("_sort=-sorted%2Csorted2%2C_lastUpdated", output);
+
+            var q2 = SearchParams.FromUriParamList(UriParamList.FromQueryString(output));
+            Assert.AreEqual(q.Query, q2.Query);     
+            CollectionAssert.AreEquivalent(q.Sort.ToList(), q2.Sort.ToList()); 
         }
 
         [TestMethod]

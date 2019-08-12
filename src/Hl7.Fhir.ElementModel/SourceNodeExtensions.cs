@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using System.Linq;
@@ -161,7 +161,7 @@ namespace Hl7.Fhir.ElementModel
         /// </summary>
         /// <param name="node"></param>
         public static string GetResourceTypeIndicator(this ISourceNode node) =>
-            node.Annotation<IResourceTypeSupplier>()?.ResourceType;
+            (node as IAnnotated)?.Annotation<IResourceTypeSupplier>()?.ResourceType;
 
         /// <summary>
         /// Gets specific annotations from the list of annotations on the node.
@@ -191,10 +191,10 @@ namespace Hl7.Fhir.ElementModel
         /// <returns>An <see cref="ITypedElement"/> that represents the data in the node, with type information
         /// added to it.</returns>
         /// <remarks>This extension method decorates the <c>ISourceNode</c> with a new instance of
-        /// an <see cref="TypedElementNode"/>, passing on the parameters of this extension method.</remarks>
+        /// an <see cref="TypedElementOnSourceNode"/>, passing on the parameters of this extension method.</remarks>
         /// <seealso cref="ITypedElement"/>
         public static ITypedElement ToTypedElement(this ISourceNode node, IStructureDefinitionSummaryProvider provider, string type = null, TypedElementSettings settings = null)
-            => new TypedElementNode(node, type, provider, settings: settings);
+            => new TypedElementOnSourceNode(node, type, provider, settings: settings);
 
 
         /// <summary>
@@ -207,7 +207,7 @@ namespace Hl7.Fhir.ElementModel
         /// it. This is used internally in a few places in the API, where the component using the <c>ITypedNode</c> is aware it
         /// cannot depend on type information being present, but should normally not be used.
         /// </remarks>
-        [Obsolete("WARNING! For internal API use only. Turning an untyped SourceNode into a typed ElementNode without providing" +
+        [Obsolete("WARNING! For internal API use only. Turning an untyped SourceNode into an ITypedElement without providing" +
 "type information (see other overload) will cause side-effects with components in the API that are not prepared to deal with" +
 "missing type information. Please don't use this overload unless you know what you are doing.")]
         public static ITypedElement ToTypedElement(this ISourceNode node) =>

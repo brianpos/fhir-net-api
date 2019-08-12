@@ -3,17 +3,17 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://github.com/ewoutkramer/fhir-net-api/blob/master/LICENSE
+ * available at https://github.com/FirelyTeam/fhir-net-api/blob/master/LICENSE
  */
 
+using Hl7.Fhir.ElementModel;
+using Hl7.Fhir.Utility;
 using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using Hl7.Fhir.Utility;
-using Hl7.Fhir.ElementModel;
-using System.Collections;
 
 #if !NETSTANDARD1_1
 
@@ -26,10 +26,10 @@ namespace Hl7.Fhir.Serialization
     /// <remarks>Replacement for XmlArtifactScanner (now obsolete).</remarks>
     public class XmlNavigatorStream : INavigatorStream
     {
-        private readonly Stream _stream = null;
-        private XmlReader _reader = null;
-        private (XElement element, string fullUrl)? _current = null;
+        private readonly Stream _stream;
         private readonly bool _disposeStream;
+        private XmlReader _reader;
+        private (XElement element, string fullUrl)? _current = null;
 
         /// <summary>Create a new <see cref="XmlNavigatorStream"/> instance for the specified serialized xml resource file.</summary>
         /// <param name="path">The filepath of a serialized xml resource.</param>
@@ -45,6 +45,14 @@ namespace Hl7.Fhir.Serialization
         public static XmlNavigatorStream FromPath(string path)
             => new XmlNavigatorStream(new FileStream(path, FileMode.Open, FileAccess.Read));
 
+        /// <summary>Create a new <see cref="XmlNavigatorStream"/> instance for the specified serialized xml resource file.</summary>
+        /// <param name="path">The filepath of a serialized xml resource.</param>
+        /// <param name="disposeStream">Determines if the <see cref="Dispose()"/> method should also dispose the internal <see cref="Stream"/> instance.</param>
+        /// <param name="settings">Parser settings that control de-serialization behavior.</param>
+        /// <returns>A new <see cref="XmlNavigatorStream"/> instance.</returns>
+        public static XmlNavigatorStream FromPath(string path, bool disposeStream, FhirXmlParsingSettings settings)
+            => new XmlNavigatorStream(new FileStream(path, FileMode.Open, FileAccess.Read), disposeStream, settings);
+
         /// <summary>Create a new <see cref="XmlNavigatorStream"/> instance for the specified xml resource stream.</summary>
         /// <param name="stream">A stream that returns a serialized xml resource.</param>
         /// <remarks>The <see cref="Dispose()"/> method also disposes the specified <paramref name="stream"/> instance.</remarks>
@@ -54,9 +62,17 @@ namespace Hl7.Fhir.Serialization
         /// <param name="stream">A stream that returns a serialized xml resource.</param>
         /// <param name="disposeStream">Determines if the <see cref="Dispose()"/> method should also dispose the specified <paramref name="stream"/> instance.</param>
         public XmlNavigatorStream(Stream stream, bool disposeStream)
+            : this(stream, disposeStream, null) { }
+
+        /// <summary>Create a new <see cref="XmlNavigatorStream"/> instance for the specified xml resource stream.</summary>
+        /// <param name="stream">A stream that returns a serialized xml resource.</param>
+        /// <param name="disposeStream">Determines if the <see cref="Dispose()"/> method should also dispose the specified <paramref name="stream"/> instance.</param>
+        /// <param name="settings">Parser settings that control de-serialization behavior.</param>
+        public XmlNavigatorStream(Stream stream, bool disposeStream, FhirXmlParsingSettings settings)
         {
             _stream = stream ?? throw Error.ArgumentNull(nameof(stream));
             _disposeStream = disposeStream;
+            ParserSettings = settings?.Clone() ?? FhirXmlParsingSettings.CreateDefault();
 
             // Don't reset stream by default!
             // Relies on Stream.Seek() method, not supported by forward-only readers (e.g. zip archive)
@@ -64,7 +80,8 @@ namespace Hl7.Fhir.Serialization
             initializeReader();
         }
 
-#region IDisposable
+
+        #region IDisposable
 
         bool _disposed;
 
@@ -101,7 +118,7 @@ namespace Hl7.Fhir.Serialization
             }
         }
 
-#endregion
+        #endregion
 
         /// <summary>The typename of the underlying resource (container).</summary>
         /// <remarks>Call Current.Type to determine the type of the currently enumerated resource.</remarks>
@@ -127,7 +144,7 @@ namespace Hl7.Fhir.Serialization
             var stream = _stream;
             if (!stream.CanSeek)
             {
-                throw Error.NotSupported($"Unable to reset the {nameof(XmlNavigatorStream)}. The internal {stream.GetType().Name} instance does not support seeking.");
+                throw Error.NotSupported($"Unable to reset the {nameof(XmlNavigatorStream)}. The internal '{stream.GetType().Name}' instance does not support seeking.");
             }
             stream.Seek(0, SeekOrigin.Begin);
 
@@ -148,6 +165,10 @@ namespace Hl7.Fhir.Serialization
 
         public bool MoveNext() => MoveNext(null);
 
+        // [WMR 20181026] For MoveNext
+        static readonly XName urlName = XmlNs.XFHIR + "url";
+        static readonly XName idName = XmlNs.XFHIR + "id";
+
         public bool MoveNext(string fullUrl)
         {
             throwIfDisposed();
@@ -161,16 +182,75 @@ namespace Hl7.Fhir.Serialization
                 while (_reader.Read() && _reader.NodeType != XmlNodeType.Element) ;
                 if (_reader.NodeType != XmlNodeType.Element) return false;
             }
-             
+
             if (IsBundle)
             {
                 do
                 {
                     using (var entryReader = _reader.ReadSubtree())
                     {
-                        var entryUrl = readFullUrl(entryReader);
+#if true
+                        // [WMR 20190304] #890 Also return entries with missing fullUrl property
 
-                        if (entryUrl != null && (fullUrl == null || entryUrl == fullUrl))
+                        bool IsFhirElement(string elemName)
+                            => entryReader.NodeType == XmlNodeType.Element
+                            && entryReader.NamespaceURI == XmlNs.FHIR
+                            && entryReader.LocalName == elemName;
+
+                        // Consume <entry>
+                        if (entryReader.Read() && IsFhirElement("entry"))
+                        {
+                            // Consume <fullUrl> or <resource>
+                            if (entryReader.Read())
+                            {
+                                string entryUrl = null;
+                                bool foundResource;
+                                if (IsFhirElement("fullUrl"))
+                                {
+                                    if (entryReader.MoveToAttribute("value"))
+                                    {
+                                        entryUrl = entryReader.Value;
+                                        entryReader.MoveToElement();
+                                    }
+                                    foundResource = entryReader.ReadToNextSibling("resource", XmlNs.FHIR);
+                                }
+                                else
+                                {
+                                    foundResource = IsFhirElement("resource");
+                                }
+                                if (foundResource)
+                                {
+                                    // To be on the safe side, only include anonymous
+                                    // resources w/o id if PermissiveParsing equals true
+                                    if (entryUrl is null && !ParserSettings.PermissiveParsing)
+                                    {
+                                        return false;
+                                    }
+                                    if (fullUrl is null || fullUrl == entryUrl)
+                                    {
+                                        var resourceNode = (XElement)XElement.ReadFrom(entryReader);
+                                        if (!(resourceNode is null))
+                                        {
+                                            var resource = resourceNode.Elements().FirstOrDefault();
+                                            if (!(resource is null))
+                                            {
+                                                _current = (resource, entryUrl);
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+#else
+                        // [WMR 20190304] Original logic skips entries w/o fullUrl
+
+                        var entryUrl = readFullUrl(entryReader);
+                        emptyUrl = entryUrl is null;
+
+                        // [WMR 20190304] return bundle entries w/o fullUrl
+                        //if (entryUrl != null && (fullUrl == null || entryUrl == fullUrl))
+                        if (fullUrl is null || entryUrl == fullUrl)
                         {
                             if (entryReader.ReadToNextSibling("resource", XmlNs.FHIR))
                             {
@@ -187,6 +267,7 @@ namespace Hl7.Fhir.Serialization
                                 }
                             }
                         }
+#endif
                     }
                 }
                 while (_reader.ReadToNextSibling("entry", XmlNs.FHIR));
@@ -203,12 +284,12 @@ namespace Hl7.Fhir.Serialization
                 var resourceNode = (XElement)XElement.ReadFrom(_reader);
 
                 // First try to initialize from canonical url (conformance resources)
-                var canonicalUrl = resourceNode.Elements(XmlNs.XFHIR + "url").Attributes("value").SingleOrDefault()?.Value;
+                var canonicalUrl = resourceNode.Elements(urlName).Attributes("value").SingleOrDefault()?.Value;
 
                 // Otherwise try to initialize from resource id
                 if (canonicalUrl == null)
                 {
-                    var resourceId = resourceNode.Elements(XmlNs.XFHIR + "id").Attributes("value").SingleOrDefault();
+                    var resourceId = resourceNode.Elements(idName).Attributes("value").SingleOrDefault();
                     if (resourceId != null)
                     {
                         // [WMR 20171023] This is not a Bundle, so ResourceType
@@ -217,7 +298,9 @@ namespace Hl7.Fhir.Serialization
                     }
                 }
 
-                if (canonicalUrl != null && (fullUrl == null || canonicalUrl == fullUrl))
+                // [WMR 20190304] return instances w/o Resource Id
+                //if (canonicalUrl != null && (fullUrl == null || canonicalUrl == fullUrl))
+                if (fullUrl is null || canonicalUrl == fullUrl)
                 {
                     _current = (resourceNode, canonicalUrl);
                     return true;
@@ -229,6 +312,11 @@ namespace Hl7.Fhir.Serialization
 
 
         // Klopt niet -> kan static zijn. Maar de aanroepers creeren toch een instance met het pad -> komt dus van twee plekken
+
+        /// <summary>Navigate to the artifact with the specified uri.</summary>
+        /// <param name="position">The uri of the target artifact.</param>
+        /// <returns><c>true</c> if found, or <c>false</c> otherwise.</returns>
+        /// <exception cref="NotSupportedException">The internal stream does not support seeking.</exception>
         public bool Seek(string position)
         {
             throwIfDisposed();
@@ -238,30 +326,31 @@ namespace Hl7.Fhir.Serialization
             Reset();
 
             return MoveNext(position);
-
-            //This code needs to be moved to the DirectorySource - which now assumes the streamer
-            //does this (but no longer - as we don't return Resources anymore)
-            //var resultResource = new FhirXmlParser().Parse<Resource>(new XmlDomFhirReader(found));
-            //resultResource.SetOrigin(entry.Origin);
-            //return resultResource
         }
 
+        /// <summary>Returns the full resource uri of the current artifact.</summary>
         public string Position => _current?.fullUrl;
 
-        /// <summary>Returns a new <see cref="ISourceNode"/> instance of on the current entry.</summary>
+        /// <summary>Returns a new <see cref="ISourceNode"/> instance for the current entry.</summary>
         public ISourceNode Current
         {
             get
             {
                 throwIfDisposed();
                 var xelem = _current?.element;
-                return xelem != null ? FhirXmlNode.Create(xelem) : null;
+                return xelem != null ? FhirXmlNode.Create(xelem, ParserSettings) : null;
             }
         }
 
         object IEnumerator.Current => this.Current;
 
-#region Private helpers
+        // [WMR 20181026] NEW
+
+        /// <summary>Gets the configuration settings that control parsing behavior.</summary>
+        /// <value>Returns a (non-<c>null</c>) <see cref="FhirXmlParsingSettings"/> instance.</value>
+        public FhirXmlParsingSettings ParserSettings { get; }
+
+        #region Private helpers
 
         static string getRootName(XmlReader reader)
         {
@@ -285,7 +374,6 @@ namespace Hl7.Fhir.Serialization
                     return result;
                 }
             }
-
             return null;
         }
 
@@ -294,7 +382,7 @@ namespace Hl7.Fhir.Serialization
             if (_disposed) { throw new ObjectDisposedException(GetType().FullName); }
         }
 
-#endregion
+        #endregion
 
     }
 }

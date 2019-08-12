@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using System;
@@ -149,13 +149,6 @@ namespace Hl7.FhirPath.Functions
 
                 return true;
             }
-        }
-
-
-
-        private static IEnumerable<ITypedElement> childrenOrEmpty(this ITypedElement focus)
-        {
-            return (focus is ITypedElement ien) ? ien.Children() : FhirValueList.Empty;
         }
 
         public static bool IsEquivalentTo(this string a, string b)

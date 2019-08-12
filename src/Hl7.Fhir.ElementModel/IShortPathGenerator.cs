@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://github.com/ewoutkramer/fhir-net-api/blob/master/LICENSE
+ * available at https://github.com/FirelyTeam/fhir-net-api/blob/master/LICENSE
  */
 
 using System;
@@ -26,6 +26,7 @@ namespace Hl7.Fhir.ElementModel
     {
         /// <summary>
         /// Gets the short path of the node the <see cref="ITypedElement"/> represents.
+        /// (any single cardinality nodes will be stripped of their [0] array indexer)
         /// </summary>
         /// <value>Returns the short path, which is a dotted path notation to the node</value>
         string ShortPath { get; }

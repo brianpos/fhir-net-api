@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.ElementModel;
@@ -36,9 +36,19 @@ namespace Hl7.Fhir.Validation
 
             foreach (var constraintElement in definition.Constraint)
             {
-                // Skip any best practice constraints until that setting is available
+                // 20190703 Issue 447 - rng-2 is incorrect in DSTU2 and STU3. EK
+                // should be removed from STU3/R4 once we get the new normative version
+                // of FP up, which could do comparisons between quantities.
+                if (constraintElement.Key == "rng-2") continue;
+
                 if (constraintElement.GetBoolExtension("http://hl7.org/fhir/StructureDefinition/elementdefinition-bestpractice") == true)
-                    continue;
+                    if (v.Settings.ConstraintBestPractices == ConstraintBestPractices.Ignore)
+                        continue;
+                    else if (v.Settings.ConstraintBestPractices == ConstraintBestPractices.Enabled)
+                        constraintElement.Severity = ElementDefinition.ConstraintSeverity.Error;
+                    else if (v.Settings.ConstraintBestPractices == ConstraintBestPractices.Disabled)
+                        constraintElement.Severity = ElementDefinition.ConstraintSeverity.Warning;
+
                 bool success = false;
                
                 try

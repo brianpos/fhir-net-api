@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -16,6 +16,8 @@ using System.IO;
 using System.Linq;
 // Use alias to avoid conflict with Hl7.Fhir.Model.Task
 using Tasks = System.Threading.Tasks;
+using Hl7.Fhir.ElementModel;
+using Hl7.Fhir.Serialization;
 
 namespace Hl7.Fhir.Specification.Tests
 {
@@ -221,15 +223,15 @@ namespace Hl7.Fhir.Specification.Tests
         public void TestIgnoreFilter()
         {
             var files = new[] {
-                @"c:\bla\",
-                @"c:\bla\file1.json",
-                @"c:\bla\file1.xml",
-                @"c:\bla\bla2\file1.json",
-                @"c:\bla\bla2\file2.xml",
-                @"c:\bla\bla2\text1.txt",
-                @"c:\bla\bla2\bla3\test2.jpg",
-                @"c:\blie\bla.xml" };
-            var basef = @"c:\bla";
+                Path.Combine("c:", "bla"),
+                Path.Combine("c:", "bla", "file1.json"),
+                Path.Combine("c:", "bla", "file1.xml"),
+                Path.Combine("c:", "bla", "bla2", "file1.json"),
+                Path.Combine("c:", "bla", "bla2", "file2.xml"),
+                Path.Combine("c:", "bla", "bla2", "text1.txt"),
+                Path.Combine("c:", "bla", "bla2", "bla3", "test2.jpg"),
+                Path.Combine("c:", "blie", "bla.xml") };
+            var basef = Path.Combine("c:", "bla");
 
             // Basic glob filter
             var fi = new FilePatternFilter("*.xml");
@@ -241,7 +243,7 @@ namespace Hl7.Fhir.Specification.Tests
             // Absolute select 1 file
             fi = new FilePatternFilter("/file1.json");
             r = fi.Filter(basef, files);
-            Assert.AreEqual(@"c:\bla\file1.json", r.Single());
+            Assert.AreEqual(Path.Combine("c:", "bla", "file1.json"), r.Single());
 
             // Absolute select 1 file - no match
             fi = new FilePatternFilter("/file1.crap");
@@ -252,7 +254,7 @@ namespace Hl7.Fhir.Specification.Tests
             fi = new FilePatternFilter("/*.json");
             r = fi.Filter(basef, files);
             Assert.AreEqual(1, r.Count());
-            Assert.AreEqual(@"c:\bla\file1.json", r.Single());
+            Assert.AreEqual(Path.Combine("c:", "bla", "file1.json"), r.Single());
 
             // Relative select file
             fi = new FilePatternFilter("file1.json");
@@ -270,37 +272,37 @@ namespace Hl7.Fhir.Specification.Tests
             fi = new FilePatternFilter("**/file1.*");
             r = fi.Filter(basef, files);
             Assert.AreEqual(3, r.Count());
-            Assert.IsTrue(r.All(f => f.Contains("\\file1.")));
+            Assert.IsTrue(r.All(f => f.Contains($"{Path.DirectorySeparatorChar}file1.")));
 
             // Relative select file with glob
             fi = new FilePatternFilter("**/*.txt");
             r = fi.Filter(basef, files);
             Assert.AreEqual(1, r.Count());
-            Assert.AreEqual(@"c:\bla\bla2\text1.txt", r.Single());
+            Assert.AreEqual(Path.Combine("c:", "bla", "bla2", "text1.txt"), r.Single());
 
             // Relative select file with glob
             fi = new FilePatternFilter("**/file*.xml");
             r = fi.Filter(basef, files);
             Assert.AreEqual(2, r.Count());
-            Assert.IsTrue(r.All(f => f.Contains("\\file") && f.EndsWith(".xml")));
+            Assert.IsTrue(r.All(f => f.Contains($"{Path.DirectorySeparatorChar}file") && f.EndsWith(".xml")));
 
             // Relative select file with glob
             fi = new FilePatternFilter("file1.*");
             r = fi.Filter(basef, files);
             Assert.AreEqual(3, r.Count());
-            Assert.IsTrue(r.All(f => f.Contains("\\file1.")));
+            Assert.IsTrue(r.All(f => f.Contains($"{Path.DirectorySeparatorChar}file1.")));
 
             // Select whole directory
             fi = new FilePatternFilter("bla2/");
             r = fi.Filter(basef, files);
             Assert.AreEqual(4, r.Count());
-            Assert.IsTrue(r.All(f => f.Contains("\\bla2\\")));
+            Assert.IsTrue(r.All(f => f.Contains($"{Path.DirectorySeparatorChar}bla2{Path.DirectorySeparatorChar}")));
 
             // Select whole directory
             fi = new FilePatternFilter("bla2/**");
             r = fi.Filter(basef, files);
             Assert.AreEqual(4, r.Count());
-            Assert.IsTrue(r.All(f => f.Contains("\\bla2\\")));
+            Assert.IsTrue(r.All(f => f.Contains($"{Path.DirectorySeparatorChar}bla2{Path.DirectorySeparatorChar}")));
 
             // Select whole directory
             fi = new FilePatternFilter("/bla3/");
@@ -311,13 +313,13 @@ namespace Hl7.Fhir.Specification.Tests
             fi = new FilePatternFilter("/bla2/*/*.jpg");
             r = fi.Filter(basef, files);
             Assert.AreEqual(1, r.Count());
-            Assert.AreEqual(@"c:\bla\bla2\bla3\test2.jpg", r.Single());
+            Assert.AreEqual(Path.Combine("c:", "bla", "bla2", "bla3", "test2.jpg"), r.Single());
 
             // Case-insensitive
             fi = new FilePatternFilter("TEST2.jpg");
             r = fi.Filter(basef, files);
             Assert.AreEqual(1, r.Count());
-            Assert.AreEqual(@"c:\bla\bla2\bla3\test2.jpg", r.Single());
+            Assert.AreEqual(Path.Combine("c:", "bla", "bla2", "bla3", "test2.jpg"), r.Single());
         }
 
 
@@ -503,10 +505,98 @@ namespace Hl7.Fhir.Specification.Tests
                 fileNames = source.ListArtifactNames().ToList();
                 Assert.AreEqual(1, fileNames.Count);
                 Assert.AreEqual(srcFileName, fileNames[0]);
+
+                // [WMR 20190528] Update file and refresh source
+                var summaries = source.ListSummaries().ToList();
+                Assert.IsNotNull(summaries);
+                Assert.AreEqual(1, summaries.Count);
+                var summary = summaries[0];
+                var uri = summary.ResourceUri;
+                const string uriPrefix = @"http://example.org/Patient/";
+                Assert.IsTrue(uri.StartsWith(uriPrefix));
+                var id = uri.Substring(uriPrefix.Length);
+                Assert.AreEqual("pat1", id);
+
+                // Update the resource id
+                Patient patient = null;
+                using (var nav = DefaultNavigatorStreamFactory.Create(tmpFilePath))
+                {
+                    Assert.IsTrue(nav.MoveNext());
+                    var node = nav.Current;
+                    Assert.IsNotNull(node);
+                    patient = node.ToPoco<Patient>();
+                }
+                Assert.IsNotNull(patient);
+                Assert.AreEqual(patient.Id, "pat1");
+                patient.Id = "CHANGED";
+                var serializer = new FhirXmlSerializer();
+                var xml = serializer.SerializeToString(patient);
+                File.WriteAllText(tmpFilePath, xml);
+
+                // Verify that Refresh updates the summary information
+                Refresh(tmpFilePath);
+                fileNames = source.ListArtifactNames().ToList();
+                Assert.AreEqual(1, fileNames.Count);
+                Assert.AreEqual(srcFileName, fileNames[0]);
+
+                summaries = source.ListSummaries().ToList();
+                Assert.AreEqual(1, summaries.Count);
+                summary = summaries[0];
+                Assert.AreEqual(uriPrefix + patient.Id, summary.ResourceUri);
+
             }
             finally
             {
                 Directory.Delete(tmpFolderPath, true);
+            }
+        }
+
+        [TestMethod]
+        public void TestParserSettings()
+        {
+            // Create an invalid patient resource on disk
+            var obs = new Observation()
+            {
+                Id = "1",
+                ReferenceRange = new List<Observation.ReferenceRangeComponent> {
+                    new Observation.ReferenceRangeComponent { Text = " "} }
+            };
+            var nav = obs.ToTypedElement();
+            var xml = nav.ToXml();
+
+            var folderPath = Path.Combine(Path.GetTempPath(), "TestDirectorySource");
+            var filePath = Path.Combine(folderPath, "TestPatient.xml");
+
+            try
+            {
+
+                Directory.CreateDirectory(folderPath);
+                File.WriteAllText(filePath, xml);
+
+                // Try to access using DirectorySource with default settings, but with PermissiveParsing switch off.
+                var settings = DirectorySourceSettings.CreateDefault();
+                settings.XmlParserSettings.PermissiveParsing = false;
+                var src = new DirectorySource(folderPath, settings);
+
+                var uri = NavigatorStreamHelper.FormatCanonicalUrlForBundleEntry(obs.TypeName, obs.Id);
+                Assert.AreEqual(@"http://example.org/Observation/1", uri);
+
+                // Expecting resolving to fail, because of illegal empty value
+                Assert.ThrowsException<FormatException>(() => { src.ResolveByUri(uri); });
+
+                // Bypass all verification; specifically, accept empty values
+                src.XmlParserSettings.PermissiveParsing = true;
+
+                // Expecting resolving to succeed
+                var result = src.ResolveByUri(uri);
+                Assert.IsNotNull(result);
+                Assert.IsInstanceOfType(result, typeof(Observation));
+
+            }
+            finally
+            {
+                // Clean up temporary files
+                Directory.Delete(folderPath, true);
             }
         }
     }

@@ -1,19 +1,16 @@
 ﻿using Hl7.Fhir.ElementModel;
 using Hl7.Fhir.Model.Primitives;
-using Hl7.Fhir.Serialization;
 using Hl7.Fhir.Specification;
 using Hl7.Fhir.Tests;
 using Hl7.Fhir.Utility;
 using Hl7.FhirPath;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Xml;
 
 namespace Hl7.Fhir.Serialization.Tests
 {
@@ -107,7 +104,7 @@ namespace Hl7.Fhir.Serialization.Tests
 
         public static void RoundtripXml(Func<string, object> navCreator)
         {
-            var tp = File.ReadAllText(@"TestData\fp-test-patient.xml");
+            var tp = File.ReadAllText(Path.Combine("TestData", "fp-test-patient.xml"));
 
             // will allow whitespace and comments to come through      
             var nav = navCreator(tp);
@@ -140,10 +137,10 @@ namespace Hl7.Fhir.Serialization.Tests
 
         public static void RoundtripJson(Func<string, object> navCreator)
         {
-            //var tp = File.ReadAllText(@"TestData\fp-test-patient.json");
+            //var tp = File.ReadAllText(Path.Combine("TestData", "fp-test-patient.json"));
             //compareJson(navCreator, tp);
 
-            var tp = File.ReadAllText(@"TestData\json-edge-cases.json");
+            var tp = File.ReadAllText(Path.Combine("TestData", "json-edge-cases.json"));
             compareJson(@"TestData\json-edge-cases.json", navCreator, tp);
         }
 

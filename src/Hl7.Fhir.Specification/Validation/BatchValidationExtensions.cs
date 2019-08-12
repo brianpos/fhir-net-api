@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.ElementModel;
@@ -49,7 +49,11 @@ namespace Hl7.Fhir.Validation
                 else
                     failures += 1;
 
-                if (mode == BatchValidationMode.Any && successes > 0) break;       // shortcut evaluation
+                if (mode == BatchValidationMode.Any && successes > 0)
+                {
+                    results.RemoveAll(r => !r.Success);
+                    break;       // shortcut evaluation
+                }
             }
 
             // Did we have success overall?

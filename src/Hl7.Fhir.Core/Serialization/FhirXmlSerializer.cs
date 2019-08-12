@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using Hl7.Fhir.Model;
@@ -22,7 +22,7 @@ namespace Hl7.Fhir.Serialization
         }
 
         private FhirXmlSerializationSettings buildFhirXmlWriterSettings() =>
-            new FhirXmlSerializationSettings { Pretty = Settings.Pretty };
+            new FhirXmlSerializationSettings { Pretty = Settings.Pretty, AppendNewLine = Settings.AppendNewLine };
 
         public string SerializeToString(Base instance, SummaryType summary = SummaryType.False, string root = null, string[] elements = null) => 
             MakeElementStack(instance, summary, elements)

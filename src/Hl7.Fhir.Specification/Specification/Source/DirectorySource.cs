@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://github.com/ewoutkramer/fhir-net-api/blob/master/LICENSE
+ * available at https://github.com/FirelyTeam/fhir-net-api/blob/master/LICENSE
  */
 
 // [WMR 20171023] TODO
@@ -22,7 +22,7 @@ using System.Linq;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
+using Hl7.Fhir.ElementModel;
 
 namespace Hl7.Fhir.Specification.Source
 {
@@ -39,6 +39,8 @@ namespace Hl7.Fhir.Specification.Source
         // Instance fields
         private readonly DirectorySourceSettings _settings;
         private readonly ArtifactSummaryGenerator _summaryGenerator;
+        private readonly ConfigurableNavigatorStreamFactory _navigatorFactory;
+        private readonly NavigatorStreamFactory _navigatorFactoryDelegate;
 
         // [WMR 20180813] NEW
         // Use Lazy<T> to synchronize collection (re-)loading (=> lock-free reading)
@@ -53,7 +55,8 @@ namespace Hl7.Fhir.Specification.Source
         /// collect the artifact summaries, while any other threads will block.
         /// </para>
         /// </summary>
-        public DirectorySource() : this(SpecificationDirectory) { }
+        public DirectorySource()
+            : this(SpecificationDirectory, null, false) { }
 
         /// <summary>
         /// Create a new <see cref="DirectorySource"/> instance to browse and resolve resources
@@ -66,46 +69,7 @@ namespace Hl7.Fhir.Specification.Source
         /// </para>
         /// <param name="contentDirectory">The file path of the target directory.</param>
         public DirectorySource(string contentDirectory)
-        {
-            ContentDirectory = contentDirectory ?? throw Error.ArgumentNull(nameof(contentDirectory));
-            _settings = new DirectorySourceSettings();
-            _summaryGenerator = new ArtifactSummaryGenerator(_settings.ExcludeSummariesForUnknownArtifacts);
-            // Initialize Lazy
-            Refresh();
-        }
-
-        /// <summary>
-        /// Create a new <see cref="DirectorySource"/> instance to browse and resolve resources
-        /// from the specified <paramref name="contentDirectory"/>
-        /// and using the specified <see cref="DirectorySourceSettings"/>.
-        /// <para>
-        /// Initialization is thread-safe. The source ensures that only a single thread will
-        /// collect the artifact summaries, while any other threads will block.
-        /// </para>
-        /// </summary>
-        /// <param name="contentDirectory">The file path of the target directory.</param>
-        /// <param name="settings">Configuration settings that control the behavior of the <see cref="DirectorySource"/>.</param>
-        public DirectorySource(string contentDirectory, DirectorySourceSettings settings)
-        {
-            ContentDirectory = contentDirectory ?? throw Error.ArgumentNull(nameof(contentDirectory));
-            // [WMR 20171023] Always copy the specified settings, to prevent shared state
-            _settings = new DirectorySourceSettings(settings);
-            _summaryGenerator = new ArtifactSummaryGenerator(_settings.ExcludeSummariesForUnknownArtifacts);
-            // Initialize Lazy
-            Refresh();
-        }
-
-        /// <summary>
-        /// Create a new <see cref="DirectorySource"/> instance to browse and resolve resources
-        /// using the specified <see cref="DirectorySourceSettings"/>.
-        /// </summary>
-        /// <param name="settings">Configuration settings that control the behavior of the <see cref="DirectorySource"/>.</param>
-        /// <exception cref="ArgumentNullException">One of the specified arguments is <c>null</c>.</exception>
-        public DirectorySource(DirectorySourceSettings settings) : this(SpecificationDirectory, settings)
-        {
-            //
-        }
-
+            : this(contentDirectory, null, false) { }
 
         /// <summary>
         /// Create a new <see cref="DirectorySource"/> instance to browse and resolve resources
@@ -116,10 +80,8 @@ namespace Hl7.Fhir.Specification.Source
         /// recursively scan all subdirectories of the specified content directory.
         /// </param>
         [Obsolete("Instead, use DirectorySource(DirectorySourceSettings settings)")]
-        public DirectorySource(bool includeSubdirectories) : this(SpecificationDirectory, includeSubdirectories)
-        {
-            //
-        }
+        public DirectorySource(bool includeSubdirectories)
+            : this(SpecificationDirectory, new DirectorySourceSettings(includeSubdirectories), false) { }
 
         /// <summary>
         /// Create a new <see cref="DirectorySource"/> instance to browse and resolve resources
@@ -132,13 +94,55 @@ namespace Hl7.Fhir.Specification.Source
         /// </param>
         [Obsolete("Instead, use DirectorySource(string contentDirectory, DirectorySourceSettings settings)")]
         public DirectorySource(string contentDirectory, bool includeSubdirectories)
-            : this(contentDirectory,
-                  new DirectorySourceSettings() { IncludeSubDirectories = includeSubdirectories })
+            : this(contentDirectory, new DirectorySourceSettings(includeSubdirectories), false) { }
+
+        /// <summary>
+        /// Create a new <see cref="DirectorySource"/> instance to browse and resolve resources
+        /// using the specified <see cref="DirectorySourceSettings"/>.
+        /// </summary>
+        /// <param name="settings">Configuration settings that control the behavior of the <see cref="DirectorySource"/>.</param>
+        /// <exception cref="ArgumentNullException">One of the specified arguments is <c>null</c>.</exception>
+        public DirectorySource(DirectorySourceSettings settings)
+            : this(SpecificationDirectory, settings, true) { }
+
+        /// <summary>
+        /// Create a new <see cref="DirectorySource"/> instance to browse and resolve resources
+        /// from the specified <paramref name="contentDirectory"/>
+        /// and using the specified <see cref="DirectorySourceSettings"/>.
+        /// <para>
+        /// Initialization is thread-safe. The source ensures that only a single thread will
+        /// collect the artifact summaries, while any other threads will block.
+        /// </para>
+        /// </summary>
+        /// <param name="contentDirectory">The file path of the target directory.</param>
+        /// <param name="settings">Configuration settings that control the behavior of the <see cref="DirectorySource"/>.</param>
+        /// <exception cref="ArgumentNullException">One of the specified arguments is <c>null</c>.</exception>
+        public DirectorySource(string contentDirectory, DirectorySourceSettings settings)
+            : this(contentDirectory, settings, true) { }
+
+        // Internal ctor
+        DirectorySource(string contentDirectory, DirectorySourceSettings settings, bool cloneSettings)
         {
-            //
+            // [WMR 20190305] FilePatternFilter requires ContentDirectory to be a full, absolute path
+            //ContentDirectory = contentDirectory ?? throw Error.ArgumentNull(nameof(contentDirectory));
+            if (contentDirectory is null) { throw Error.ArgumentNull(nameof(contentDirectory)); }
+            ContentDirectory = Path.GetFullPath(contentDirectory);
+
+            // [WMR 20171023] Clone specified settings to prevent shared state
+            _settings = settings != null 
+                ? (cloneSettings ? new DirectorySourceSettings(settings) : settings)
+                : DirectorySourceSettings.CreateDefault();
+            _summaryGenerator = new ArtifactSummaryGenerator(_settings.ExcludeSummariesForUnknownArtifacts);
+            _navigatorFactory = new ConfigurableNavigatorStreamFactory(_settings.XmlParserSettings, _settings.JsonParserSettings)
+            {
+                ThrowOnUnsupportedFormat = false
+            };
+            _navigatorFactoryDelegate = new NavigatorStreamFactory(_navigatorFactory.Create);
+            // Initialize Lazy
+            Refresh();
         }
 
-        /// <summary>Returns the content directory as specified to the constructor.</summary>
+        /// <summary>Returns the full path to the content directory.</summary>
         public string ContentDirectory { get; }
 
         /// <summary>
@@ -369,6 +373,16 @@ namespace Hl7.Fhir.Specification.Source
             }
         }
 
+        /// <summary>Gets the configuration settings that the behavior of the PoCo parser.</summary>
+        public ParserSettings ParserSettings => _settings.ParserSettings;
+
+        /// <summary>Gets the configuration settings that control the behavior of the XML parser.</summary>
+        public FhirXmlParsingSettings XmlParserSettings => _settings.XmlParserSettings;
+
+        /// <summary>Gets the configuration settings that control the behavior of the JSON parser.</summary>
+        public FhirJsonParsingSettings JsonParserSettings => _settings.JsonParserSettings;
+
+
         #region Refresh
 
         /// <summary>
@@ -450,20 +464,28 @@ namespace Hl7.Fhir.Specification.Source
             // However this won't detect Refresh on main tread while bg threads are reading
 
             var summaries = GetSummaries();
+            var factory = _navigatorFactoryDelegate;
+            var generator = _summaryGenerator;
+            var harvesters = _settings.SummaryDetailsHarvesters;
+
             foreach (var filePath in filePaths)
             {
-                bool exists = File.Exists(filePath);
-                if (!exists)
+                // Always remove existing summaries
+                var isRemoved = summaries.RemoveAll(s => PathComparer.Equals(filePath, s.Origin)) > 0;
+
+                // [WMR 20190528] Fixed: also update existing summaries!
+                if (File.Exists(filePath))
                 {
-                    // File was deleted; remove associated summaries
-                    result |= summaries.RemoveAll(s => PathComparer.Equals(filePath, s.Origin)) > 0;
-                }
-                else if (!summaries.Any(s => PathComparer.Equals(filePath, s.Origin)))
-                {
-                    // File was added; generate and add new summary
-                    var newSummaries = _summaryGenerator.Generate(filePath, _settings.SummaryDetailsHarvesters);
+                    // File was added/changed; generate and add new summary
+                    // [WMR 20190403] Fixed: inject navigator factory delegate
+                    var newSummaries = generator.Generate(filePath, factory, harvesters);
                     summaries.AddRange(newSummaries);
                     result |= newSummaries.Count > 0;
+                }
+                else
+                {
+                    // File was removed
+                    result |= isRemoved;
                 }
             }
             return result;
@@ -484,11 +506,43 @@ namespace Hl7.Fhir.Specification.Source
         /// Also accepts relative file paths.
         /// </summary>
         /// <exception cref="InvalidOperationException">More than one file exists with the specified name.</exception>
-        public Stream LoadArtifactByName(string name)
+        public Stream LoadArtifactByName(string filePath)
         {
-            if (name == null) throw Error.ArgumentNull(nameof(name));
-            var fullFileName = GetFilePaths().SingleOrDefault(path => path.EndsWith(Path.DirectorySeparatorChar + name, PathComparison));
-            return fullFileName == null ? null : File.OpenRead(fullFileName);
+            if (filePath == null) throw Error.ArgumentNull(nameof(filePath));
+
+            var fullList = GetFilePaths();
+            // [WMR 20190219] https://github.com/FirelyTeam/fhir-net-api/issues/875
+            // var fullFileName = GetFilePaths().SingleOrDefault(path => path.EndsWith(Path.DirectorySeparatorChar + filePath, PathComparison));
+            //return fullFileName == null ? null : File.OpenRead(fullFileName);
+
+            // Exact match on absolute path, or partial match on relative path
+            bool isMatch(ArtifactSummary summary)
+                => PathComparer.Equals(summary.Origin, filePath)
+                || summary.Origin.EndsWith(Path.DirectorySeparatorChar + filePath, PathComparison);
+
+            // Only consider valid summaries for recognized artifacts
+            bool isCandidateArtifact(ArtifactSummary summary)
+                => !(summary is null)
+                // EK
+                //      && !summary.IsFaulted
+                && !(summary.Origin is null)
+                && isMatch(summary);
+
+            var candidates = GetSummaries().Where(isCandidateArtifact);
+
+            // We might match multiple files; pick best/nearest fit
+            ArtifactSummary match = null;
+            foreach (var candidate in candidates)
+            {
+                if (match is null || candidate.Origin.Length < match.Origin.Length)
+                {
+                    match = candidate;
+                }
+            }
+
+            if (match?.Origin is null) { return null; }
+
+            return File.OpenRead(match.Origin);
         }
 
         #endregion
@@ -530,7 +584,7 @@ namespace Hl7.Fhir.Specification.Source
         {
             if (sourceUri == null && targetUri == null)
             {
-                throw Error.ArgumentNull(nameof(targetUri), $"{nameof(sourceUri)} and {nameof(targetUri)} cannot both be null.");
+                throw Error.ArgumentNull(nameof(targetUri), $"{nameof(sourceUri)} and {nameof(targetUri)} arguments cannot both be null");
             }
             var summaries = GetSummaries().FindConceptMaps(sourceUri, targetUri);
             return summaries.Select(summary => loadResourceInternal<ConceptMap>(summary)).Where(r => r != null);
@@ -545,7 +599,6 @@ namespace Hl7.Fhir.Specification.Source
             var summary = GetSummaries().ResolveNamingSystem(uniqueId);
             return loadResourceInternal<NamingSystem>(summary);
         }
-
 
         #endregion
 
@@ -816,19 +869,21 @@ namespace Hl7.Fhir.Specification.Source
             return summaries;
         }
 
-        private List<ArtifactSummary> harvestSummaries(List<string> paths)
+        List<ArtifactSummary> harvestSummaries(List<string> paths)
         {
             // [WMR 20171023] Note: some files may no longer exist
 
             var cnt = paths.Count;
             var scanResult = new List<ArtifactSummary>(cnt);
             var harvesters = _settings.SummaryDetailsHarvesters;
+            var factory = _navigatorFactoryDelegate;
 
             if (!_settings.MultiThreaded)
             {
                 foreach (var filePath in paths)
                 {
-                    var summaries = _summaryGenerator.Generate(filePath, harvesters);
+                    // [WMR 20190403] Fixed: inject navigator factory delegate
+                    var summaries = _summaryGenerator.Generate(filePath, factory, harvesters);
 
                     // [WMR 20180423] Generate may return null, e.g. if specified file has unknown extension
                     if (summaries != null)
@@ -864,7 +919,8 @@ namespace Hl7.Fhir.Specification.Source
                         {
                             // Harvest summaries from single file
                             // Save each result to a separate array entry (no locking required)
-                            summaries[i] = _summaryGenerator.Generate(paths[i], harvesters);
+                            // [WMR 20190403] Fixed: inject navigator factory delegate
+                            summaries[i] = _summaryGenerator.Generate(paths[i], factory, harvesters);
                         });
                 }
                 catch (AggregateException aex)
@@ -897,19 +953,26 @@ namespace Hl7.Fhir.Specification.Source
             var origin = summary.Origin;
             if (string.IsNullOrEmpty(origin))
             {
-                throw Error.Argument($"Cannot load resource from summary. The {nameof(ArtifactSummary.Origin)} information is empty or missing.");
+                throw Error.Argument($"Unable to load resource from summary. The '{nameof(ArtifactSummary.Origin)}' information is unavailable.");
             }
 
             var pos = summary.Position;
             if (string.IsNullOrEmpty(pos))
             {
-                throw Error.Argument($"Cannot load resource from summary. The {nameof(ArtifactSummary.Position)} information is empty or missing.");
+                throw Error.Argument($"Unable to load resource from summary. The '{nameof(ArtifactSummary.Position)}' information is unavailable.");
             }
 
-            T result = null;
-            using (var navStream = DefaultNavigatorStreamFactory.Create(origin))
-            {
+            // Always use the current Xml/Json parser settings
+            var factory = GetNavigatorStreamFactory();
 
+            // Also use the current PoCo parser settings
+            var pocoSettings = PocoBuilderSettings.CreateDefault();
+            _settings.ParserSettings?.CopyTo(pocoSettings);
+
+            T result = null;
+
+            using (var navStream = factory.Create(origin))
+            {
                 // Handle exceptions & null return values?
                 // e.g. file may have been deleted/renamed since last scan
 
@@ -917,12 +980,13 @@ namespace Hl7.Fhir.Specification.Source
                 if (navStream != null && navStream.Seek(pos))
                 {
                     // Create navigator for the target resource
+                    // Current property uses the specified Xml/JsonParsingSettings for parsing
                     var nav = navStream.Current;
                     if (nav != null)
                     {
                         // Parse target resource from navigator
-                        var parser = new BaseFhirParser();
-                        result = parser.Parse<T>(nav);
+                        result = nav.ToPoco<T>(pocoSettings);
+
                         // Add origin annotation
                         result?.SetOrigin(origin);
                     }
@@ -930,6 +994,16 @@ namespace Hl7.Fhir.Specification.Source
             }
 
             return result;
+        }
+
+        /// <summary>Return <see cref="ConfigurableNavigatorStreamFactory"/> instance, updated with current Xml/Json parser settings.</summary>
+        ConfigurableNavigatorStreamFactory GetNavigatorStreamFactory()
+        {
+            var settings = _settings;
+            var factory = _navigatorFactory;
+            settings.XmlParserSettings.CopyTo(factory.XmlParsingSettings);
+            settings.JsonParserSettings.CopyTo(factory.JsonParsingSettings);
+            return factory;
         }
 
         #endregion

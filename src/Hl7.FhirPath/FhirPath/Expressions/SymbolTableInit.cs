@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using System;
@@ -194,7 +194,7 @@ namespace Hl7.FhirPath.Expressions
 
             foreach (ITypedElement element in focus)
             {
-                var newFocus = FhirValueList.Create(element);
+                var newFocus = ElementNode.CreateList(element);
                 var newContext = ctx.Nest(newFocus);
                 newContext.SetThis(newFocus);
 
@@ -210,7 +210,7 @@ namespace Hl7.FhirPath.Expressions
 
             foreach (ITypedElement element in focus)
             {
-                var newFocus = FhirValueList.Create(element);
+                var newFocus = ElementNode.CreateList(element);
                 var newContext = ctx.Nest(newFocus);
                 newContext.SetThis(newFocus);
 
@@ -235,7 +235,7 @@ namespace Hl7.FhirPath.Expressions
 
                 foreach (ITypedElement element in current)
                 {
-                    var newFocus = FhirValueList.Create(element);
+                    var newFocus = ElementNode.CreateList(element);
                     var newContext = ctx.Nest(newFocus);
                     newContext.SetThis(newFocus);
 
@@ -256,16 +256,16 @@ namespace Hl7.FhirPath.Expressions
 
             foreach (ITypedElement element in focus)
             {
-                var newFocus = FhirValueList.Create(element);
+                var newFocus = ElementNode.CreateList(element);
                 var newContext = ctx.Nest(newFocus);
                 newContext.SetThis(newFocus);
 
                 var result = lambda(newContext, InvokeeFactory.EmptyArgs).BooleanEval();
-                if (result == null) return FhirValueList.Empty;
-                if (result == false) return FhirValueList.Create(false);
+                if (result == null) return ElementNode.EmptyList;
+                if (result == false) return ElementNode.CreateList(false);
             }
 
-            return FhirValueList.Create(true);
+            return ElementNode.CreateList(true);
         }
 
         private static IEnumerable<ITypedElement> runAny(Closure ctx, IEnumerable<Invokee> arguments)
@@ -275,19 +275,19 @@ namespace Hl7.FhirPath.Expressions
 
             foreach (ITypedElement element in focus)
             {
-                var newFocus = FhirValueList.Create(element);
+                var newFocus = ElementNode.CreateList(element);
                 var newContext = ctx.Nest(newFocus);
                 newContext.SetThis(newFocus);
 
 
                 var result = lambda(newContext, InvokeeFactory.EmptyArgs).BooleanEval();
 
-                //if (result == null) return FhirValueList.Empty; -> otherwise this would not be where().exists()
+                //if (result == null) return ElementNode.EmptyList; -> otherwise this would not be where().exists()
                 //Patient.identifier.any(use = 'official') would return {} if ANY identifier has no 'use' element. Unexpected behaviour, I think
-                if (result == true) return FhirValueList.Create(true);
+                if (result == true) return ElementNode.CreateList(true);
             }
 
-            return FhirValueList.Create(false);
+            return ElementNode.CreateList(false);
         }
     }
 }

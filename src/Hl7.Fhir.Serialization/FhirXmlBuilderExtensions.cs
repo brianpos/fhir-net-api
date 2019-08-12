@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://github.com/ewoutkramer/fhir-net-api/blob/master/LICENSE
+ * available at https://github.com/FirelyTeam/fhir-net-api/blob/master/LICENSE
  */
 
 
@@ -42,14 +42,14 @@ namespace Hl7.Fhir.Serialization
 #pragma warning restore 612, 618
 
         public static string ToXml(this ISourceNode source, FhirXmlSerializationSettings settings = null)
-        => SerializationUtil.WriteXmlToString(writer => source.WriteTo(writer, settings), settings?.Pretty ?? false);
+        => SerializationUtil.WriteXmlToString(writer => source.WriteTo(writer, settings), settings?.Pretty ?? false, settings?.AppendNewLine ?? false);
 
         public static string ToXml(this ITypedElement source, FhirXmlSerializationSettings settings = null)
-                => SerializationUtil.WriteXmlToString(writer => source.WriteTo(writer, settings), settings?.Pretty ?? false);
+                => SerializationUtil.WriteXmlToString(writer => source.WriteTo(writer, settings), settings?.Pretty ?? false, settings?.AppendNewLine ?? false);
 
 #pragma warning disable 612, 618
         public static string ToXml(this IElementNavigator source, FhirXmlSerializationSettings settings = null)
-        => SerializationUtil.WriteXmlToString(writer => source.WriteTo(writer, settings), settings?.Pretty ?? false);
+        => SerializationUtil.WriteXmlToString(writer => source.WriteTo(writer, settings), settings?.Pretty ?? false, settings?.AppendNewLine ?? false);
 #pragma warning restore 612, 618
 
         public static byte[] ToXmlBytes(this ITypedElement source, FhirXmlSerializationSettings settings = null)

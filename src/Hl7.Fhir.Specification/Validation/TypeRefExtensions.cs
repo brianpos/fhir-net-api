@@ -3,7 +3,7 @@
  * See the file CONTRIBUTORS for details.
  * 
  * This file is licensed under the BSD 3-Clause license
- * available at https://raw.githubusercontent.com/ewoutkramer/fhir-net-api/master/LICENSE
+ * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
 using System.Linq;
@@ -19,15 +19,15 @@ namespace Hl7.Fhir.Validation
     {
         public static string ReadableName(this StructureDefinition sd) => sd.Derivation == StructureDefinition.TypeDerivationRule.Constraint ? sd.Url : sd.Id;
 
-        public static string GetDeclaredProfiles(this ElementDefinition.TypeRefComponent typeRef)
+        public static string[] GetDeclaredProfiles(this ElementDefinition.TypeRefComponent typeRef)
         {
             // back to what DSTU2 had ;)
             if (typeRef.ProfileElement.Any())
             {
-                return typeRef.Profile.First();
+                return typeRef.Profile.ToArray();
             }
             if (!string.IsNullOrEmpty(typeRef.Code))
-                return ModelInfo.CanonicalUriForFhirCoreType(typeRef.Code);
+                return new[] { ModelInfo.CanonicalUriForFhirCoreType(typeRef.Code)?.Value };
             return null;
         }
 
