@@ -99,13 +99,13 @@ namespace Hl7.Fhir.QuestionnaireServices
                 {
                     // this is an error (no need to check how many there are without performance of counting them each time)
                     result.AddIssue("Need to have one of these! " + rule.Path,
-                        new Issue() { Code = 12, Severity = OperationOutcome.IssueSeverity.Error, Type = OperationOutcome.IssueType.Value },
+                    Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
                         ParentContext);
                 }
                 else if (values.Count() < rule.Min)
                 {
                     result.AddIssue("Need to have at least " + rule.Min.ToString() + " of these! " + rule.Path,
-                    new Issue() { Code = 12, Severity = OperationOutcome.IssueSeverity.Error, Type = OperationOutcome.IssueType.Value },
+                    Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
                     ParentContext);
                 }
             }
@@ -115,7 +115,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                 {
                     // this is an error (no need to check how many there are without performance of counting them each time)
                     result.AddIssue("Should not contain one of these!" + rule.Path,
-                        new Issue() { Code = 12, Severity = OperationOutcome.IssueSeverity.Error, Type = OperationOutcome.IssueType.Value },
+                    Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
                         ParentContext);
                 }
             }
@@ -129,7 +129,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                     {
                         // this is an error (no need to check how many there are without performance of counting them each time)
                         result.AddIssue("Should only have " + rule.Max + " one of these!" + rule.Path,
-                            new Issue() { Code = 12, Severity = OperationOutcome.IssueSeverity.Error, Type = OperationOutcome.IssueType.Value },
+                            Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
                             ParentContext);
                     }
                 }
