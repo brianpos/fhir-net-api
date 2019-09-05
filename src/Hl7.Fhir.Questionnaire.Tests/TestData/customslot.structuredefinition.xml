@@ -1,0 +1,382 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="customslot" />
+  <meta>
+    <lastUpdated value="2017-08-03T14:56:53.364+10:00" />
+  </meta>
+  <url value="http://sqlonfhir-ci2.azurewebsites.net/fhir/StructureDefinition/customslot" />
+  <name value="MySlot" />
+  <status value="draft" />
+  <fhirVersion value="3.0.1" />
+  <kind value="resource" />
+  <type value="Slot" />
+  <abstract value="false" />
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Slot" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="1">
+      <path value="Slot" />
+      <short value="A slot of time on a schedule that may be available for booking appointments" />
+      <definition value="A slot of time on a schedule that may be available for booking appointments." />
+      <min value="0" />
+      <max value="*" />
+      <base>
+        <path value="Slot" />
+        <min value="0" />
+        <max value="*" />
+      </base>
+      <mapping>
+        <identity value="ical" />
+        <map value="(refer to the Availability resource for the header mapping details)" />
+      </mapping>
+      <mapping>
+        <identity value="w5" />
+        <map value="workflow.scheduling" />
+      </mapping>
+    </element>
+    <element id="2">
+      <path value="Slot.extension" />
+      <sliceName value="phone-ismain" />
+      <definition value="Optional Extensions Element - found in all resources." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="http://healthconnex.com.au/hcxd/Phone/IsMain" />
+      </type>
+    </element>
+    <element id="3">
+      <path value="Slot.extension" />
+      <sliceName value="phone-prefix" />
+      <definition value="Optional Extensions Element - found in all resources." />
+      <min value="0" />
+      <max value="1" />
+      <type>
+        <code value="Extension" />
+        <profile value="http://healthconnex.com.au/hcxd/Phone/Prefix" />
+      </type>
+    </element>
+    <element id="4">
+      <path value="Slot.meta" />
+      <short value="Metadata about the resource" />
+      <definition value="The metadata about the resource. This is content that is maintained by the infrastructure. Changes to the content may not always be associated with version changes to the resource." />
+      <min value="0" />
+      <max value="0" />
+      <base>
+        <path value="Slot.meta" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="Meta" />
+      </type>
+      <isSummary value="true" />
+    </element>
+    <element id="5">
+      <path value="Slot.identifier" />
+      <slicing>
+        <discriminator><type value="value" /><path value="system" /></discriminator>
+        <rules value="openAtEnd" />
+      </slicing>
+      <short value="External Ids for this item" />
+      <definition value="External Ids for this item." />
+      <min value="0" />
+      <max value="*" />
+      <base>
+        <path value="Slot.identifier" />
+        <min value="0" />
+        <max value="*" />
+      </base>
+      <type>
+        <code value="Identifier" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="rim" />
+        <map value=".id" />
+      </mapping>
+      <mapping>
+        <identity value="w5" />
+        <map value="id" />
+      </mapping>
+    </element>
+    <element id="6">
+      <path value="Slot.identifier" />
+      <sliceName value="AgedCare" />
+      <short value="External Ids for this item" />
+      <definition value="External Ids for this item." />
+      <min value="0" />
+      <max value="*" />
+      <base>
+        <path value="Slot.identifier" />
+        <min value="0" />
+        <max value="*" />
+      </base>
+      <type>
+        <code value="Identifier" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="rim" />
+        <map value=".id" />
+      </mapping>
+      <mapping>
+        <identity value="w5" />
+        <map value="id" />
+      </mapping>
+    </element>
+    <element id="7">
+      <path value="Slot.identifier.type" />
+      <short value="Description of identifier" />
+      <definition value="A coded type for the identifier that can be used to determine which identifier to use for a specific purpose." />
+      <comment value="This element deals only with general categories of identifiers.  It SHOULD not be used for codes that correspond 1..1 with the Identifier.system. Some identifiers may fall into multiple categories due to common usage.   Where the system is known, a type is unnecessary because the type is always part of the system definition. However systems often need to handle identifiers where the system is not known. There is not a 1:1 relationship between type and system, since many different systems have the same type." />
+      <requirements value="Allows users to make use of identifiers when the identifier system is not known." />
+      <min value="0" />
+      <max value="0" />
+      <base>
+        <path value="Slot.identifier.type" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="CodeableConcept" />
+      </type>
+      <isSummary value="true" />
+      <binding>
+        <strength value="extensible" />
+        <description value="A coded type for an identifier that can be used to determine which identifier to use for a specific purpose." />
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/identifier-type" />
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2" />
+        <map value="CX.5" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="Role.code or implied by context" />
+      </mapping>
+    </element>
+    <element id="8">
+      <path value="Slot.identifier.system" />
+      <short value="The namespace for the identifier" />
+      <definition value="Establishes the namespace in which set of possible id values is unique." />
+      <requirements value="There are many sequences of identifiers.  To perform matching, we need to know what sequence we're dealing with. The system identifies a particular sequence or set of unique identifiers." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Slot.identifier.system" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="uri" />
+      </type>
+      <fixedUri value="http://example.org/AgedCareIdentifier" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="CX.4 / EI-2-4" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="II.root or Role.id.root" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./IdentifierType" />
+      </mapping>
+    </element>
+    <element id="9">
+      <path value="Slot.identifier.assigner" />
+      <short value="Organization that issued id (may be just text)" />
+      <definition value="Organization that issued/manages the identifier." />
+      <comment value="The reference may be just a text description of the assigner." />
+      <min value="0" />
+      <max value="0" />
+      <base>
+        <path value="Slot.identifier.assigner" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/Organization" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="CX.4 / (CX.4,CX.9,CX.10)" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="II.assigningAuthorityName but note that this is an improper use by the definition of the field.  Also Role.scoper" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./IdentifierIssuingAuthority" />
+      </mapping>
+    </element>
+    <element id="10">
+      <path value="Slot.identifier" />
+      <sliceName value="Community" />
+      <short value="External Ids for this item" />
+      <definition value="External Ids for this item." />
+      <min value="0" />
+      <max value="*" />
+      <base>
+        <path value="Slot.identifier" />
+        <min value="0" />
+        <max value="*" />
+      </base>
+      <type>
+        <code value="Identifier" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="rim" />
+        <map value=".id" />
+      </mapping>
+      <mapping>
+        <identity value="w5" />
+        <map value="id" />
+      </mapping>
+    </element>
+    <element id="11">
+      <path value="Slot.identifier.type" />
+      <short value="Description of identifier" />
+      <definition value="A coded type for the identifier that can be used to determine which identifier to use for a specific purpose." />
+      <comment value="This element deals only with general categories of identifiers.  It SHOULD not be used for codes that correspond 1..1 with the Identifier.system. Some identifiers may fall into multiple categories due to common usage.   Where the system is known, a type is unnecessary because the type is always part of the system definition. However systems often need to handle identifiers where the system is not known. There is not a 1:1 relationship between type and system, since many different systems have the same type." />
+      <requirements value="Allows users to make use of identifiers when the identifier system is not known." />
+      <min value="0" />
+      <max value="0" />
+      <base>
+        <path value="Slot.identifier.type" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="CodeableConcept" />
+      </type>
+      <isSummary value="true" />
+      <binding>
+        <strength value="extensible" />
+        <description value="A coded type for an identifier that can be used to determine which identifier to use for a specific purpose." />
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/identifier-type" />
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="v2" />
+        <map value="CX.5" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="Role.code or implied by context" />
+      </mapping>
+    </element>
+    <element id="12">
+      <path value="Slot.identifier.system" />
+      <short value="The namespace for the identifier" />
+      <definition value="Establishes the namespace in which set of possible id values is unique." />
+      <requirements value="There are many sequences of identifiers.  To perform matching, we need to know what sequence we're dealing with. The system identifies a particular sequence or set of unique identifiers." />
+      <min value="0" />
+      <max value="1" />
+      <base>
+        <path value="Slot.identifier.system" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="uri" />
+      </type>
+      <fixedUri value="http://example.org/CommunityIdentifier" />
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="CX.4 / EI-2-4" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="II.root or Role.id.root" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./IdentifierType" />
+      </mapping>
+    </element>
+    <element id="13">
+      <path value="Slot.identifier.assigner" />
+      <short value="Organization that issued id (may be just text)" />
+      <definition value="Organization that issued/manages the identifier." />
+      <comment value="The reference may be just a text description of the assigner." />
+      <min value="0" />
+      <max value="0" />
+      <base>
+        <path value="Slot.identifier.assigner" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="Reference" />
+        <profile value="http://hl7.org/fhir/StructureDefinition/Organization" />
+      </type>
+      <isSummary value="true" />
+      <mapping>
+        <identity value="v2" />
+        <map value="CX.4 / (CX.4,CX.9,CX.10)" />
+      </mapping>
+      <mapping>
+        <identity value="rim" />
+        <map value="II.assigningAuthorityName but note that this is an improper use by the definition of the field.  Also Role.scoper" />
+      </mapping>
+      <mapping>
+        <identity value="servd" />
+        <map value="./IdentifierIssuingAuthority" />
+      </mapping>
+    </element>
+    <element id="14">
+      <path value="Slot.type" />
+      <short value="The type of appointments that can be booked into this slot (ideally this would be an identifiable service - which is at a location, rather than the location itself). If provided then this overrides the value provided on the availability resource" />
+      <definition value="The type of appointments that can be booked into this slot (ideally this would be an identifiable service - which is at a location, rather than the location itself). If provided then this overrides the value provided on the availability resource." />
+      <min value="0" />
+      <max value="0" />
+      <base>
+        <path value="Slot.type" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="CodeableConcept" />
+      </type>
+      <binding>
+        <strength value="preferred" />
+        <description value="Additional details about where the content was created (e.g. clinical specialty)." />
+        <valueSetReference>
+          <reference value="http://hl7.org/fhir/ValueSet/c80-practice-codes" />
+        </valueSetReference>
+      </binding>
+      <mapping>
+        <identity value="w5" />
+        <map value="class" />
+      </mapping>
+    </element>
+    <element id="15">
+      <path value="Slot.overbooked" />
+      <short value="This slot has already been overbooked, appointments are unlikely to be accepted for this time" />
+      <definition value="This slot has already been overbooked, appointments are unlikely to be accepted for this time." />
+      <min value="0" />
+      <max value="0" />
+      <base>
+        <path value="Slot.overbooked" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="boolean" />
+      </type>
+      <meaningWhenMissing value="If overbooked is missing, systems may assume that there are still appointments available" />
+    </element>
+  </differential>
+</StructureDefinition>

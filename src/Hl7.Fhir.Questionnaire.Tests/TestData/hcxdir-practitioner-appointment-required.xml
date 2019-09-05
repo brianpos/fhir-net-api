@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="hcxdir-practitioner-appointment-required" />
+  <meta>
+    <lastUpdated value="2015-09-22T20:02:49.724+10:00" />
+  </meta>
+  <url value="http://healthconnex.com.au/hcxd/Practitioner/AppointmentRequired" />
+  <version value="1" />
+  <name value="hcxdir-practitioner-appointment-required" />
+  <title value="hcxdir-practitioner-appointment-required" />
+  <status value="draft" />
+  <publisher value="Healthconnex" />
+  <date value="2015-09-22T20:02:49+10:00" />
+  <description value="Extension defined to check wether appointment is required for a practitioner" />
+  <purpose value="The ability to add extensions in a structured way is what keeps FHIR resources simple" />
+  <copyright value="Healthconnex" />
+  <fhirVersion value="3.0.1" />
+  <kind value="resource" />
+  <type value="Extension" />
+  <abstract value="false" />
+  <contextType value="resource" />
+  <context value="Practitioner" />
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
+  <derivation value="constraint" />
+  <differential>
+    <element id="1">
+      <path value="Extension" />
+      <definition value="Optional Extensions Element - found in all resources." />
+      <min value="0" />
+      <max value="*" />
+      <base>
+        <path value="Extension" />
+        <min value="0" />
+        <max value="*" />
+      </base>
+      <mapping>
+        <identity value="rim" />
+        <map value="N/A" />
+      </mapping>
+    </element>
+    <element id="2">
+      <path value="Extension.value[x]" />
+      <label value="Appointment Required" />
+      <short value="Value of Appointment Required" />
+      <definition value="Value of extension - may be a resource or one of a constrained set of the data types (see Extensibility in the spec for list)." />
+      <min value="1" />
+      <max value="1" />
+      <base>
+        <path value="Extension.value[x]" />
+        <min value="0" />
+        <max value="1" />
+      </base>
+      <type>
+        <code value="string" />
+      </type>
+      <mapping>
+        <identity value="rim" />
+        <map value="N/A" />
+      </mapping>
+    </element>
+  </differential>
+</StructureDefinition>
