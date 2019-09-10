@@ -84,9 +84,25 @@ namespace Hl7.Fhir.QuestionnaireServices
             return result;
         }
 
+        internal static void UpdateQuestionnaireResponseDefinitions(Model.Questionnaire.ItemComponent qItem, QuestionnaireResponse.ItemComponent qrItem)
+        {
+            if (string.IsNullOrEmpty(qrItem.Definition))
+                qrItem.Definition = qItem.Definition;
+            else if (qrItem.Definition != qItem.Definition)
+                System.Diagnostics.Debug.WriteLine($"Definition not matching for LinkId: {qrItem.LinkId}    {qItem.Definition}  {qrItem.Definition}");
+            foreach (var qrItemChild in qrItem.Item)
+            {
+                UpdateQuestionnaireResponseDefinitions(qItem.Item.FirstOrDefault(i => i.LinkId == qrItemChild.LinkId), qrItemChild);
+            }
+        }
+
         public static T CreateResourceInstance<T>(StructureDefinition pracSd, StructureItem parent, Model.Questionnaire questionnaire, QuestionnaireResponse questionnaireResponse)
             where T : Resource, new()
         {
+            foreach (var qrItem in questionnaireResponse.Item)
+            {
+                UpdateQuestionnaireResponseDefinitions(questionnaire.Item.FirstOrDefault(i => i.LinkId == qrItem.LinkId), qrItem);
+            }
             System.Diagnostics.Debug.WriteLine("-----------------------------");
             T result = new T();
             List<QuestionnaireResponse.ItemComponent> groups = new List<QuestionnaireResponse.ItemComponent>();
@@ -284,8 +300,16 @@ namespace Hl7.Fhir.QuestionnaireServices
             List<QuestionnaireResponse.ItemComponent> result = new List<QuestionnaireResponse.ItemComponent>();
             foreach (var g in groups)
             {
-                if (g.LinkId == si.Path)
+                if (g.Definition == si.Definition)
                     result.Add(g);
+                else if (g.LinkId == si.Path)
+                    result.Add(g);
+                else if (g.Definition != null
+                    && g.Definition.StartsWith(si.Definition)
+                    && !g.Definition.StartsWith(si.Definition + ":") // and that this isn't a slice
+                    && g.Definition != si.Definition
+                    && result == null)
+                    result.Add(g); // this is a step along the way
                 else
                 {
                     foreach (var gn in g.Item.SelectMany(s => s.Answer.Select(a => a.Item)))
@@ -329,7 +353,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                 }
                 // Check if THIS is a question on the way to the item
                 // (need to check if the path approach will always work once we get into the extensions)
-                if (group.LinkId == si.Path)
+                if (group.LinkId == si.Path || group.Definition == si.Definition)
                 {
                     if (result == null)
                         result = new List<QuestionnaireResponse.AnswerComponent>();
@@ -338,6 +362,12 @@ namespace Hl7.Fhir.QuestionnaireServices
                 if (group.LinkId.StartsWith(si.Path)
                     && !group.LinkId.StartsWith(si.Path+":") // and that this isn't a slice
                     && group.LinkId != si.Path 
+                    && result == null)
+                    result = new List<QuestionnaireResponse.AnswerComponent>();
+                else if (group.Definition != null 
+                    && group.Definition.StartsWith(si.Definition)
+                    && !group.Definition.StartsWith(si.Definition + ":") // and that this isn't a slice
+                    && group.Definition != si.Definition
                     && result == null)
                     result = new List<QuestionnaireResponse.AnswerComponent>();
             }

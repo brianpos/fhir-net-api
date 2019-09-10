@@ -42,6 +42,13 @@ namespace Hl7.Fhir.QuestionnaireServices
         /// </summary>
         public string Path { get; set; }
 
+        /// <summary>
+        /// The value used in the Definition field in the questionnaires
+        /// (is essentially a prefixed version of the ElementDefinition path)
+        /// </summary>
+        public string Definition { get => $"{StructureDefinitionUrl}#{Path}"; }
+        public string StructureDefinitionUrl { get; set; }
+
         public String FhirpathExpression { get; set; }
 
         public ElementDefinition ed { get; set; }

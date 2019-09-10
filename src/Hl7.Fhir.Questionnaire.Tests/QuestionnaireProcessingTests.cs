@@ -32,7 +32,9 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var si = StructureItemTree.CreateStructureTree(pracSd, TestHelpers.Source);
             var q = GetPractitionerQuestionnaire();
             StructureItemTree.PruneTree(si, q);
-            var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, q, GetPractitionerQuestionnaireResponse());
+            var qr = GetPractitionerQuestionnaireResponse();
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qr));
+            var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, q, qr);
 
             if (prac != null)
                 System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(prac));
@@ -40,12 +42,12 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual(true, prac.Active);
             Assert.AreEqual(AdministrativeGender.Male, prac.Gender);
             Assert.AreEqual("1970", prac.BirthDate);
-            Assert.AreEqual(2, prac.Qualification?.Count);
             Assert.AreEqual("Brian Postlethwaite", prac.Name?.FirstOrDefault()?.Text);
             Assert.AreEqual("MOPO", prac.Address[0].Line.FirstOrDefault());
             Assert.AreEqual("Ascot Vale Rd", prac.Address[0].Line.Skip(1).FirstOrDefault());
             Assert.AreEqual("3039", prac.Address[0]?.PostalCode);
 
+            Assert.AreEqual(2, prac.Qualification?.Count);
             Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
             Assert.AreEqual("Certification 3 - Aged Care", prac.Qualification[0].Code.Coding[0].Display);
             Assert.AreEqual("2017", prac.Qualification[0].Period.End);
@@ -73,38 +75,44 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             {
                 Text = "Active",
                 Type = Questionnaire.QuestionnaireItemType.Boolean,
-                LinkId = "Practitioner.active"
+                LinkId = "Practitioner.active",
+                Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.active"
             });
             gCoreProps.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Gender",
                 Type = Questionnaire.QuestionnaireItemType.Choice,
-                LinkId = "Practitioner.gender"
+                LinkId = "Practitioner.gender",
+                Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.gender"
             });
             gCoreProps.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Birth Date",
                 Type = Questionnaire.QuestionnaireItemType.Date,
-                LinkId = "Practitioner.birthDate"
+                LinkId = "Practitioner.birthDate",
+                Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.birthDate"
             });
             gCoreProps.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Name",
                 Type = Questionnaire.QuestionnaireItemType.String,
-                LinkId = "Practitioner.name.text"
+                LinkId = "Practitioner.name.text",
+                Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.name.text"
             });
             gCoreProps.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Address",
                 Type = Questionnaire.QuestionnaireItemType.String,
                 Repeats = true,
-                LinkId = "Practitioner.address.line"
+                LinkId = "Practitioner.address.line",
+                Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.address.line"
             });
             gCoreProps.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Post Code",
                 Type = Questionnaire.QuestionnaireItemType.String,
-                LinkId = "Practitioner.address.postalCode"
+                LinkId = "Practitioner.address.postalCode",
+                Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.address.postalCode"
             });
 
             // A collection of Qualifications
@@ -113,30 +121,35 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             gCerts.Type = Questionnaire.QuestionnaireItemType.Group;
             gCerts.Text = "Qualifications";
             gCerts.LinkId = "Practitioner.qualification";
+            gCerts.Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.qualification";
             gCerts.Repeats = true;
             gCerts.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Code",
                 Type = Questionnaire.QuestionnaireItemType.String,
-                LinkId = "Practitioner.qualification.code.coding.code"
+                LinkId = "Practitioner.qualification.code.coding.code",
+                Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.qualification.code.coding.code"
             });
             gCerts.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Display",
                 Type = Questionnaire.QuestionnaireItemType.String,
-                LinkId = "Practitioner.qualification.code.coding.display"
+                LinkId = "Practitioner.qualification.code.coding.display",
+                Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.qualification.code.coding.display"
             });
             gCerts.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Completion Year",
                 Type = Questionnaire.QuestionnaireItemType.DateTime,
-                LinkId = "Practitioner.qualification.period.end"
+                LinkId = "Practitioner.qualification.period.end",
+                Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.qualification.period.end"
             });
             gCerts.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Issued by",
                 Type = Questionnaire.QuestionnaireItemType.String,
-                LinkId = "Practitioner.qualification.issuer.display"
+                LinkId = "Practitioner.qualification.issuer.display",
+                Definition = "http://hl7.org/fhir/StructureDefinition/Practitioner#Practitioner.qualification.issuer.display"
             });
 
             return q;
@@ -286,14 +299,19 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         [TestMethod]
         public void QuestionnaireCreateExtendedPractitioner()
         {
+            StructureItemTree.FlushCache();
             string xml = System.IO.File.ReadAllText(
                 @"TestData\hcxdir-practitioner.xml");
 
             var pracSd = new Serialization.FhirXmlParser().Parse<StructureDefinition>(xml);
             var si = StructureItemTree.CreateStructureTree(pracSd, TestHelpers.Source);
             var q = GetExtendedPractitionerQuestionnaire();
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(q));
             var qr = GetExtendedPractitionerQuestionnaireResponse();
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qr));
+            DumpTree(si);
             StructureItemTree.PruneTree(si, q);
+            DumpTree(si);
             var prac = QuestionnaireProcessing.CreateResourceInstance<Practitioner>(pracSd, si, q, qr);
 
             System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(prac));
@@ -301,11 +319,11 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual(true, prac.Active);
             Assert.AreEqual(AdministrativeGender.Male, prac.Gender);
             Assert.AreEqual("1970", prac.BirthDate);
-            Assert.AreEqual(2, prac.Qualification?.Count);
             Assert.AreEqual("Brian Postlethwaite", prac.Name?.FirstOrDefault()?.Text);
             Assert.AreEqual("yes", prac.GetStringExtension("http://healthconnex.com.au/hcxd/Practitioner/AppointmentRequired"));
-            Assert.AreEqual("Agency Staff", prac.GetExtensionValue<CodeableConcept>("http://hl7.org/fhir/StructureDefinition/practitioner-classification").Text);
+             Assert.AreEqual("Agency Staff", prac.GetExtensionValue<CodeableConcept>("http://hl7.org/fhir/StructureDefinition/practitioner-classification").Text);
 
+            Assert.AreEqual(2, prac.Qualification?.Count);
             Assert.AreEqual("cert3-agedcare", prac.Qualification[0].Code.Coding[0].Code);
             Assert.AreEqual("Certification 3 - Aged Care", prac.Qualification[0].Code.Coding[0].Display);
             Assert.AreEqual("2017", prac.Qualification[0].Period.End);
@@ -619,6 +637,8 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var q = GetBloodPressureQuestionnaire();
             StructureItemTree.PruneTree(si, q);
             var obs = QuestionnaireProcessing.CreateResourceInstance<Observation>(vitalSignsSd, si, q, GetBloodPressureQuestionnaireResponse());
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(obs));
+
             Assert.AreEqual(ObservationStatus.Preliminary, obs.Status);
             Assert.AreEqual("2017-07-09", (obs.Effective as FhirDateTime).Value);
 
@@ -647,25 +667,29 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             {
                 Text = "Status",
                 Type = Questionnaire.QuestionnaireItemType.Choice,
-                LinkId = "Observation.status"
+                LinkId = "Observation.status",
+                Definition = "http://hl7.org/fhir/StructureDefinition/vitalsigns#Observation.status"
             });
             gCoreProps.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Effective",
                 Type = Questionnaire.QuestionnaireItemType.DateTime,
-                LinkId = "Observation.effective[x]"
+                LinkId = "Observation.effective[x]",
+                Definition = "http://hl7.org/fhir/StructureDefinition/vitalsigns#Observation.effective[x]"
             });
             gCoreProps.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Diastolic",
                 Type = Questionnaire.QuestionnaireItemType.Decimal,
-                LinkId = "Observation.valueQuantity.value"
+                LinkId = "Observation.valueQuantity.value",
+                Definition = "http://hl7.org/fhir/StructureDefinition/vitalsigns#Observation.valueQuantity.value"
             });
             gCoreProps.Item.Add(new Questionnaire.ItemComponent()
             {
                 Text = "Reference Range",
                 Type = Questionnaire.QuestionnaireItemType.String,
-                LinkId = "Observation.referenceRange.text"
+                LinkId = "Observation.referenceRange.text",
+                Definition = "http://hl7.org/fhir/StructureDefinition/vitalsigns#Observation.referenceRange.text"
             });
 
             return q;
@@ -718,11 +742,11 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         }
         #endregion
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void QuestionnaireCreatePublishToAzure()
         {
             // FhirClient server = new FhirClient("http://sqlonfhir-r4.azurewebsites.net/fhir");
-            FhirClient server = new FhirClient("http://localhost/sqlonfhir3/fhir");
+            FhirClient server = new FhirClient("http://localhost/sqlonfhir4/fhir");
             server.Update(GetPractitionerQuestionnaire());
             server.Update(GetExtendedPractitionerQuestionnaire());
             server.Update(GetBloodPressureQuestionnaireResponse());
@@ -752,11 +776,11 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             server.Update(prac);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void QuestionnaireCreatePublishSDsToAzure()
         {
             // FhirClient server = new FhirClient("http://sqlonfhir-r4.azurewebsites.net/fhir");
-            FhirClient server = new FhirClient("http://localhost/sqlonfhir3/fhir");
+            FhirClient server = new FhirClient("http://localhost/sqlonfhir4/fhir");
 
             DirectorySource source = new DirectorySource("TestData");
             foreach (var item in source.FindAll<StructureDefinition>())
@@ -848,6 +872,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             var qrP1 = GetExtendedPractitionerQuestionnaireResponse();
 
             Bundle resources = QuestionnaireProcessing.CreateResourceInstances(qPart1, qrP1, TestHelpers.Source);
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(resources));
 
             var prac = resources.Entry[0].Resource as Practitioner;
             Assert.AreEqual(true, prac.Active);
@@ -863,8 +888,6 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.AreEqual("Agency Staff", prac.GetExtensionValue<CodeableConcept>("http://hl7.org/fhir/StructureDefinition/practitioner-classification").Text);
             Assert.AreEqual("http://example.org/brian", prac.Telecom[0].Value);
 
-            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(resources));
-
             // Now reproduce the QR from this content
             QuestionnaireResponse qr = QuestionnaireFiller.CreateQuestionnaireResponse(qPart1, resources, TestHelpers.Source);
             qr.Id = "prac-ext-demo-qr";
@@ -879,6 +902,11 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
 
             // now reset to the expected value in the source (which was wrong)
             qr.Item[2].Item[1].Answer[0].Value = new FhirString("Certification 3 - Community Care");
+
+            foreach (var qrItem in qrP1.Item)
+            {
+                QuestionnaireProcessing.UpdateQuestionnaireResponseDefinitions(qPart1.Item.FirstOrDefault(i => i.LinkId == qrItem.LinkId), qrItem);
+            }
 
             if (qr != null)
                 System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qr));
@@ -970,6 +998,10 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             Assert.IsTrue(StructureItemTree.ContainsPath(si, "Slot.identifier.type.coding"));
             Assert.IsTrue(StructureItemTree.ContainsPath(si, "Slot.identifier:AgedCare.system"));
             Assert.IsTrue(StructureItemTree.ContainsPath(si, "Slot.identifier:AgedCare.value"));
+
+            Assert.IsTrue(StructureItemTree.ContainsDefinition(si, "http://sqlonfhir-ci2.azurewebsites.net/fhir/StructureDefinition/customslot#Slot.identifier.type.coding"));
+            Assert.IsTrue(StructureItemTree.ContainsDefinition(si, "http://sqlonfhir-ci2.azurewebsites.net/fhir/StructureDefinition/customslot#Slot.identifier:AgedCare.system"));
+            Assert.IsTrue(StructureItemTree.ContainsDefinition(si, "http://sqlonfhir-ci2.azurewebsites.net/fhir/StructureDefinition/customslot#Slot.identifier:AgedCare.value"));
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
     [TestClass]
     public class MappingProcessingTests
     {
-        [TestMethod]
+        [TestMethod, Ignore]
         public void QuestionnaireCreateTCMPatientDefinition()
         {
             string xml = System.IO.File.ReadAllText(

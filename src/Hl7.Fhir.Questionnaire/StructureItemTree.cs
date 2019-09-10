@@ -182,11 +182,24 @@ namespace Hl7.Fhir.QuestionnaireServices
             }
             return false;
         }
+        public static bool ContainsDefinition(StructureItem item, string definition)
+        {
+            if (item.Definition == definition)
+                return true;
+            foreach (var child in item.Children)
+            {
+                if (ContainsDefinition(child, definition))
+                    return true;
+            }
+            return false;
+        }
 
         private static void PopulateBindings(StructureItem item, Dictionary<string, string> mapPathsToLinkIds)
         {
             if (mapPathsToLinkIds.ContainsKey(item.Path))
                 item.LinkId = mapPathsToLinkIds[item.Path];
+            if (mapPathsToLinkIds.ContainsKey(item.Definition))
+                item.LinkId = mapPathsToLinkIds[item.Definition];
             foreach (var child in item.Children)
             {
                 PopulateBindings(child, mapPathsToLinkIds);
@@ -198,7 +211,7 @@ namespace Hl7.Fhir.QuestionnaireServices
         /// </summary>
         /// <param name="sd"></param>
         /// <returns></returns>
-        public static StructureItem CreateStructureTree(StructureDefinition sd, IResourceResolver source, string replaceRoot = null, bool skipCache = false)
+        public static StructureItem CreateStructureTree(StructureDefinition sd, IResourceResolver source, string replaceRoot = null, bool skipCache = false, string UsingStructureDefinitionUrl = null)
         {
             if (_cache.ContainsKey(sd.Url) && !skipCache && replaceRoot == null)
                 return _cache[sd.Url];
@@ -218,17 +231,18 @@ namespace Hl7.Fhir.QuestionnaireServices
             var nav = ElementDefinitionNavigator.ForSnapshot(sd);
             nav.MoveToFirstChild(); // move to root
             parent.Path = nav.Current.Path;
+            parent.StructureDefinitionUrl = UsingStructureDefinitionUrl ?? sd.Url;
             parent.ed = nav.Current;
 
             nav.MoveToFirstChild(); // move to first child
-            CreateStructureChildren(parent, nav, source, replaceRoot);
+            CreateStructureChildren(parent, nav, source, replaceRoot, UsingStructureDefinitionUrl ?? sd.Url);
 
             if (!_cache.ContainsKey(sd.Url) && replaceRoot == null)
                 _cache.Add(sd.Url, parent);
             return parent;
         }
 
-        private static void CreateStructureChildren(StructureItem parent, ElementDefinitionNavigator nav, IResourceResolver source, string replaceRoot = null)
+        private static void CreateStructureChildren(StructureItem parent, ElementDefinitionNavigator nav, IResourceResolver source, string replaceRoot = null, string UsingStructureDefinitionUrl = null)
         {
             // Explicit loop detection - yes VERY dodgy
             if (replaceRoot?.EndsWith("identifier.assigner") == true || replaceRoot?.EndsWith("assigner.identifier") == true)
@@ -252,6 +266,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                             item.Path = item.Path.Replace(parent.ed.Path, parent.Path);
                         }
                     }
+                    System.Diagnostics.Trace.WriteLine($"{parent.Definition}");
                     if (nav.Current.IsMappedExtension())
                     {
                         item.ExtensionUrl = nav.Current.PrimaryTypeProfile();
@@ -310,6 +325,9 @@ namespace Hl7.Fhir.QuestionnaireServices
                         }
                     }
 
+                    // Set the definition value too
+                    item.StructureDefinitionUrl = UsingStructureDefinitionUrl ?? parent.StructureDefinitionUrl;
+
                     parent.Children.Add(item);
                     if (nav.HasChildren)
                     {
@@ -341,7 +359,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                         // Now process all the children
                         Bookmark bm = nav.Bookmark();
                         nav.MoveToFirstChild();
-                        CreateStructureChildren(item, nav, source, replaceRoot);
+                        CreateStructureChildren(item, nav, source, replaceRoot, UsingStructureDefinitionUrl);
                         nav.ReturnToBookmark(bm);
                     }
                     else
@@ -358,7 +376,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                                 StructureDefinition sdDataType = source.FindStructureDefinition(profile);
                                 if (sdDataType != null)
                                 {
-                                    StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path, true);
+                                    StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path, true, UsingStructureDefinitionUrl);
                                     item.Children.AddRange(dataType.Children);
                                     item.ClassMapping = dataType.ClassMapping;
                                 }
@@ -373,7 +391,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                                 if (sdDataType != null)
                                 {
                                     // do not look at the cache, as the item path could be different
-                                    StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path, true);
+                                    StructureItem dataType = CreateStructureTree(sdDataType, source, item.Path, true, UsingStructureDefinitionUrl);
                                     item.Children.AddRange(dataType.Children);
                                     item.ClassMapping = dataType.ClassMapping;
                                 }
