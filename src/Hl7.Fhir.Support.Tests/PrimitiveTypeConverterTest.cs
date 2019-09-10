@@ -47,15 +47,6 @@ namespace Hl7.Fhir.Support.Tests.Serialization
             yield return ("0001-01-01T00:00:00+01:00", new DateTimeOffset(), true);
         }
 
-        private IEnumerable<(string input, DateTime expected, bool expectException)> GetDateTimeTestdata()
-        {
-            yield return ("0001-01-02+03:00", new DateTime(1, 1, 1, 21, 0, 0), false);
-            yield return ("0001-01-02T00:00:00+00:00", new DateTime(1, 1, 2, 0, 0, 0), false); 
-            yield return ("2018-04-12T13:22:12Z", new DateTime(2018, 4, 12, 13, 22, 12), false);
-            yield return ("2018-04-12T13:22:12+02:00", new DateTime(2018, 4, 12, 11, 22, 12), false);
-            yield return ("2018-04-12+02:00", new DateTime(2018, 4, 11, 22, 0, 0), false);
-        }
-
         [TestMethod]
         public void ConvertToDateTimeOffsetTest()
         {
@@ -68,10 +59,11 @@ namespace Hl7.Fhir.Support.Tests.Serialization
         [TestMethod]
         public void ConvertToDateTimeTest()
         {
-            foreach (var (input, expected, expectException) in GetDateTimeTestdata())
-            {
-                AssertConvertToType(input, expected, expectException);
-            }
+            // AssertConvertToType("0001-01-02+03:00", new DateTime(1, 1, 1, 21, 0, 0), false); // partial dates don't have timezones.
+            AssertConvertToType("0001-01-02T00:00:00+00:00", new DateTime(1, 1, 2, 0, 0, 0), false);
+            AssertConvertToType("2018-04-12T13:22:12Z", new DateTime(2018, 4, 12, 13, 22, 12), false);
+            AssertConvertToType("2018-04-12T13:22:12+02:00", new DateTime(2018, 4, 12, 11, 22, 12), false);
+            // AssertConvertToType("2018-04-12+02:00", new DateTime(2018, 4, 11, 22, 0, 0), false); // partial dates don't have timezones.
         }
 
         private IEnumerable<(string input, decimal expected, bool expectException)> GetDecimalTestdata()

@@ -91,6 +91,22 @@ namespace Hl7.Fhir.Utility
             return result.Value;
         }
 
+        /// <summary>
+        /// Return the number of items currently in the cache
+        /// </summary>
+        /// <returns></returns>
+        public int Count()
+        {
+            return _cached.Count();
+        }
+        /// <summary>
+        /// Flush all content from the cache
+        /// </summary>
+        public void Flush()
+        {
+            _cached.Clear();
+        }
+
         private void EnforceMaxItems()
         {
             var currentCount = _cached.Count();

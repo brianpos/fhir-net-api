@@ -106,6 +106,8 @@ namespace Hl7.Fhir.Model
 
         public void AddAnnotation(object annotation)
         {
+            if (annotation == null)
+                throw new ArgumentNullException();
             annotations.Add(annotation);
         }
 

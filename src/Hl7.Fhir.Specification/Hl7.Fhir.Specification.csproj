@@ -18,6 +18,20 @@
     <RootNamespace>Hl7.Fhir.Specification</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net45|AnyCPU'">
+    <DocumentationFile>bin\Debug\net45\Hl7.Fhir.R4.Specification.xml</DocumentationFile>
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+    <WarningLevel>0</WarningLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net45|AnyCPU'">
+    <NoWarn>1701;1702;1705;1591;</NoWarn>
+    <WarningLevel>0</WarningLevel>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
   </ItemGroup>

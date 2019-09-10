@@ -322,13 +322,12 @@ namespace Hl7.Fhir.Validation
             var pattern = elementDef.GetStringExtension(uri);
             if (pattern != null)
             {
-                var regex = new Regex(pattern);
                 var value = toStringRepresentation(instance);
-                var success = Regex.Match(value, "^" + regex + "$").Success;
+                var success = Regex.Match(value, "^" + pattern + "$").Success;
 
                 if (!success)
                 {
-                    Trace(outcome, $"Value '{value}' does not match regex '{regex}'", Issue.CONTENT_ELEMENT_INVALID_PRIMITIVE_VALUE, instance);
+                    Trace(outcome, $"Value '{value}' does not match regex '{pattern}'", Issue.CONTENT_ELEMENT_INVALID_PRIMITIVE_VALUE, instance);
                 }
             }
 

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>telstrahealth.fhir.core.stu3</id>
+    <version>1.3.4</version>
+    <title>HL7 FHIR R4 (Telstra Health build)</title>
+    <authors>Brian Postlethwaite</authors>
+    <owners>Telstra Health</owners>
+    <projectUrl>https://github.com/brianpos/fhir-net-api/tree/develop-r4-sqlonfhir/src</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/brianpos/fhir-net-api/sqlonfhir-dstu2/icon-fhir-32.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The Telstra Health clone of the FHIR R4 (4.0.0) assemblies, there are some specific customizations included for Telstra Health</description>
+    <releaseNotes>R4 release. See https://confluence.telstrahealth.com.au/display/FHIR/Branches+and+Releases</releaseNotes>
+    <copyright>Copyright © 2016+ Telstra Health</copyright>
+    <tags>HL7 FHIR REST parse serialize class model</tags>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="11.0.2" />
+      <dependency id="System.ValueTuple" version="4.5.0" />
+    </dependencies>
+    <contentFiles>
+      <files include="any/any/specification.zip" buildAction="Content" copyToOutput="true" flatten="true" />
+    </contentFiles>
+  </metadata>
+  <files>
+    <file src="Hl7.Fhir.Questionnaire\bin\Release\net45\Hl7.*.dll" target="lib/net462"/>
+    <file src="Hl7.Fhir.Questionnaire\bin\Release\net45\Hl7.*.xml" target="lib/net462"/>
+    <file src="Hl7.Fhir.Questionnaire\bin\Release\net45\Hl7.*.pdb" target="lib/net462"/>
+
+    <file src="Hl7.Fhir.Questionnaire\bin\Release\netstandard2.0\Hl7.*.dll" target="lib/netstandard2.0"/>
+    <file src="Hl7.Fhir.Questionnaire\bin\Release\netstandard2.0\Hl7.*.xml" target="lib/netstandard2.0"/>
+    <file src="Hl7.Fhir.Questionnaire\bin\Release\netstandard2.0\Hl7.*.pdb" target="lib/netstandard2.0"/>
+    
+    <file src="Hl7.Fhir.Questionnaire\bin\Release\net45\specification.zip" target="contentFiles/any/any"/>
+  </files>
+</package>

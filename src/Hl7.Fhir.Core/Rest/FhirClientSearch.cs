@@ -584,7 +584,7 @@ namespace Hl7.Fhir.Rest
                 {
                     var keyVal = crit.SplitLeft('=');
 
-                    if (string.IsNullOrEmpty(keyVal.Item1) || string.IsNullOrEmpty(keyVal.Item2))
+                     if (string.IsNullOrEmpty(keyVal.Item1) || (string.IsNullOrEmpty(keyVal.Item2) && !ParserSettings.PermissiveParsing))
                         throw Error.Argument("criteria", "Argument should be of the form <key>=<value>");
 
                     q.Add(keyVal.Item1, keyVal.Item2);

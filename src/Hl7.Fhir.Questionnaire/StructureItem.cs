@@ -106,7 +106,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                 {
                     // this is an error (no need to check how many there are without performance of counting them each time)
                     result.AddIssue("Need to have one of these! " + rule.Path,
-                    Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
+                        Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
                         ParentContext);
                 }
                 else if (values.Count() < rule.Min)
@@ -122,7 +122,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                 {
                     // this is an error (no need to check how many there are without performance of counting them each time)
                     result.AddIssue("Should not contain one of these!" + rule.Path,
-                    Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
+                        Issue.Create(12, OperationOutcome.IssueSeverity.Error, OperationOutcome.IssueType.Value),
                         ParentContext);
                 }
             }
@@ -143,7 +143,7 @@ namespace Hl7.Fhir.QuestionnaireServices
             }
             if (rule.Fixed != null)
             {
-                foreach (PocoElementNode item in values)
+                foreach (PocoNavigator item in values)
                 {
                     if (!item.FhirValue.IsExactly(rule.Fixed))
                     {
@@ -172,7 +172,7 @@ namespace Hl7.Fhir.QuestionnaireServices
                                 Severity = OperationOutcome.IssueSeverity.Error,
                                 Diagnostics = expression,
                                 Code = OperationOutcome.IssueType.Invariant,
-                                Location = new[] { (item as PocoElementNode).ShortPath }
+                                Location = new[] { item.Annotation<IShortPathGenerator>()?.ShortPath }
                             });
                         }
                     }

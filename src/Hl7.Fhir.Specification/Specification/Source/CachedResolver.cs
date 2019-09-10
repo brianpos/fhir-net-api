@@ -11,6 +11,7 @@ using Hl7.Fhir.Model;
 using System.Collections.Generic;
 using Hl7.Fhir.Utility;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Hl7.Fhir.Specification.Source
 {
@@ -33,6 +34,16 @@ namespace Hl7.Fhir.Specification.Source
 
         readonly Cache<Resource> _resourcesByUri;
         readonly Cache<Resource> _resourcesByCanonical;
+
+        /// <summary>
+        /// The internal Cache status to be used for checking the current contents of the cache
+        /// (used in places like a server internal status check routine/log)
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<Tuple<string, Resource, DateTimeOffset>> CacheStatus()
+        {
+            return _resourcesByUri.CacheStatus().Concat(_resourcesByCanonical.CacheStatus());
+        }
 
         /// <summary>Creates a new artifact resolver that caches loaded resources in memory.</summary>
         /// <param name="source">Internal resolver from which artifacts are initially resolved on a cache miss.</param>
@@ -179,6 +190,14 @@ namespace Hl7.Fhir.Specification.Source
 
             readonly Object _getLock = new Object();
             readonly Dictionary<string, CacheEntry<T>> _cache = new Dictionary<string, CacheEntry<T>>();
+
+            public IEnumerable<Tuple<string, T, DateTimeOffset>> CacheStatus()
+            {
+                lock (_getLock)
+                {
+                    return _cache.Select(i => new Tuple<string, T, DateTimeOffset>(i.Key, i.Value.Data, i.Value.Expires));
+                }
+            }
 
             public Cache(Func<string,T> onCacheMiss, int duration)
             {

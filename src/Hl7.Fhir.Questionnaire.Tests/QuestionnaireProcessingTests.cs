@@ -779,7 +779,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             server.Update(prac);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         public void QuestionnaireCreatePublishSDsToAzure()
         {
             FhirClient server = new FhirClient("http://sqlonfhir-r4.azurewebsites.net/fhir");

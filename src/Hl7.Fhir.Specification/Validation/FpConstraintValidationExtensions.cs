@@ -18,7 +18,8 @@ using System.Linq;
 
 namespace Hl7.Fhir.Validation
 {
-    internal class CompiledConstraintAnnotation
+    // TODO: Brian - made public so I can pre-compile these into the structure definition so that they are thread safe
+    public class CompiledConstraintAnnotation
     {
         public CompiledExpression Expression;
     }
@@ -110,8 +111,17 @@ namespace Hl7.Fhir.Validation
                 {
                     try
                     {
-                        compiledExpression = v.FpCompiler.Compile(fpExpressionText);
-                        constraintElement.AddAnnotation(new CompiledConstraintAnnotation { Expression = compiledExpression });
+                        // To permit this element to be used concurrently in validations, lock so that the
+                        // annotation 
+                        lock (constraintElement)
+                        {
+                            compiledExpression = constraintElement.Annotation<CompiledConstraintAnnotation>()?.Expression;
+                            if (compiledExpression != null)
+                                return compiledExpression;
+
+                            compiledExpression = v.FpCompiler.Compile(fpExpressionText);
+                            constraintElement.SetAnnotation(new CompiledConstraintAnnotation { Expression = compiledExpression });
+                        }
                     }
                     catch (Exception e)
                     {

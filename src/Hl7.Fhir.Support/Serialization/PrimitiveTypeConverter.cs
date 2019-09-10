@@ -121,8 +121,8 @@ namespace Hl7.Fhir.Serialization
                 return XmlConvert.ToByte(value);        // Not used in FHIR serialization
             if (typeof(Char) == to)
                 return XmlConvert.ToChar(value);        // Not used in FHIR serialization
-            if (typeof(DateTime) == to)
-                return ConvertToDatetimeOffset(value).UtcDateTime;  // Obsolete: use DateTimeOffset instead!!
+            if(typeof(DateTime) == to)
+                return XmlConvert.ToDateTimeOffset(value).DateTime; // TODO: should handle FHIR's "instant" datatype
             if (typeof(Decimal) == to)
             {
                 if (FORBIDDEN_DECIMAL_PREFIXES.Any(prefix => value.StartsWith(prefix)) || value.EndsWith("."))

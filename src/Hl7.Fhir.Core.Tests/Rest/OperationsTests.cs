@@ -163,15 +163,13 @@ namespace Hl7.Fhir.Tests.Rest
         [TestCategory("IntegrationTest")]
         public async System.Threading.Tasks.Task InvokeTestPatientGetEverythingAsyncWebClient()
         {
-            string _endpoint = "https://api.hspconsortium.org/rpineda/open";
-
-            var client = new FhirClient(_endpoint);
+            var client = new FhirClient(testEndpoint);
             var start = new FhirDateTime(2014, 11, 1);
             var end = new FhirDateTime(2020, 1, 1);
             var par = new Parameters().Add("start", start).Add("end", end);
 
-            var bundleTask = client.InstanceOperationAsync(ResourceIdentity.Build("Patient", "SMART-1288992"), "everything", par);
-            var bundle2Task = client.FetchPatientRecordAsync(ResourceIdentity.Build("Patient", "SMART-1288992"), start, end);
+            var bundleTask = client.InstanceOperationAsync(ResourceIdentity.Build("Patient", "example"), "everything", par);
+            var bundle2Task = client.FetchPatientRecordAsync(ResourceIdentity.Build("Patient", "example"), start, end);
 
             await System.Threading.Tasks.Task.WhenAll(bundleTask, bundle2Task);
 
