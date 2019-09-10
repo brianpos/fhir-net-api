@@ -13,6 +13,40 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="TestData\customslot.structuredefinition.xml" />
+    <None Remove="TestData\hcxdir-phone-ismain.xml" />
+    <None Remove="TestData\hcxdir-phone-prefix.xml" />
+    <None Remove="TestData\hcxdir-phone-type.xml" />
+    <None Remove="TestData\hcxdir-practitioner-appointment-required.xml" />
+    <None Remove="TestData\hcxdir-practitioner-referral-methods.xml" />
+    <None Remove="TestData\hcxdir-practitioner.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="TestData\customslot.structuredefinition.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\hcxdir-phone-ismain.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\hcxdir-phone-prefix.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\hcxdir-phone-type.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\hcxdir-practitioner-appointment-required.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\hcxdir-practitioner-referral-methods.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestData\hcxdir-practitioner.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Hl7.Fhir.Questionnaire\Hl7.Fhir.QuestionnaireServices.csproj" />
   </ItemGroup>
   <ItemGroup>
@@ -27,29 +61,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="TestData\customslot.structuredefinition.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\hcxdir-phone-ismain.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\hcxdir-phone-prefix.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\hcxdir-phone-type.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\hcxdir-practitioner-appointment-required.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\hcxdir-practitioner-referral-methods.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="TestData\hcxdir-practitioner.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
   <!-- Necessary to make the Test Explorer find the tests in this assembly 

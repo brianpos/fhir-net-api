@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<StructureDefinition xmlns="http://hl7.org/fhir">
+  <id value="practitioner-classification"/>
+  <url value="http://hl7.org/fhir/StructureDefinition/practitioner-classification"/>
+  <name value="classification"/>
+  <title value="classification"/>
+  <status value="draft"/>
+  <date value="2017-04-19T07:44:43+10:00"/>
+  <publisher value="HL7"/>
+  <description value="The more specific service or occupation within the health care provider type of the practitioner at a specific organization unit, for example, counselor."/>
+  <fhirVersion value="4.0.0"/>
+  <type value="Extension" />
+  <kind value="complex-type"/>
+  <abstract value="false"/>
+  <context>
+    <type value="element" />
+    <expression value="Practitioner" />
+  </context>
+  <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension"/>
+  <derivation value="constraint"/>
+  <differential>
+    <element id="Extension">
+      <path value="Extension"/>
+      <short value="Classification of the provider"/>
+      <definition value="The more specific service or occupation within the health care provider type of the practitioner at a specific organization unit, for example, counselor."/>
+      <min value="0"/>
+      <max value="1"/>
+    </element>
+    <element id="Extension.extension">
+      <path value="Extension.extension"/>
+      <max value="0"/>
+    </element>
+    <element id="Extension.url">
+      <path value="Extension.url"/>
+      <type>
+        <code value="uri"/>
+      </type>
+      <fixedUri value="http://hl7.org/fhir/StructureDefinition/practitioner-classification"/>
+    </element>
+    <element id="Extension.valueCodeableConcept">
+      <path value="Extension.valueCodeableConcept"/>
+      <type>
+        <code value="CodeableConcept"/>
+      </type>
+    </element>
+  </differential>
+</StructureDefinition>

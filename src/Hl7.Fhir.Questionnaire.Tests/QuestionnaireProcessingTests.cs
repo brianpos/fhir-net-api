@@ -721,7 +721,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         [TestMethod]
         public void QuestionnaireCreatePublishToAzure()
         {
-            // FhirClient server = new FhirClient("http://sqlonfhir-stu3.azurewebsites.net/fhir");
+            // FhirClient server = new FhirClient("http://sqlonfhir-r4.azurewebsites.net/fhir");
             FhirClient server = new FhirClient("http://localhost/sqlonfhir3/fhir");
             server.Update(GetPractitionerQuestionnaire());
             server.Update(GetExtendedPractitionerQuestionnaire());
@@ -755,7 +755,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         [TestMethod]
         public void QuestionnaireCreatePublishSDsToAzure()
         {
-            // FhirClient server = new FhirClient("http://sqlonfhir-stu3.azurewebsites.net/fhir");
+            // FhirClient server = new FhirClient("http://sqlonfhir-r4.azurewebsites.net/fhir");
             FhirClient server = new FhirClient("http://localhost/sqlonfhir3/fhir");
 
             DirectorySource source = new DirectorySource("TestData");

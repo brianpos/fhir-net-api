@@ -14,12 +14,14 @@
   <description value="Extension to telecom to support phone type" />
   <purpose value="The ability to add extensions in a structured way is what keeps FHIR resources simple." />
   <copyright value="Telstra Health" />
-  <fhirVersion value="3.0.1" />
+  <fhirVersion value="4.0.0"/>
   <kind value="primitive-type" />
   <type value="Extension" />
   <abstract value="false" />
-  <contextType value="resource" />
-  <context value="Location.telecom" />
+  <context>
+    <type value="element" />
+    <expression value="Location.telecom" />
+  </context>
   <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
   <derivation value="constraint" />
   <differential>
@@ -79,9 +81,7 @@
       <binding>
         <strength value="extensible" />
         <description value="phone type value set" />
-        <valueSetReference>
-          <reference value="http://sqlonfhir-dstu2.azurewebsites.net/fhir/ValueSet/hcxdir-phone-type-valueset" />
-        </valueSetReference>
+        <valueSet value="http://sqlonfhir-dstu2.azurewebsites.net/fhir/ValueSet/hcxdir-phone-type-valueset" />
       </binding>
       <mapping>
         <identity value="rim" />

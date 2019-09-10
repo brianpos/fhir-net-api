@@ -7,7 +7,7 @@
   <url value="http://sqlonfhir-ci2.azurewebsites.net/fhir/StructureDefinition/customslot" />
   <name value="MySlot" />
   <status value="draft" />
-  <fhirVersion value="3.0.1" />
+  <fhirVersion value="4.0.0"/>
   <kind value="resource" />
   <type value="Slot" />
   <abstract value="false" />
@@ -145,9 +145,7 @@
       <binding>
         <strength value="extensible" />
         <description value="A coded type for an identifier that can be used to determine which identifier to use for a specific purpose." />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/identifier-type" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/identifier-type" />
       </binding>
       <mapping>
         <identity value="v2" />
@@ -263,9 +261,7 @@
       <binding>
         <strength value="extensible" />
         <description value="A coded type for an identifier that can be used to determine which identifier to use for a specific purpose." />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/identifier-type" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/identifier-type" />
       </binding>
       <mapping>
         <identity value="v2" />
@@ -353,9 +349,7 @@
       <binding>
         <strength value="preferred" />
         <description value="Additional details about where the content was created (e.g. clinical specialty)." />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/c80-practice-codes" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/c80-practice-codes" />
       </binding>
       <mapping>
         <identity value="w5" />

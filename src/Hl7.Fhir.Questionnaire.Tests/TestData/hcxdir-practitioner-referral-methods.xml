@@ -14,12 +14,14 @@
   <description value="extension to provide a note on the referral methods for a practitioner" />
   <purpose value="The ability to add extensions in a structured way is what keeps FHIR resources simple." />
   <copyright value="Telstra Health" />
-  <fhirVersion value="3.0.1" />
+  <fhirVersion value="4.0.0"/>
   <kind value="primitive-type" />
   <type value="Extension" />
   <abstract value="false" />
-  <contextType value="resource" />
-  <context value="Practitioner" />
+  <context>
+    <type value="element" />
+    <expression value="Practitioner" />
+  </context>
   <baseDefinition value="http://hl7.org/fhir/StructureDefinition/Extension" />
   <derivation value="constraint" />
   <differential>
@@ -77,9 +79,7 @@
       <binding>
         <strength value="extensible" />
         <description value="Preference Value Set" />
-        <valueSetReference>
-          <reference value="http://sqlonfhir-dstu2.azurewebsites.net/fhir/ValueSet/hcxdir-practitioner-referral-preference-valueset" />
-        </valueSetReference>
+        <valueSet value="http://sqlonfhir-dstu2.azurewebsites.net/fhir/ValueSet/hcxdir-practitioner-referral-preference-valueset" />
       </binding>
     </element>
     <element id="6">
@@ -220,9 +220,7 @@
       <binding>
         <strength value="extensible" />
         <description value="Referral Method" />
-        <valueSetReference>
-          <reference value="http://sqlonfhir-dstu2.azurewebsites.net/fhir/ValueSet/hcxdir-practitioner-referral-method-valueset" />
-        </valueSetReference>
+        <valueSet value="http://sqlonfhir-dstu2.azurewebsites.net/fhir/ValueSet/hcxdir-practitioner-referral-method-valueset" />
       </binding>
     </element>
   </differential>

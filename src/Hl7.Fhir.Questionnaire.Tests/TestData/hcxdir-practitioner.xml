@@ -15,6 +15,7 @@
   <publisher value="Healthconnex" />
   <description value="Base StructureDefinition for Practitioner used by HcxDirectory" />
   <copyright value="Healthconnex" />
+  <fhirVersion value="4.0.0"/>
   <kind value="resource" />
   <type value="Practitioner" />
   <abstract value="false" />
@@ -133,7 +134,7 @@
       <binding>
         <strength value="required" />
         <description value="A human language." />
-        <valueSetUri value="http://tools.ietf.org/html/bcp47" />
+        <valueSet value="http://tools.ietf.org/html/bcp47" />
       </binding>
     </element>
     <element id="7">
@@ -238,9 +239,7 @@
       <binding>
         <strength value="required" />
         <description value="The use of a human name" />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/name-use" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/name-use" />
       </binding>
       <mapping>
         <identity value="v2" />
@@ -509,9 +508,7 @@
       <binding>
         <strength value="required" />
         <description value="Telecommunications form for contact point" />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/contact-point-system" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/contact-point-system" />
       </binding>
       <mapping>
         <identity value="v2" />
@@ -577,9 +574,7 @@
       <binding>
         <strength value="required" />
         <description value="Use of contact point" />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/contact-point-use" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/contact-point-use" />
       </binding>
       <mapping>
         <identity value="v2" />
@@ -698,9 +693,7 @@
       <binding>
         <strength value="required" />
         <description value="Telecommunications form for contact point" />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/contact-point-system" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/contact-point-system" />
       </binding>
       <mapping>
         <identity value="v2" />
@@ -768,9 +761,7 @@
       <binding>
         <strength value="required" />
         <description value="Use of contact point" />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/contact-point-use" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/contact-point-use" />
       </binding>
       <mapping>
         <identity value="v2" />
@@ -855,9 +846,7 @@
       <binding>
         <strength value="required" />
         <description value="The use of an address" />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/address-use" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/address-use" />
       </binding>
       <mapping>
         <identity value="v2" />
@@ -890,9 +879,7 @@
       <binding>
         <strength value="required" />
         <description value="The type of an address (physical / postal)" />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/address-type" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/address-type" />
       </binding>
       <mapping>
         <identity value="v2" />
@@ -1011,9 +998,7 @@
       <isSummary value="true" />
       <binding>
         <strength value="required" />
-        <valueSetReference>
-          <reference value="http://hl7.org/fhir/ValueSet/administrative-gender" />
-        </valueSetReference>
+        <valueSet value="http://hl7.org/fhir/ValueSet/administrative-gender" />
       </binding>
       <mapping>
         <identity value="v2" />
@@ -1398,7 +1383,7 @@
       <binding>
         <strength value="required" />
         <description value="A human language." />
-        <valueSetUri value="http://tools.ietf.org/html/bcp47" />
+        <valueSet value="http://tools.ietf.org/html/bcp47" />
       </binding>
       <mapping>
         <identity value="v2" />
