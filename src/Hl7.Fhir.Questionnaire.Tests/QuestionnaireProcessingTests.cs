@@ -711,7 +711,7 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
                 Text = "Status",
                 LinkId = "Observation.status",
                 Answer = new List<QuestionnaireResponse.AnswerComponent>() { new QuestionnaireResponse.AnswerComponent()
-                    { Value = new Coding("", "preliminary") }
+                    { Value = new Coding("http://hl7.org/fhir/observation-status", "preliminary") }
                 }
             });
             gCoreProps.Item.Add(new QuestionnaireResponse.ItemComponent()
@@ -745,11 +745,11 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
         [TestMethod, Ignore]
         public void QuestionnaireCreatePublishToAzure()
         {
-            // FhirClient server = new FhirClient("http://sqlonfhir-r4.azurewebsites.net/fhir");
-            FhirClient server = new FhirClient("http://localhost/sqlonfhir4/fhir");
+            FhirClient server = new FhirClient("http://sqlonfhir-r4.azurewebsites.net/fhir");
+            // FhirClient server = new FhirClient("http://localhost/sqlonfhir4/fhir");
             server.Update(GetPractitionerQuestionnaire());
             server.Update(GetExtendedPractitionerQuestionnaire());
-            server.Update(GetBloodPressureQuestionnaireResponse());
+            server.Update(GetBloodPressureQuestionnaire());
             server.Update(GetPractitionerQuestionnaireResponse());
             server.Update(GetExtendedPractitionerQuestionnaireResponse());
             server.Update(GetBloodPressureQuestionnaireResponse());
@@ -776,11 +776,11 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             server.Update(prac);
         }
 
-        [TestMethod, Ignore]
+        [TestMethod]
         public void QuestionnaireCreatePublishSDsToAzure()
         {
-            // FhirClient server = new FhirClient("http://sqlonfhir-r4.azurewebsites.net/fhir");
-            FhirClient server = new FhirClient("http://localhost/sqlonfhir4/fhir");
+            FhirClient server = new FhirClient("http://sqlonfhir-r4.azurewebsites.net/fhir");
+            // FhirClient server = new FhirClient("http://localhost/sqlonfhir4/fhir");
 
             DirectorySource source = new DirectorySource("TestData");
             foreach (var item in source.FindAll<StructureDefinition>())
