@@ -27,7 +27,6 @@
   <differential>
     <element id="1">
       <path value="Extension" />
-      <sliceName value="extension" />
       <definition value="Optional Extensions Element - found in all resources." />
       <min value="0" />
       <max value="*" />

@@ -11,7 +11,7 @@
   <version value="1" />
   <name value="hcxdir-practitioner" />
   <title value="hcxdir-practitioner" />
-  <status value="draft" />
+  <status value="retired" />
   <publisher value="Healthconnex" />
   <description value="Base StructureDefinition for Practitioner used by HcxDirectory" />
   <copyright value="Healthconnex" />
@@ -113,7 +113,6 @@
       <type>
         <code value="uri" />
       </type>
-      <isModifier value="true" />
       <isSummary value="true" />
     </element>
     <element id="6">
@@ -177,7 +176,6 @@
       <type>
         <code value="boolean" />
       </type>
-      <defaultValueBoolean value="true" />
       <isSummary value="true" />
       <mapping>
         <identity value="rim" />
@@ -234,7 +232,6 @@
       <type>
         <code value="code" />
       </type>
-      <isModifier value="true" />
       <isSummary value="true" />
       <binding>
         <strength value="required" />
@@ -569,7 +566,6 @@
       <type>
         <code value="code" />
       </type>
-      <isModifier value="true" />
       <isSummary value="true" />
       <binding>
         <strength value="required" />
@@ -756,7 +752,6 @@
         <code value="code" />
       </type>
       <fixedCode value="work" />
-      <isModifier value="true" />
       <isSummary value="true" />
       <binding>
         <strength value="required" />
@@ -841,7 +836,6 @@
       <type>
         <code value="code" />
       </type>
-      <isModifier value="true" />
       <isSummary value="true" />
       <binding>
         <strength value="required" />
