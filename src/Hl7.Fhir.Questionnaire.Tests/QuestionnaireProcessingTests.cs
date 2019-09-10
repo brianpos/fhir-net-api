@@ -635,8 +635,11 @@ namespace Hl7.Fhir.QuestionnaireServices.Tests
             //sg.Update(pracSd);
             var si = StructureItemTree.CreateStructureTree(vitalSignsSd, TestHelpers.Source);
             var q = GetBloodPressureQuestionnaire();
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(q));
             StructureItemTree.PruneTree(si, q);
-            var obs = QuestionnaireProcessing.CreateResourceInstance<Observation>(vitalSignsSd, si, q, GetBloodPressureQuestionnaireResponse());
+            var qr = GetBloodPressureQuestionnaireResponse();
+            var obs = QuestionnaireProcessing.CreateResourceInstance<Observation>(vitalSignsSd, si, q, qr);
+            System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(qr));
             System.Diagnostics.Trace.WriteLine(Hl7.Fhir.Serialization.FhirSerializer.SerializeResourceToXml(obs));
 
             Assert.AreEqual(ObservationStatus.Preliminary, obs.Status);
