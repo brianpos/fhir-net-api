@@ -35,6 +35,16 @@ namespace Hl7.Fhir.Tests.Serialization
             Assert.AreEqual(metaXml, xml);
         }
 
+        [TestMethod]
+        public void SerializeParametersWithMeta()
+        {
+            Parameters p = new Parameters();
+            p.Add("meta", new Meta() { Tag = new List<Coding> { new Coding("system", "code") } });
+            var xml = new FhirXmlSerializer().SerializeToString(p);
+            System.Diagnostics.Trace.WriteLine(xml);
+            var p2 = new FhirXmlParser().Parse<Parameters>(xml);
+            Assert.IsTrue(p2.IsExactly(p));
+        }
 
         [TestMethod]
         public void SerializeMetaJson()
