@@ -6,14 +6,14 @@
  * available at https://raw.githubusercontent.com/FirelyTeam/fhir-net-api/master/LICENSE
  */
 
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Hl7.Fhir.Serialization;
-using System.IO;
 using Hl7.Fhir.Model;
-using System.Diagnostics;
+using Hl7.Fhir.Serialization;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
-using Hl7.Fhir.ElementModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
 namespace Hl7.Fhir.Tests.Serialization
 {
@@ -366,6 +366,19 @@ namespace Hl7.Fhir.Tests.Serialization
             var parser = new FhirXmlParser();
 
             Assert.ThrowsException<FormatException>(() => parser.Parse<Patient>(xml));
+        }
+
+        [TestMethod]
+        public void ParsePractitionerForTelecomValues()
+        {
+            var xml = File.ReadAllText(Path.Combine("TestData", "test-practitioner.xml"));
+            var actual = FhirXmlParser.Parse<Practitioner>(xml);
+
+            Assert.IsNotNull(actual);
+            Assert.IsNotNull(actual.Telecom);
+            Assert.AreEqual(2, actual.Telecom.Count);
+            Assert.AreEqual("0423 111 111", actual.Telecom[0].Value);
+            Assert.AreEqual("emma.test@gmail.com", actual.Telecom[1].Value);
         }
     }
 }
