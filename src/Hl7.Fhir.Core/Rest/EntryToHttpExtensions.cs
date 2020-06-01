@@ -151,6 +151,8 @@ namespace Hl7.Fhir.Rest
                 // This is done by the caller after the OnBeforeRequest is called so that other properties
                 // can be set before the content is committed
                 // request.WriteBody(CompressRequestBody, bin.Content);
+                if (!string.IsNullOrEmpty(bin.SecurityContext?.Reference))
+                    request.Headers["X-Security-Context"] =  bin.SecurityContext.Reference;
                 request.ContentType = bin.ContentType;
             }
             else if (searchUsingPost)

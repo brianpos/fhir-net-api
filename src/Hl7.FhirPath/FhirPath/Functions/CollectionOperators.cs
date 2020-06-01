@@ -17,6 +17,7 @@ namespace Hl7.FhirPath.Functions
     {
         public static bool? BooleanEval(this IEnumerable<ITypedElement> focus)
         {
+            if (focus == null) return null;
             if (!focus.Any()) return null;
 
             if (focus.Count() == 1 && focus.Single().Value is bool)
@@ -110,6 +111,8 @@ namespace Hl7.FhirPath.Functions
             }
             else
             {
+                if (element == null)
+                    return Enumerable.Empty<ITypedElement>();
                 return element.Children(name);
             }
         }
