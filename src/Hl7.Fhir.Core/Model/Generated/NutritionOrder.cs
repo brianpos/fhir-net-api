@@ -87,13 +87,13 @@ namespace Hl7.Fhir.Model
       /// </summary>
       [FhirElement("schedule", Order=50)]
       [DataMember]
-      public Hl7.Fhir.Model.NutritionOrder.ScheduleComponent Schedule
+      public Hl7.Fhir.Model.NutritionOrder.OralDiet_ScheduleComponent Schedule
       {
         get { return _Schedule; }
         set { _Schedule = value; OnPropertyChanged("Schedule"); }
       }
 
-      private Hl7.Fhir.Model.NutritionOrder.ScheduleComponent _Schedule;
+      private Hl7.Fhir.Model.NutritionOrder.OralDiet_ScheduleComponent _Schedule;
 
       /// <summary>
       /// Required  nutrient modifications
@@ -179,7 +179,7 @@ namespace Hl7.Fhir.Model
 
         base.CopyTo(dest);
         if(Type != null) dest.Type = new List<Hl7.Fhir.Model.CodeableConcept>(Type.DeepCopy());
-        if(Schedule != null) dest.Schedule = (Hl7.Fhir.Model.NutritionOrder.ScheduleComponent)Schedule.DeepCopy();
+        if(Schedule != null) dest.Schedule = (Hl7.Fhir.Model.NutritionOrder.OralDiet_ScheduleComponent)Schedule.DeepCopy();
         if(Nutrient != null) dest.Nutrient = new List<Hl7.Fhir.Model.NutritionOrder.NutrientComponent>(Nutrient.DeepCopy());
         if(Texture != null) dest.Texture = new List<Hl7.Fhir.Model.NutritionOrder.TextureComponent>(Texture.DeepCopy());
         if(FluidConsistencyType != null) dest.FluidConsistencyType = new List<Hl7.Fhir.Model.CodeableConcept>(FluidConsistencyType.DeepCopy());
@@ -301,13 +301,13 @@ namespace Hl7.Fhir.Model
     /// </summary>
     [Serializable]
     [DataContract]
-    [FhirType("NutritionOrder#Schedule", IsNestedType=true)]
-    public partial class ScheduleComponent : Hl7.Fhir.Model.BackboneElement
+    [FhirType("NutritionOrder#OralDiet#Schedule", IsNestedType=true)]
+    public partial class OralDiet_ScheduleComponent : Hl7.Fhir.Model.BackboneElement
     {
       /// <summary>
       /// FHIR Type Name
       /// </summary>
-      public override string TypeName { get { return "NutritionOrder#Schedule"; } }
+      public override string TypeName { get { return "NutritionOrder#OralDiet#Schedule"; } }
 
       /// <summary>
       /// Scheduled frequency of diet
@@ -369,7 +369,7 @@ namespace Hl7.Fhir.Model
 
       public override IDeepCopyable CopyTo(IDeepCopyable other)
       {
-        var dest = other as ScheduleComponent;
+        var dest = other as OralDiet_ScheduleComponent;
 
         if (dest == null)
         {
@@ -385,13 +385,13 @@ namespace Hl7.Fhir.Model
 
       public override IDeepCopyable DeepCopy()
       {
-        return CopyTo(new ScheduleComponent());
+        return CopyTo(new OralDiet_ScheduleComponent());
       }
 
       ///<inheritdoc />
       public override bool Matches(IDeepComparable other)
       {
-        var otherT = other as ScheduleComponent;
+        var otherT = other as OralDiet_ScheduleComponent;
         if(otherT == null) return false;
 
         if(!base.Matches(otherT)) return false;
@@ -404,7 +404,7 @@ namespace Hl7.Fhir.Model
 
       public override bool IsExactly(IDeepComparable other)
       {
-        var otherT = other as ScheduleComponent;
+        var otherT = other as OralDiet_ScheduleComponent;
         if(otherT == null) return false;
 
         if(!base.IsExactly(otherT)) return false;
@@ -792,13 +792,13 @@ namespace Hl7.Fhir.Model
       /// </summary>
       [FhirElement("schedule", Order=60)]
       [DataMember]
-      public Hl7.Fhir.Model.NutritionOrder.ScheduleComponent Schedule
+      public Hl7.Fhir.Model.NutritionOrder.Supplement_ScheduleComponent Schedule
       {
         get { return _Schedule; }
         set { _Schedule = value; OnPropertyChanged("Schedule"); }
       }
 
-      private Hl7.Fhir.Model.NutritionOrder.ScheduleComponent _Schedule;
+      private Hl7.Fhir.Model.NutritionOrder.Supplement_ScheduleComponent _Schedule;
 
       /// <summary>
       /// Amount of the nutritional supplement
@@ -856,7 +856,7 @@ namespace Hl7.Fhir.Model
         base.CopyTo(dest);
         if(Type != null) dest.Type = (Hl7.Fhir.Model.CodeableReference)Type.DeepCopy();
         if(ProductNameElement != null) dest.ProductNameElement = (Hl7.Fhir.Model.FhirString)ProductNameElement.DeepCopy();
-        if(Schedule != null) dest.Schedule = (Hl7.Fhir.Model.NutritionOrder.ScheduleComponent)Schedule.DeepCopy();
+        if(Schedule != null) dest.Schedule = (Hl7.Fhir.Model.NutritionOrder.Supplement_ScheduleComponent)Schedule.DeepCopy();
         if(Quantity != null) dest.Quantity = (Hl7.Fhir.Model.Quantity)Quantity.DeepCopy();
         if(InstructionElement != null) dest.InstructionElement = (Hl7.Fhir.Model.FhirString)InstructionElement.DeepCopy();
         return dest;
@@ -968,13 +968,13 @@ namespace Hl7.Fhir.Model
     /// </summary>
     [Serializable]
     [DataContract]
-    [FhirType("NutritionOrder#Schedule", IsNestedType=true)]
-    public partial class ScheduleComponent : Hl7.Fhir.Model.BackboneElement
+    [FhirType("NutritionOrder#Supplement#Schedule", IsNestedType=true)]
+    public partial class Supplement_ScheduleComponent : Hl7.Fhir.Model.BackboneElement
     {
       /// <summary>
       /// FHIR Type Name
       /// </summary>
-      public override string TypeName { get { return "NutritionOrder#Schedule"; } }
+      public override string TypeName { get { return "NutritionOrder#Supplement#Schedule"; } }
 
       /// <summary>
       /// Scheduled frequency of diet
@@ -1036,7 +1036,7 @@ namespace Hl7.Fhir.Model
 
       public override IDeepCopyable CopyTo(IDeepCopyable other)
       {
-        var dest = other as ScheduleComponent;
+        var dest = other as Supplement_ScheduleComponent;
 
         if (dest == null)
         {
@@ -1052,13 +1052,13 @@ namespace Hl7.Fhir.Model
 
       public override IDeepCopyable DeepCopy()
       {
-        return CopyTo(new ScheduleComponent());
+        return CopyTo(new Supplement_ScheduleComponent());
       }
 
       ///<inheritdoc />
       public override bool Matches(IDeepComparable other)
       {
-        var otherT = other as ScheduleComponent;
+        var otherT = other as Supplement_ScheduleComponent;
         if(otherT == null) return false;
 
         if(!base.Matches(otherT)) return false;
@@ -1071,7 +1071,7 @@ namespace Hl7.Fhir.Model
 
       public override bool IsExactly(IDeepComparable other)
       {
-        var otherT = other as ScheduleComponent;
+        var otherT = other as Supplement_ScheduleComponent;
         if(otherT == null) return false;
 
         if(!base.IsExactly(otherT)) return false;
@@ -1648,13 +1648,13 @@ namespace Hl7.Fhir.Model
       /// </summary>
       [FhirElement("schedule", Order=40)]
       [DataMember]
-      public Hl7.Fhir.Model.NutritionOrder.ScheduleComponent Schedule
+      public Hl7.Fhir.Model.NutritionOrder.EnteralFormula_ScheduleComponent Schedule
       {
         get { return _Schedule; }
         set { _Schedule = value; OnPropertyChanged("Schedule"); }
       }
 
-      private Hl7.Fhir.Model.NutritionOrder.ScheduleComponent _Schedule;
+      private Hl7.Fhir.Model.NutritionOrder.EnteralFormula_ScheduleComponent _Schedule;
 
       /// <summary>
       /// The volume of formula to provide
@@ -1694,7 +1694,7 @@ namespace Hl7.Fhir.Model
         }
 
         base.CopyTo(dest);
-        if(Schedule != null) dest.Schedule = (Hl7.Fhir.Model.NutritionOrder.ScheduleComponent)Schedule.DeepCopy();
+        if(Schedule != null) dest.Schedule = (Hl7.Fhir.Model.NutritionOrder.EnteralFormula_ScheduleComponent)Schedule.DeepCopy();
         if(Quantity != null) dest.Quantity = (Hl7.Fhir.Model.Quantity)Quantity.DeepCopy();
         if(Rate != null) dest.Rate = (Hl7.Fhir.Model.DataType)Rate.DeepCopy();
         return dest;
@@ -1790,13 +1790,13 @@ namespace Hl7.Fhir.Model
     /// </summary>
     [Serializable]
     [DataContract]
-    [FhirType("NutritionOrder#Schedule", IsNestedType=true)]
-    public partial class ScheduleComponent : Hl7.Fhir.Model.BackboneElement
+    [FhirType("NutritionOrder#EnteralFormula#Schedule", IsNestedType=true)]
+    public partial class EnteralFormula_ScheduleComponent : Hl7.Fhir.Model.BackboneElement
     {
       /// <summary>
       /// FHIR Type Name
       /// </summary>
-      public override string TypeName { get { return "NutritionOrder#Schedule"; } }
+      public override string TypeName { get { return "NutritionOrder#EnteralFormula#Schedule"; } }
 
       /// <summary>
       /// Scheduled frequency of enteral formula
@@ -1858,7 +1858,7 @@ namespace Hl7.Fhir.Model
 
       public override IDeepCopyable CopyTo(IDeepCopyable other)
       {
-        var dest = other as ScheduleComponent;
+        var dest = other as EnteralFormula_ScheduleComponent;
 
         if (dest == null)
         {
@@ -1874,13 +1874,13 @@ namespace Hl7.Fhir.Model
 
       public override IDeepCopyable DeepCopy()
       {
-        return CopyTo(new ScheduleComponent());
+        return CopyTo(new EnteralFormula_ScheduleComponent());
       }
 
       ///<inheritdoc />
       public override bool Matches(IDeepComparable other)
       {
-        var otherT = other as ScheduleComponent;
+        var otherT = other as EnteralFormula_ScheduleComponent;
         if(otherT == null) return false;
 
         if(!base.Matches(otherT)) return false;
@@ -1893,7 +1893,7 @@ namespace Hl7.Fhir.Model
 
       public override bool IsExactly(IDeepComparable other)
       {
-        var otherT = other as ScheduleComponent;
+        var otherT = other as EnteralFormula_ScheduleComponent;
         if(otherT == null) return false;
 
         if(!base.IsExactly(otherT)) return false;

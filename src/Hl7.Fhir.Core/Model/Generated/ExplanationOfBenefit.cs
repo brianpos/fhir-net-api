@@ -2069,13 +2069,13 @@ namespace Hl7.Fhir.Model
       [FhirElement("bodySite", Order=240)]
       [Cardinality(Min=0,Max=-1)]
       [DataMember]
-      public List<Hl7.Fhir.Model.ExplanationOfBenefit.BodySiteComponent> BodySite
+      public List<Hl7.Fhir.Model.ExplanationOfBenefit.Item_BodySiteComponent> BodySite
       {
-        get { if(_BodySite==null) _BodySite = new List<Hl7.Fhir.Model.ExplanationOfBenefit.BodySiteComponent>(); return _BodySite; }
+        get { if(_BodySite==null) _BodySite = new List<Hl7.Fhir.Model.ExplanationOfBenefit.Item_BodySiteComponent>(); return _BodySite; }
         set { _BodySite = value; OnPropertyChanged("BodySite"); }
       }
 
-      private List<Hl7.Fhir.Model.ExplanationOfBenefit.BodySiteComponent> _BodySite;
+      private List<Hl7.Fhir.Model.ExplanationOfBenefit.Item_BodySiteComponent> _BodySite;
 
       /// <summary>
       /// Encounters related to this billed item
@@ -2196,7 +2196,7 @@ namespace Hl7.Fhir.Model
         if(Tax != null) dest.Tax = (Hl7.Fhir.Model.Money)Tax.DeepCopy();
         if(Net != null) dest.Net = (Hl7.Fhir.Model.Money)Net.DeepCopy();
         if(Udi != null) dest.Udi = new List<Hl7.Fhir.Model.ResourceReference>(Udi.DeepCopy());
-        if(BodySite != null) dest.BodySite = new List<Hl7.Fhir.Model.ExplanationOfBenefit.BodySiteComponent>(BodySite.DeepCopy());
+        if(BodySite != null) dest.BodySite = new List<Hl7.Fhir.Model.ExplanationOfBenefit.Item_BodySiteComponent>(BodySite.DeepCopy());
         if(Encounter != null) dest.Encounter = new List<Hl7.Fhir.Model.ResourceReference>(Encounter.DeepCopy());
         if(NoteNumberElement != null) dest.NoteNumberElement = new List<Hl7.Fhir.Model.PositiveInt>(NoteNumberElement.DeepCopy());
         if(Decision != null) dest.Decision = (Hl7.Fhir.Model.CodeableConcept)Decision.DeepCopy();
@@ -2479,13 +2479,13 @@ namespace Hl7.Fhir.Model
     /// </summary>
     [Serializable]
     [DataContract]
-    [FhirType("ExplanationOfBenefit#BodySite", IsNestedType=true)]
-    public partial class BodySiteComponent : Hl7.Fhir.Model.BackboneElement
+    [FhirType("ExplanationOfBenefit#Item#BodySite", IsNestedType=true)]
+    public partial class Item_BodySiteComponent : Hl7.Fhir.Model.BackboneElement
     {
       /// <summary>
       /// FHIR Type Name
       /// </summary>
-      public override string TypeName { get { return "ExplanationOfBenefit#BodySite"; } }
+      public override string TypeName { get { return "ExplanationOfBenefit#Item#BodySite"; } }
 
       /// <summary>
       /// Location
@@ -2517,7 +2517,7 @@ namespace Hl7.Fhir.Model
 
       public override IDeepCopyable CopyTo(IDeepCopyable other)
       {
-        var dest = other as BodySiteComponent;
+        var dest = other as Item_BodySiteComponent;
 
         if (dest == null)
         {
@@ -2532,13 +2532,13 @@ namespace Hl7.Fhir.Model
 
       public override IDeepCopyable DeepCopy()
       {
-        return CopyTo(new BodySiteComponent());
+        return CopyTo(new Item_BodySiteComponent());
       }
 
       ///<inheritdoc />
       public override bool Matches(IDeepComparable other)
       {
-        var otherT = other as BodySiteComponent;
+        var otherT = other as Item_BodySiteComponent;
         if(otherT == null) return false;
 
         if(!base.Matches(otherT)) return false;
@@ -2550,7 +2550,7 @@ namespace Hl7.Fhir.Model
 
       public override bool IsExactly(IDeepComparable other)
       {
-        var otherT = other as BodySiteComponent;
+        var otherT = other as Item_BodySiteComponent;
         if(otherT == null) return false;
 
         if(!base.IsExactly(otherT)) return false;
@@ -4195,13 +4195,13 @@ namespace Hl7.Fhir.Model
       [FhirElement("bodySite", Order=210)]
       [Cardinality(Min=0,Max=-1)]
       [DataMember]
-      public List<Hl7.Fhir.Model.ExplanationOfBenefit.BodySiteComponent> BodySite
+      public List<Hl7.Fhir.Model.ExplanationOfBenefit.AddedItem_BodySiteComponent> BodySite
       {
-        get { if(_BodySite==null) _BodySite = new List<Hl7.Fhir.Model.ExplanationOfBenefit.BodySiteComponent>(); return _BodySite; }
+        get { if(_BodySite==null) _BodySite = new List<Hl7.Fhir.Model.ExplanationOfBenefit.AddedItem_BodySiteComponent>(); return _BodySite; }
         set { _BodySite = value; OnPropertyChanged("BodySite"); }
       }
 
-      private List<Hl7.Fhir.Model.ExplanationOfBenefit.BodySiteComponent> _BodySite;
+      private List<Hl7.Fhir.Model.ExplanationOfBenefit.AddedItem_BodySiteComponent> _BodySite;
 
       /// <summary>
       /// Applicable note numbers
@@ -4303,7 +4303,7 @@ namespace Hl7.Fhir.Model
         if(FactorElement != null) dest.FactorElement = (Hl7.Fhir.Model.FhirDecimal)FactorElement.DeepCopy();
         if(Tax != null) dest.Tax = (Hl7.Fhir.Model.Money)Tax.DeepCopy();
         if(Net != null) dest.Net = (Hl7.Fhir.Model.Money)Net.DeepCopy();
-        if(BodySite != null) dest.BodySite = new List<Hl7.Fhir.Model.ExplanationOfBenefit.BodySiteComponent>(BodySite.DeepCopy());
+        if(BodySite != null) dest.BodySite = new List<Hl7.Fhir.Model.ExplanationOfBenefit.AddedItem_BodySiteComponent>(BodySite.DeepCopy());
         if(NoteNumberElement != null) dest.NoteNumberElement = new List<Hl7.Fhir.Model.PositiveInt>(NoteNumberElement.DeepCopy());
         if(Decision != null) dest.Decision = (Hl7.Fhir.Model.CodeableConcept)Decision.DeepCopy();
         if(Adjudication != null) dest.Adjudication = new List<Hl7.Fhir.Model.ExplanationOfBenefit.AdjudicationComponent>(Adjudication.DeepCopy());
@@ -4553,13 +4553,13 @@ namespace Hl7.Fhir.Model
     /// </summary>
     [Serializable]
     [DataContract]
-    [FhirType("ExplanationOfBenefit#BodySite", IsNestedType=true)]
-    public partial class BodySiteComponent : Hl7.Fhir.Model.BackboneElement
+    [FhirType("ExplanationOfBenefit#AddedItem#BodySite", IsNestedType=true)]
+    public partial class AddedItem_BodySiteComponent : Hl7.Fhir.Model.BackboneElement
     {
       /// <summary>
       /// FHIR Type Name
       /// </summary>
-      public override string TypeName { get { return "ExplanationOfBenefit#BodySite"; } }
+      public override string TypeName { get { return "ExplanationOfBenefit#AddedItem#BodySite"; } }
 
       /// <summary>
       /// Location
@@ -4591,7 +4591,7 @@ namespace Hl7.Fhir.Model
 
       public override IDeepCopyable CopyTo(IDeepCopyable other)
       {
-        var dest = other as BodySiteComponent;
+        var dest = other as AddedItem_BodySiteComponent;
 
         if (dest == null)
         {
@@ -4606,13 +4606,13 @@ namespace Hl7.Fhir.Model
 
       public override IDeepCopyable DeepCopy()
       {
-        return CopyTo(new BodySiteComponent());
+        return CopyTo(new AddedItem_BodySiteComponent());
       }
 
       ///<inheritdoc />
       public override bool Matches(IDeepComparable other)
       {
-        var otherT = other as BodySiteComponent;
+        var otherT = other as AddedItem_BodySiteComponent;
         if(otherT == null) return false;
 
         if(!base.Matches(otherT)) return false;
@@ -4624,7 +4624,7 @@ namespace Hl7.Fhir.Model
 
       public override bool IsExactly(IDeepComparable other)
       {
-        var otherT = other as BodySiteComponent;
+        var otherT = other as AddedItem_BodySiteComponent;
         if(otherT == null) return false;
 
         if(!base.IsExactly(otherT)) return false;
