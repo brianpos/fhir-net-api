@@ -287,13 +287,13 @@ namespace Hl7.Fhir.Model
       [FhirElement("priceComponent", Order=50)]
       [Cardinality(Min=0,Max=-1)]
       [DataMember]
-      public List<Hl7.Fhir.Model.ChargeItemDefinition.PriceComponentComponent> PriceComponent
+      public List<Hl7.Fhir.Model.MonetaryComponent> PriceComponent
       {
-        get { if(_PriceComponent==null) _PriceComponent = new List<Hl7.Fhir.Model.ChargeItemDefinition.PriceComponentComponent>(); return _PriceComponent; }
+        get { if(_PriceComponent==null) _PriceComponent = new List<Hl7.Fhir.Model.MonetaryComponent>(); return _PriceComponent; }
         set { _PriceComponent = value; OnPropertyChanged("PriceComponent"); }
       }
 
-      private List<Hl7.Fhir.Model.ChargeItemDefinition.PriceComponentComponent> _PriceComponent;
+      private List<Hl7.Fhir.Model.MonetaryComponent> _PriceComponent;
 
       public override IDeepCopyable CopyTo(IDeepCopyable other)
       {
@@ -306,7 +306,7 @@ namespace Hl7.Fhir.Model
 
         base.CopyTo(dest);
         if(Applicability != null) dest.Applicability = new List<Hl7.Fhir.Model.ChargeItemDefinition.ApplicabilityComponent>(Applicability.DeepCopy());
-        if(PriceComponent != null) dest.PriceComponent = new List<Hl7.Fhir.Model.ChargeItemDefinition.PriceComponentComponent>(PriceComponent.DeepCopy());
+        if(PriceComponent != null) dest.PriceComponent = new List<Hl7.Fhir.Model.MonetaryComponent>(PriceComponent.DeepCopy());
         return dest;
       }
 
@@ -383,219 +383,6 @@ namespace Hl7.Fhir.Model
         foreach (var kvp in base.GetElementPairs()) yield return kvp;
         if (Applicability?.Any() == true) yield return new KeyValuePair<string,object>("applicability",Applicability);
         if (PriceComponent?.Any() == true) yield return new KeyValuePair<string,object>("priceComponent",PriceComponent);
-      }
-
-    }
-
-    /// <summary>
-    /// Components of total line item price
-    /// </summary>
-    [Serializable]
-    [DataContract]
-    [FhirType("ChargeItemDefinition#PriceComponent", IsNestedType=true)]
-    public partial class PriceComponentComponent : Hl7.Fhir.Model.MonetaryComponent
-    {
-      /// <summary>
-      /// FHIR Type Name
-      /// </summary>
-      public override string TypeName { get { return "ChargeItemDefinition#PriceComponent"; } }
-
-      /// <summary>
-      /// base | surcharge | deduction | discount | tax | informational
-      /// </summary>
-      [FhirElement("type", Order=10)]
-      [DeclaredType(Type = typeof(Code))]
-      [Cardinality(Min=1,Max=1)]
-      [DataMember]
-      public Code<Hl7.Fhir.Model.ChargeItemDefinition.InvoicePriceComponentType> TypeElement
-      {
-        get { return _TypeElement; }
-        set { _TypeElement = value; OnPropertyChanged("TypeElement"); }
-      }
-
-      private Code<Hl7.Fhir.Model.ChargeItemDefinition.InvoicePriceComponentType> _TypeElement;
-
-      /// <summary>
-      /// base | surcharge | deduction | discount | tax | informational
-      /// </summary>
-      /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
-      [IgnoreDataMember]
-      public Hl7.Fhir.Model.ChargeItemDefinition.InvoicePriceComponentType? Type
-      {
-        get { return TypeElement != null ? TypeElement.Value : null; }
-        set
-        {
-          if (value == null)
-            TypeElement = null;
-          else
-            TypeElement = new Code<Hl7.Fhir.Model.ChargeItemDefinition.InvoicePriceComponentType>(value);
-          OnPropertyChanged("Type");
-        }
-      }
-
-      /// <summary>
-      /// Code identifying the specific component
-      /// </summary>
-      [FhirElement("code", Order=20)]
-      [DataMember]
-      public Hl7.Fhir.Model.CodeableConcept Code
-      {
-        get { return _Code; }
-        set { _Code = value; OnPropertyChanged("Code"); }
-      }
-
-      private Hl7.Fhir.Model.CodeableConcept _Code;
-
-      /// <summary>
-      /// Factor used for calculating this component
-      /// </summary>
-      [FhirElement("factor", Order=30)]
-      [DataMember]
-      public Hl7.Fhir.Model.FhirDecimal FactorElement
-      {
-        get { return _FactorElement; }
-        set { _FactorElement = value; OnPropertyChanged("FactorElement"); }
-      }
-
-      private Hl7.Fhir.Model.FhirDecimal _FactorElement;
-
-      /// <summary>
-      /// Factor used for calculating this component
-      /// </summary>
-      /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
-      [IgnoreDataMember]
-      public decimal? Factor
-      {
-        get { return FactorElement != null ? FactorElement.Value : null; }
-        set
-        {
-          if (value == null)
-            FactorElement = null;
-          else
-            FactorElement = new Hl7.Fhir.Model.FhirDecimal(value);
-          OnPropertyChanged("Factor");
-        }
-      }
-
-      /// <summary>
-      /// Monetary amount associated with this component
-      /// </summary>
-      [FhirElement("amount", Order=40)]
-      [DataMember]
-      public Hl7.Fhir.Model.Money Amount
-      {
-        get { return _Amount; }
-        set { _Amount = value; OnPropertyChanged("Amount"); }
-      }
-
-      private Hl7.Fhir.Model.Money _Amount;
-
-      public override IDeepCopyable CopyTo(IDeepCopyable other)
-      {
-        var dest = other as PriceComponentComponent;
-
-        if (dest == null)
-        {
-          throw new ArgumentException("Can only copy to an object of the same type", "other");
-        }
-
-        base.CopyTo(dest);
-        if(TypeElement != null) dest.TypeElement = (Code<Hl7.Fhir.Model.ChargeItemDefinition.InvoicePriceComponentType>)TypeElement.DeepCopy();
-        if(Code != null) dest.Code = (Hl7.Fhir.Model.CodeableConcept)Code.DeepCopy();
-        if(FactorElement != null) dest.FactorElement = (Hl7.Fhir.Model.FhirDecimal)FactorElement.DeepCopy();
-        if(Amount != null) dest.Amount = (Hl7.Fhir.Model.Money)Amount.DeepCopy();
-        return dest;
-      }
-
-      public override IDeepCopyable DeepCopy()
-      {
-        return CopyTo(new PriceComponentComponent());
-      }
-
-      ///<inheritdoc />
-      public override bool Matches(IDeepComparable other)
-      {
-        var otherT = other as PriceComponentComponent;
-        if(otherT == null) return false;
-
-        if(!base.Matches(otherT)) return false;
-        if( !DeepComparable.Matches(TypeElement, otherT.TypeElement)) return false;
-        if( !DeepComparable.Matches(Code, otherT.Code)) return false;
-        if( !DeepComparable.Matches(FactorElement, otherT.FactorElement)) return false;
-        if( !DeepComparable.Matches(Amount, otherT.Amount)) return false;
-
-        return true;
-      }
-
-      public override bool IsExactly(IDeepComparable other)
-      {
-        var otherT = other as PriceComponentComponent;
-        if(otherT == null) return false;
-
-        if(!base.IsExactly(otherT)) return false;
-        if( !DeepComparable.IsExactly(TypeElement, otherT.TypeElement)) return false;
-        if( !DeepComparable.IsExactly(Code, otherT.Code)) return false;
-        if( !DeepComparable.IsExactly(FactorElement, otherT.FactorElement)) return false;
-        if( !DeepComparable.IsExactly(Amount, otherT.Amount)) return false;
-
-        return true;
-      }
-
-      [IgnoreDataMember]
-      public override IEnumerable<Base> Children
-      {
-        get
-        {
-          foreach (var item in base.Children) yield return item;
-          if (TypeElement != null) yield return TypeElement;
-          if (Code != null) yield return Code;
-          if (FactorElement != null) yield return FactorElement;
-          if (Amount != null) yield return Amount;
-        }
-      }
-
-      [IgnoreDataMember]
-      public override IEnumerable<ElementValue> NamedChildren
-      {
-        get
-        {
-          foreach (var item in base.NamedChildren) yield return item;
-          if (TypeElement != null) yield return new ElementValue("type", TypeElement);
-          if (Code != null) yield return new ElementValue("code", Code);
-          if (FactorElement != null) yield return new ElementValue("factor", FactorElement);
-          if (Amount != null) yield return new ElementValue("amount", Amount);
-        }
-      }
-
-      protected override bool TryGetValue(string key, out object value)
-      {
-        switch (key)
-        {
-          case "type":
-            value = TypeElement;
-            return TypeElement is not null;
-          case "code":
-            value = Code;
-            return Code is not null;
-          case "factor":
-            value = FactorElement;
-            return FactorElement is not null;
-          case "amount":
-            value = Amount;
-            return Amount is not null;
-          default:
-            return base.TryGetValue(key, out value);
-        };
-
-      }
-
-      protected override IEnumerable<KeyValuePair<string, object>> GetElementPairs()
-      {
-        foreach (var kvp in base.GetElementPairs()) yield return kvp;
-        if (TypeElement is not null) yield return new KeyValuePair<string,object>("type",TypeElement);
-        if (Code is not null) yield return new KeyValuePair<string,object>("code",Code);
-        if (FactorElement is not null) yield return new KeyValuePair<string,object>("factor",FactorElement);
-        if (Amount is not null) yield return new KeyValuePair<string,object>("amount",Amount);
       }
 
     }
