@@ -1,12 +1,12 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net452;netstandard2.0</TargetFrameworks>
+		<TargetFrameworks>net6.0</TargetFrameworks>
 	</PropertyGroup>
 
 	<!-- Solution-wide properties for NuGet packaging -->
 	<PropertyGroup>
-		<VersionPrefix>4.2.1</VersionPrefix>
+		<VersionPrefix>4.3.0</VersionPrefix>
 		<VersionSuffix></VersionSuffix>
 		<Authors>Firely (info@fire.ly) and contributors</Authors>
 		<Company>Firely (https://fire.ly)</Company>
@@ -24,7 +24,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<!-- Error	CS4014	Because this call is not awaited, execution of the current method continues before the call is completed. 
+		<!-- Error	CS4014	Because this call is not awaited, execution of the current method continues before the call is completed.
 		Consider applying the 'await' operator to the result of the call.	-->
 		<WarningsAsErrors>CS4014</WarningsAsErrors>
 	</PropertyGroup>
