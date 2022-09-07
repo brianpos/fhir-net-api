@@ -49,8 +49,8 @@ namespace Hl7.Fhir.Model
                     StringBuilder sb = new StringBuilder();
                     if (!string.IsNullOrEmpty(this.LinkId))
                         sb.AppendFormat(" LinkId=\"{0}\"", LinkId);
-                    if (!string.IsNullOrEmpty(this.Text?.Value))
-                        sb.AppendFormat(" Text=\"{0}\"", Text.Value);
+                    if (!string.IsNullOrEmpty(this.Text))
+                        sb.AppendFormat(" Text=\"{0}\"", Text);
 
                     return sb.ToString();
                 }

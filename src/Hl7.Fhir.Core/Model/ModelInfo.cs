@@ -379,7 +379,7 @@ namespace Hl7.Fhir.Model
         [Obsolete("Profiled quantities have been removed from the POCO model and will not appear in data anymore.")]
         public static bool IsProfiledQuantity(FHIRAllTypes type)
         {
-            return type == FHIRAllTypes.SimpleQuantity || type == FHIRAllTypes.MoneyQuantity;
+            return false;
         }
 
         public static bool IsBindable(string type)

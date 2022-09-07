@@ -42,26 +42,26 @@ namespace Hl7.Fhir.Model
     {
         public string SourceAsString()
         {
-            if (Source == null) return null;
+            if (SourceScope == null) return null;
 
-            if (Source as ResourceReference != null)
-                return ((ResourceReference)Source).Reference;
-            else if (Source as FhirUri != null)
-                return ((FhirUri)Source).Value;
+            if (SourceScope as Canonical != null)
+                return ((Canonical)SourceScope).Value;
+            else if (SourceScope as FhirUri != null)
+                return ((FhirUri)SourceScope).Value;
             else
-                throw Error.NotSupported("Don't know how to handle a ConceptMap with Source of type " + Source.GetType().Name);
+                throw Error.NotSupported("Don't know how to handle a ConceptMap with Source of type " + SourceScope.GetType().Name);
         }
 
         public string TargetAsString()
         {
-            if (Target == null) return null;
+            if (TargetScope == null) return null;
 
-            if (Target as ResourceReference != null)
-                return ((ResourceReference)Target).Reference;
-            else if (Target as FhirUri != null)
-                return ((FhirUri)Target).Value;
+            if (TargetScope as Canonical != null)
+                return ((Canonical)TargetScope).Value;
+            else if (TargetScope as FhirUri != null)
+                return ((FhirUri)TargetScope).Value;
             else
-                throw Error.NotSupported("Don't know how to handle a ConceptMap with Target of type " + Target.GetType().Name);
+                throw Error.NotSupported("Don't know how to handle a ConceptMap with Target of type " + TargetScope.GetType().Name);
         }
     }
     

@@ -32,6 +32,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Hl7.Fhir.Utility;
 
 #nullable enable
 
@@ -111,7 +112,7 @@ namespace Hl7.Fhir.Model
         {
             if (Link is null) return null;
 
-            var entry = Link.FirstOrDefault(e => rel.Equals(e.Relation, StringComparison.OrdinalIgnoreCase));
+            var entry = Link.FirstOrDefault(e => rel.Equals(e.Relation?.GetLiteral(), StringComparison.OrdinalIgnoreCase));
 
             return entry != null ? new Uri(entry.Url, UriKind.RelativeOrAbsolute) : null;
         }
@@ -122,7 +123,7 @@ namespace Hl7.Fhir.Model
 
             if (Link == null) Link = new List<LinkComponent>();
 
-            var entry = Link.FirstOrDefault(e => rel.Equals(e.Relation, StringComparison.OrdinalIgnoreCase));
+            var entry = Link.FirstOrDefault(e => rel.Equals(e.Relation?.GetLiteral(), StringComparison.OrdinalIgnoreCase));
 
             // Setting the link to null removes the entry
             if (uri is null)
@@ -137,7 +138,7 @@ namespace Hl7.Fhir.Model
             if (entry != null)
                 entry.Url = uriString;
             else
-                Link.Add(new LinkComponent() { Relation = rel, Url = uriString });
+                Link.Add(new LinkComponent() { Relation = EnumUtility.ParseLiteral<LinkRelationTypes>(rel), Url = uriString });
         }
     }
 }
