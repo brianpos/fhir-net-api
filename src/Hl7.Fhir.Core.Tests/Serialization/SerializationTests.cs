@@ -386,14 +386,14 @@ namespace Hl7.Fhir.Tests.Serialization
             var es = new ExampleScenario();
             es.Instance.Add(new ExampleScenario.InstanceComponent()
             {
-                ResourceType = ResourceType.ExampleScenario,
-                Name = "brian"
+                StructureType = new Coding(null, ResourceType.ExampleScenario.GetLiteral()),
+                Title = "brian"
             });
 
             string json = FhirJsonSerializer.SerializeToString(es);
             var c2 = new FhirJsonParser().Parse<ExampleScenario>(json);
-            Assert.AreEqual("brian", c2.Instance[0].Name);
-            Assert.AreEqual("ExampleScenario", c2.Instance[0].ResourceTypeElement.ObjectValue as string);
+            Assert.AreEqual("brian", c2.Instance[0].Title);
+            Assert.AreEqual("ExampleScenario", c2.Instance[0].StructureType.Code);
         }
 
         [TestMethod]

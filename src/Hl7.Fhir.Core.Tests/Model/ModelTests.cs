@@ -765,7 +765,7 @@ namespace Hl7.Fhir.Tests.Model
         [TestMethod]
         public void TestCorrectCurrencyDescription()
         {
-            var currency = Money.Currencies.STN;
+            var currency = Currencies.STN;
             currency.GetDocumentation().Should().Be("São Tomé and Príncipe dobra");
         }
     }

@@ -739,13 +739,12 @@ namespace Hl7.Fhir.Specification.Tests
                 Subject = new ResourceReference
                 {
                     Reference = "Patient/23"
-                },
-
-                Author = new ResourceReference
-                {
-                    Reference = "Patient/23"
                 }
             };
+            cp.Contributor.Add(new ResourceReference
+            {
+                Reference = "Patient/23"
+            });
 
             var source =
                     new MultiResolver(
