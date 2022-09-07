@@ -32,6 +32,9 @@ using System.Linq;
 
 namespace Hl7.Fhir.Model
 {
+    // refer to http://hl7.org/fhir/5.0.0-ballot/canonicalresource.html#CanonicalResource
+    // for where these are all defined
+
     public partial class StructureDefinition : IVersionableConformanceResource
     {
 
@@ -100,16 +103,6 @@ namespace Hl7.Fhir.Model
 
     }
 
-
-    //public partial class ExpansionProfile : IVersionableConformanceResource
-    //{
-    //    public Markdown Purpose
-    //    {
-    //        get { return null; }
-    //        set { throw new NotImplementedException(); }
-    //    }
-    //}
-
     public partial class Questionnaire : IVersionableConformanceResource
     {
 
@@ -122,26 +115,99 @@ namespace Hl7.Fhir.Model
 
     public partial class NamingSystem : IConformanceResource
     {
-        // I think NamingSystem should have Experimental too
+    }
+
+    public partial class Library : IConformanceResource
+    {
+    }
+
+    public partial class SubscriptionTopic : IConformanceResource
+    {
         [Obsolete("This property is not a part of the official FHIR specification", true)]
-        public Markdown Purpose
+        public String Name
         {
             get { return null; }
             set { throw new NotImplementedException(); }
         }
 
         [Obsolete("This property is not a part of the official FHIR specification", true)]
-        public bool? Experimental
-        {
-            get { return null; }
-            set { throw new NotImplementedException(); }
-        }
-
-        [Obsolete("This property is not a part of the official FHIR specification", true)]
-        public FhirBoolean ExperimentalElement
+        public FhirString NameElement
         {
             get { return null; }
             set { throw new NotImplementedException(); }
         }
     }
+
+    public partial class ActivityDefinition : IConformanceResource
+    {
+    }
+
+    public partial class ActorDefinition : IConformanceResource
+    {
+    }
+
+    public partial class ChargeItemDefinition : IConformanceResource
+    {
+    }
+
+    public partial class Citation : IConformanceResource
+    {
+    }
+
+    //public partial class ConditionDefinition : IConformanceResource
+    //{
+    //}
+
+    public partial class EventDefinition : IConformanceResource
+    {
+    }
+
+    //public partial class Evidence : IConformanceResource
+    //{
+    //}
+
+    //public partial class EvidenceReport : IConformanceResource
+    //{
+    //}
+
+    //public partial class EvidenceVariable : IConformanceResource
+    //{
+    //}
+
+    public partial class ExampleScenario : IConformanceResource
+    {
+    }
+
+    public partial class Measure : IConformanceResource
+    {
+    }
+
+    public partial class ObservationDefinition : IConformanceResource
+    {
+        [Obsolete("This property is not a part of the official FHIR specification", true)]
+        String IConformanceResource.Publisher
+        {
+            get { return null; }
+            set { throw new NotImplementedException(); }
+        }
+
+        [Obsolete("This property is not a part of the official FHIR specification", true)]
+        FhirString IConformanceResource.PublisherElement
+        {
+            get { return null; }
+            set { throw new NotImplementedException(); }
+        }
+    }
+
+    public partial class PlanDefinition : IConformanceResource
+    {
+    }
+
+    public partial class Requirements : IConformanceResource
+    {
+    }
+
+    //public partial class SpecimenDefinition : IConformanceResource
+    //{
+    //}
 }

@@ -263,7 +263,19 @@ namespace Hl7.Fhir.Model
             FHIRAllTypes.TestScript,
             //FHIRAllTypes.TestReport,
             FHIRAllTypes.Questionnaire,
-            FHIRAllTypes.TerminologyCapabilities
+            FHIRAllTypes.TerminologyCapabilities,
+            FHIRAllTypes.Library,
+            FHIRAllTypes.SubscriptionTopic,
+            FHIRAllTypes.ActivityDefinition,
+            FHIRAllTypes.ActorDefinition,
+            FHIRAllTypes.ChargeItemDefinition,
+            FHIRAllTypes.Citation,
+            FHIRAllTypes.EventDefinition,
+            FHIRAllTypes.ExampleScenario,
+            FHIRAllTypes.Measure,
+            FHIRAllTypes.ObservationDefinition,
+            FHIRAllTypes.PlanDefinition,
+            FHIRAllTypes.Requirements,
         };
 
         /// <summary>
@@ -296,7 +308,19 @@ namespace Hl7.Fhir.Model
             ResourceType.NamingSystem,
             ResourceType.TestScript,
             //ResourceType.TestReport,
-            ResourceType.TerminologyCapabilities
+            ResourceType.TerminologyCapabilities,
+            ResourceType.Library,
+            ResourceType.SubscriptionTopic,
+            ResourceType.ActivityDefinition,
+            ResourceType.ActorDefinition,
+            ResourceType.ChargeItemDefinition,
+            ResourceType.Citation,
+            ResourceType.EventDefinition,
+            ResourceType.ExampleScenario,
+            ResourceType.Measure,
+            ResourceType.ObservationDefinition,
+            ResourceType.PlanDefinition,
+            ResourceType.Requirements,
         };
 
         /// <summary>
