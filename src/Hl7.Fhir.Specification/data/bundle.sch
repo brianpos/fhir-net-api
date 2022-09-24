@@ -34,38 +34,45 @@
       <sch:assert test="not(f:entry/f:response) or (f:type/@value = 'batch-response') or (f:type/@value = 'transaction-response') or (f:type/@value = 'history') or (f:type/@value = 'subscription-notification)">bdl-4: entry.response mandatory for batch-response/transaction-response/history, allowed for subscription-notification, otherwise prohibited</sch:assert>
       <sch:assert test="not(f:type/@value='subscription-notification') or f:entry[1]/f:resource/f:SubscriptionStatus">bdl-13: A subscription-notification must have a SubscriptionStatus as the first resource</sch:assert>
       <sch:assert test="not(f:type/@value='message') or f:entry[1]/f:resource/f:MessageHeader">bdl-12: A message must have a MessageHeader as the first resource</sch:assert>
+      <sch:assert test="not(           (f:type/@value = 'transaction') or            (f:type/@value = 'transaction-response') or            (f:type/@value = 'batch') or            (f:type/@value = 'batch-response')            ) or count(f:entry) = (count(f:entry/f:fullUrl) + count(f:entry[not(f:fullUrl)]/f:request/f:method/@value='POST'))">bdl-15: Bundle resources where type is not transaction, transaction-response, batch, or batch-response or when the request is a POST SHALL have Bundle.entry.fullUrl populated</sch:assert>
+      <sch:assert test="(f:type/@value = 'history') and not(f:entry/f:request/f:method/@value = 'PATCH')">bdl-14: entry.request.method PATCH not allowed for history</sch:assert>
+      <sch:assert test="not(f:type/@value='document') or f:entry[1]/f:resource/f:Composition">bdl-11: A document must have a Composition as the first resource</sch:assert>
+      <sch:assert test="not(f:type/@value = 'document') or exists(f:timestamp/@value)">bdl-10: A document must have a date</sch:assert>
       <sch:assert test="not(f:total) or (f:type/@value = 'searchset') or (f:type/@value = 'history')">bdl-1: total only when a search or history</sch:assert>
       <sch:assert test="not(f:entry/f:search) or (f:type/@value = 'searchset')">bdl-2: entry.search only when a search</sch:assert>
-      <sch:assert test="not(f:type/@value='document') or f:entry[1]/f:resource/f:Composition">bdl-11: A document must have a Composition as the first resource</sch:assert>
-      <sch:assert test="not(f:type/@value = 'document') or exists(f:timestamp/f:value)">bdl-10: A document must have a date</sch:assert>
     </sch:rule>
     <sch:rule context="f:Bundle/f:identifier/f:period">
       <sch:assert test="not(exists(f:start/@value)) or not(exists(f:end/@value)) or (xs:dateTime(f:start/@value) &lt;= xs:dateTime(f:end/@value))">per-1: If present, start SHALL have a lower or equal value than end</sch:assert>
     </sch:rule>
     <sch:rule context="f:Bundle/f:identifier/f:assigner">
-      <sch:assert test="not(starts-with(f:reference/@value, '#')) or exists(ancestor::*[self::f:entry or self::f:parameter]/f:resource/f:*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')]|/*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')])">ref-1: SHALL have a contained resource if a local reference is provided</sch:assert>
+      <sch:assert test="not(exists(f:reference)) or not(starts-with(f:reference/@value, '#')) or exists(ancestor::*[self::f:entry or self::f:parameter]/f:resource/f:*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')]|/*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')])">ref-1: SHALL have a contained resource if a local reference is provided</sch:assert>
+      <sch:assert test="exists(f:reference) or exists(f:identifier) or exists(f:display) or exists(f:extension)">ref-2: At least one of reference, identifier and display SHALL be present (unless an extension is provided).</sch:assert>
     </sch:rule>
     <sch:rule context="f:Bundle/f:entry">
       <sch:assert test="not(exists(f:fullUrl[contains(string(@value), '/_history/')]))">bdl-8: fullUrl cannot be a version specific reference</sch:assert>
       <sch:assert test="exists(f:resource) or exists(f:request) or exists(f:response)">bdl-5: must be a resource unless there's a request or response</sch:assert>
     </sch:rule>
     <sch:rule context="f:Bundle/f:signature/f:who">
-      <sch:assert test="not(starts-with(f:reference/@value, '#')) or exists(ancestor::*[self::f:entry or self::f:parameter]/f:resource/f:*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')]|/*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')])">ref-1: SHALL have a contained resource if a local reference is provided</sch:assert>
+      <sch:assert test="not(exists(f:reference)) or not(starts-with(f:reference/@value, '#')) or exists(ancestor::*[self::f:entry or self::f:parameter]/f:resource/f:*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')]|/*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')])">ref-1: SHALL have a contained resource if a local reference is provided</sch:assert>
+      <sch:assert test="exists(f:reference) or exists(f:identifier) or exists(f:display) or exists(f:extension)">ref-2: At least one of reference, identifier and display SHALL be present (unless an extension is provided).</sch:assert>
     </sch:rule>
     <sch:rule context="f:Bundle/f:signature/f:who/f:identifier/f:period">
       <sch:assert test="not(exists(f:start/@value)) or not(exists(f:end/@value)) or (xs:dateTime(f:start/@value) &lt;= xs:dateTime(f:end/@value))">per-1: If present, start SHALL have a lower or equal value than end</sch:assert>
     </sch:rule>
     <sch:rule context="f:Bundle/f:signature/f:who/f:identifier/f:assigner">
-      <sch:assert test="not(starts-with(f:reference/@value, '#')) or exists(ancestor::*[self::f:entry or self::f:parameter]/f:resource/f:*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')]|/*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')])">ref-1: SHALL have a contained resource if a local reference is provided</sch:assert>
+      <sch:assert test="not(exists(f:reference)) or not(starts-with(f:reference/@value, '#')) or exists(ancestor::*[self::f:entry or self::f:parameter]/f:resource/f:*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')]|/*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')])">ref-1: SHALL have a contained resource if a local reference is provided</sch:assert>
+      <sch:assert test="exists(f:reference) or exists(f:identifier) or exists(f:display) or exists(f:extension)">ref-2: At least one of reference, identifier and display SHALL be present (unless an extension is provided).</sch:assert>
     </sch:rule>
     <sch:rule context="f:Bundle/f:signature/f:onBehalfOf">
-      <sch:assert test="not(starts-with(f:reference/@value, '#')) or exists(ancestor::*[self::f:entry or self::f:parameter]/f:resource/f:*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')]|/*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')])">ref-1: SHALL have a contained resource if a local reference is provided</sch:assert>
+      <sch:assert test="not(exists(f:reference)) or not(starts-with(f:reference/@value, '#')) or exists(ancestor::*[self::f:entry or self::f:parameter]/f:resource/f:*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')]|/*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')])">ref-1: SHALL have a contained resource if a local reference is provided</sch:assert>
+      <sch:assert test="exists(f:reference) or exists(f:identifier) or exists(f:display) or exists(f:extension)">ref-2: At least one of reference, identifier and display SHALL be present (unless an extension is provided).</sch:assert>
     </sch:rule>
     <sch:rule context="f:Bundle/f:signature/f:onBehalfOf/f:identifier/f:period">
       <sch:assert test="not(exists(f:start/@value)) or not(exists(f:end/@value)) or (xs:dateTime(f:start/@value) &lt;= xs:dateTime(f:end/@value))">per-1: If present, start SHALL have a lower or equal value than end</sch:assert>
     </sch:rule>
     <sch:rule context="f:Bundle/f:signature/f:onBehalfOf/f:identifier/f:assigner">
-      <sch:assert test="not(starts-with(f:reference/@value, '#')) or exists(ancestor::*[self::f:entry or self::f:parameter]/f:resource/f:*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')]|/*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')])">ref-1: SHALL have a contained resource if a local reference is provided</sch:assert>
+      <sch:assert test="not(exists(f:reference)) or not(starts-with(f:reference/@value, '#')) or exists(ancestor::*[self::f:entry or self::f:parameter]/f:resource/f:*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')]|/*/f:contained/f:*[f:id/@value=substring-after(current()/f:reference/@value, '#')])">ref-1: SHALL have a contained resource if a local reference is provided</sch:assert>
+      <sch:assert test="exists(f:reference) or exists(f:identifier) or exists(f:display) or exists(f:extension)">ref-2: At least one of reference, identifier and display SHALL be present (unless an extension is provided).</sch:assert>
     </sch:rule>
   </sch:pattern>
 </sch:schema>

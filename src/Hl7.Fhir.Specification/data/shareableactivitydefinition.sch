@@ -23,7 +23,7 @@
   <sch:pattern>
     <sch:title>ActivityDefinition</sch:title>
     <sch:rule context="f:ActivityDefinition">
-      <sch:assert test="not(exists(f:name/@value)) or matches(f:name/@value, '[A-Z]([A-Za-z0-9_]){0,254}')">Name should be usable as an identifier for the module by machine processing applications such as code generation (inherited)</sch:assert>
+      <sch:assert test="not(exists(f:name/@value)) or matches(f:name/@value, '[A-Z]([A-Za-z0-9_]){1,254}')">Name should be usable as an identifier for the module by machine processing applications such as code generation (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
@@ -67,6 +67,7 @@
   <sch:pattern>
     <sch:title>ActivityDefinition.url</sch:title>
     <sch:rule context="f:ActivityDefinition/f:url">
+      <sch:assert test="not(exists(@value)) or matches(@value, '([^|#])*')">URL should not contain | or # - these characters make processing canonical references problematic (inherited)</sch:assert>
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
@@ -275,6 +276,12 @@
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
+    <sch:title>ActivityDefinition.asNeeded[x] 1</sch:title>
+    <sch:rule context="f:ActivityDefinition/f:asNeeded[x]">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
     <sch:title>ActivityDefinition.location</sch:title>
     <sch:rule context="f:ActivityDefinition/f:location">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
@@ -303,6 +310,12 @@
   <sch:pattern>
     <sch:title>ActivityDefinition.participant.type</sch:title>
     <sch:rule context="f:ActivityDefinition/f:participant/f:type">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ActivityDefinition.participant.typeCanonical</sch:title>
+    <sch:rule context="f:ActivityDefinition/f:participant/f:typeCanonical">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>

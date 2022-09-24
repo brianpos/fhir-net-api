@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -71,7 +71,7 @@
         <xs:sequence>
           <xs:element name="url" minOccurs="0" maxOccurs="1" type="uri">
             <xs:annotation>
-              <xs:documentation xml:lang="en">An absolute URI that is used to identify this terminology capabilities when it is referenced in a specification, model, design or an instance; also called its canonical identifier. This SHOULD be globally unique and SHOULD be a literal address at which at which an authoritative instance of this terminology capabilities is (or will be) published. This URL can be the target of a canonical reference. It SHALL remain the same when the terminology capabilities is stored on different servers.</xs:documentation>
+              <xs:documentation xml:lang="en">An absolute URI that is used to identify this terminology capabilities when it is referenced in a specification, model, design or an instance; also called its canonical identifier. This SHOULD be globally unique and SHOULD be a literal address at which an authoritative instance of this terminology capabilities is (or will be) published. This URL can be the target of a canonical reference. It SHALL remain the same when the terminology capabilities is stored on different servers.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="identifier" minOccurs="0" maxOccurs="unbounded" type="Identifier">
@@ -111,7 +111,7 @@
           </xs:element>
           <xs:element name="publisher" minOccurs="0" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The name of the organization or individual that published the terminology capabilities.</xs:documentation>
+              <xs:documentation xml:lang="en">The name of the organization or individual responsible for the release and ongoing maintenance of the terminology capabilities.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="contact" minOccurs="0" maxOccurs="unbounded" type="ContactDetail">
@@ -257,6 +257,11 @@
               <xs:documentation xml:lang="en">For the code system, a list of versions that are supported by the server.</xs:documentation>
            </xs:annotation>
           </xs:element>
+          <xs:element name="content" minOccurs="1" maxOccurs="1" type="CodeSystemContentMode">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The extent of the content of the code system (the concepts and codes it defines) are represented in this resource instance.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
           <xs:element name="subsumption" minOccurs="0" maxOccurs="1" type="boolean">
             <xs:annotation>
               <xs:documentation xml:lang="en">True if subsumption is supported for this version of the code system.</xs:documentation>
@@ -288,7 +293,7 @@
               <xs:documentation xml:lang="en">If the compositional grammar defined by the code system is supported.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="language" minOccurs="0" maxOccurs="unbounded" type="code">
+          <xs:element name="language" minOccurs="0" maxOccurs="unbounded" type="CommonLanguages">
             <xs:annotation>
               <xs:documentation xml:lang="en">Language Displays supported.</xs:documentation>
            </xs:annotation>
@@ -435,14 +440,19 @@
   </xs:complexType>
   <xs:simpleType name="CodeSearchSupportEnum">
     <xs:restriction base="code-primitive">
-      <xs:enumeration value="explicit">
+      <xs:enumeration value="in-compose">
         <xs:annotation>
-          <xs:documentation xml:lang="en">Explicit Codes</xs:documentation>
+          <xs:documentation xml:lang="en">In Compose</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      <xs:enumeration value="all">
+      <xs:enumeration value="in-expansion">
         <xs:annotation>
-          <xs:documentation xml:lang="en">Implicit Codes</xs:documentation>
+          <xs:documentation xml:lang="en">In Expansion</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="in-compose-or-expansion">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">In Compose Or Expansion</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
     </xs:restriction>

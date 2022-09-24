@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -71,7 +71,7 @@
         <xs:sequence>
           <xs:element name="url" minOccurs="0" maxOccurs="1" type="uri">
             <xs:annotation>
-              <xs:documentation xml:lang="en">An absolute URI that is used to identify this example scenario when it is referenced in a specification, model, design or an instance; also called its canonical identifier. This SHOULD be globally unique and SHOULD be a literal address at which at which an authoritative instance of this example scenario is (or will be) published. This URL can be the target of a canonical reference. It SHALL remain the same when the example scenario is stored on different servers.</xs:documentation>
+              <xs:documentation xml:lang="en">An absolute URI that is used to identify this example scenario when it is referenced in a specification, model, design or an instance; also called its canonical identifier. This SHOULD be globally unique and SHOULD be a literal address at which an authoritative instance of this example scenario is (or will be) published. This URL can be the target of a canonical reference. It SHALL remain the same when the example scenario is stored on different servers.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="identifier" minOccurs="0" maxOccurs="unbounded" type="Identifier">
@@ -84,9 +84,21 @@
               <xs:documentation xml:lang="en">The identifier that is used to identify this version of the example scenario when it is referenced in a specification, model, design or instance. This is an arbitrary value managed by the example scenario author and is not expected to be globally unique. For example, it might be a timestamp (e.g. yyyymmdd) if a managed version is not available. There is also no expectation that versions can be placed in a lexicographical sequence.</xs:documentation>
            </xs:annotation>
           </xs:element>
+          <xs:choice minOccurs="0" maxOccurs="1" >
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Indicates the mechanism used to compare versions to determine which is more current.</xs:documentation>
+            </xs:annotation>
+            <xs:element name="versionAlgorithmString" type="string"/>
+            <xs:element name="versionAlgorithmCoding" type="Coding"/>
+          </xs:choice>
           <xs:element name="name" minOccurs="0" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">A natural language name identifying the example scenario. This name should be usable as an identifier for the module by machine processing applications such as code generation.</xs:documentation>
+              <xs:documentation xml:lang="en">Temporarily retained for tooling purposes.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="title" minOccurs="0" maxOccurs="1" type="string">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">A short, descriptive, user-friendly title for the ExampleScenario.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="status" minOccurs="1" maxOccurs="1" type="PublicationStatus">
@@ -106,12 +118,17 @@
           </xs:element>
           <xs:element name="publisher" minOccurs="0" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The name of the organization or individual that published the example scenario.</xs:documentation>
+              <xs:documentation xml:lang="en">The name of the organization or individual responsible for the release and ongoing maintenance of the example scenario.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="contact" minOccurs="0" maxOccurs="unbounded" type="ContactDetail">
             <xs:annotation>
               <xs:documentation xml:lang="en">Contact details to assist a user in finding and communicating with the publisher.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="description" minOccurs="0" maxOccurs="1" type="markdown">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">A free text natural language description of the ExampleScenario from a consumer's perspective.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="useContext" minOccurs="0" maxOccurs="unbounded" type="UsageContext">
@@ -134,24 +151,24 @@
               <xs:documentation xml:lang="en">A copyright statement relating to the example scenario and/or its contents. Copyright statements are generally legal restrictions on the use and publishing of the example scenario.</xs:documentation>
            </xs:annotation>
           </xs:element>
+          <xs:element name="copyrightLabel" minOccurs="0" maxOccurs="1" type="string">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">A short string (&lt;50 characters), suitable for inclusion in a page footer that identifies the copyright holder, effective period, and optionally whether rights are resctricted. (e.g. 'All rights reserved', 'Some rights reserved').</xs:documentation>
+           </xs:annotation>
+          </xs:element>
           <xs:element name="actor" type="ExampleScenario.Actor" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Actor participating in the resource.</xs:documentation>
+              <xs:documentation xml:lang="en">A system or person who shares or receives an instance within the scenario.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="instance" type="ExampleScenario.Instance" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Each resource and each version that is present in the workflow.</xs:documentation>
+              <xs:documentation xml:lang="en">A single data collection that is shared as part of the scenario.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="process" type="ExampleScenario.Process" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Each major process - a group of operations.</xs:documentation>
-           </xs:annotation>
-          </xs:element>
-          <xs:element name="workflow" minOccurs="0" maxOccurs="unbounded" type="canonical">
-            <xs:annotation>
-              <xs:documentation xml:lang="en">Another nested workflow.</xs:documentation>
+              <xs:documentation xml:lang="en">A group of operations that represents a significant step within a scenario.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -165,24 +182,24 @@
     <xs:complexContent>
       <xs:extension base="BackboneElement">
         <xs:sequence>
-          <xs:element name="actorId" minOccurs="1" maxOccurs="1" type="string">
+          <xs:element name="key" minOccurs="1" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">ID or acronym of actor.</xs:documentation>
+              <xs:documentation xml:lang="en">A unique string within the scenario that is used to reference the actor.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="type" minOccurs="1" maxOccurs="1" type="ExampleScenarioActorType">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The type of actor - person or system.</xs:documentation>
+              <xs:documentation xml:lang="en">The category of actor - person or system.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="name" minOccurs="0" maxOccurs="1" type="string">
+          <xs:element name="title" minOccurs="1" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The name of the actor as shown in the page.</xs:documentation>
+              <xs:documentation xml:lang="en">The human-readable name for the actor used when rendering the scenario.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="description" minOccurs="0" maxOccurs="1" type="markdown">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The description of the actor.</xs:documentation>
+              <xs:documentation xml:lang="en">An explanation of who/what the actor is and its role in the scenario.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -196,34 +213,51 @@
     <xs:complexContent>
       <xs:extension base="BackboneElement">
         <xs:sequence>
-          <xs:element name="resourceId" minOccurs="1" maxOccurs="1" type="string">
+          <xs:element name="key" minOccurs="1" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The id of the resource for referencing.</xs:documentation>
+              <xs:documentation xml:lang="en">A unique string within the scenario that is used to reference the instance.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="resourceType" minOccurs="1" maxOccurs="1" type="ResourceType">
+          <xs:element name="structureType" minOccurs="1" maxOccurs="1" type="Coding">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The type of the resource.</xs:documentation>
+              <xs:documentation xml:lang="en">A code indicating the kind of data structure (FHIR resource or some other standard) this is an instance of.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="name" minOccurs="0" maxOccurs="1" type="string">
+          <xs:element name="structureVersion" minOccurs="0" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">A short name for the resource instance.</xs:documentation>
+              <xs:documentation xml:lang="en">Conveys the version of the data structure instantiated.  I.e. what release of FHIR, X12, OpenEHR, etc. is instance compliant with.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:choice minOccurs="0" maxOccurs="1" >
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Refers to a profile, template or other ruleset the instance adheres to.</xs:documentation>
+            </xs:annotation>
+            <xs:element name="structureProfileCanonical" type="canonical"/>
+            <xs:element name="structureProfileUri" type="uri"/>
+          </xs:choice>
+          <xs:element name="title" minOccurs="1" maxOccurs="1" type="string">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">A short descriptive label the instance to be used in tables or diagrams.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="description" minOccurs="0" maxOccurs="1" type="markdown">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Human-friendly description of the resource instance.</xs:documentation>
+              <xs:documentation xml:lang="en">An explanation of what the instance contains and what it's for.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="content" minOccurs="0" maxOccurs="1" type="Reference">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Points to an instance (typically an example) that shows the data that would corespond to this instance.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="version" type="ExampleScenario.Version" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
-              <xs:documentation xml:lang="en">A specific version of the resource.</xs:documentation>
+              <xs:documentation xml:lang="en">Represents the instance as it was at a specific time-point.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="containedInstance" type="ExampleScenario.ContainedInstance" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Resources contained in the instance (e.g. the observations contained in a bundle).</xs:documentation>
+              <xs:documentation xml:lang="en">References to other instances that can be found within this instance (e.g. the observations contained in a bundle).</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -237,14 +271,19 @@
     <xs:complexContent>
       <xs:extension base="BackboneElement">
         <xs:sequence>
-          <xs:element name="versionId" minOccurs="1" maxOccurs="1" type="string">
+          <xs:element name="key" minOccurs="1" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The identifier of a specific version of a resource.</xs:documentation>
+              <xs:documentation xml:lang="en">A unique string within the instance that is used to reference the version of the instance.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="description" minOccurs="1" maxOccurs="1" type="markdown">
+          <xs:element name="description" minOccurs="0" maxOccurs="1" type="markdown">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The description of the resource version.</xs:documentation>
+              <xs:documentation xml:lang="en">An explanation of what this specific version of the instance contains and represents.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="content" minOccurs="0" maxOccurs="1" type="Reference">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Points to an instance (typically an example) that shows the data that would flow at this point in the scenario.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -258,14 +297,14 @@
     <xs:complexContent>
       <xs:extension base="BackboneElement">
         <xs:sequence>
-          <xs:element name="resourceId" minOccurs="1" maxOccurs="1" type="string">
+          <xs:element name="instanceReference" minOccurs="1" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Each resource contained in the instance.</xs:documentation>
+              <xs:documentation xml:lang="en">A reference to the key of an instance found within this one.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="versionId" minOccurs="0" maxOccurs="1" type="string">
+          <xs:element name="versionReference" minOccurs="0" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">A specific version of a resource contained in the instance.</xs:documentation>
+              <xs:documentation xml:lang="en">A reference to the key of a specific version of an instance in this instance.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -281,27 +320,27 @@
         <xs:sequence>
           <xs:element name="title" minOccurs="1" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The diagram title of the group of operations.</xs:documentation>
+              <xs:documentation xml:lang="en">A short descriptive label the process to be used in tables or diagrams.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="description" minOccurs="0" maxOccurs="1" type="markdown">
             <xs:annotation>
-              <xs:documentation xml:lang="en">A longer description of the group of operations.</xs:documentation>
+              <xs:documentation xml:lang="en">An explanation of what the process represents and what it does.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="preConditions" minOccurs="0" maxOccurs="1" type="markdown">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Description of initial status before the process starts.</xs:documentation>
+              <xs:documentation xml:lang="en">Description of the initial state of the actors, environment and data before the process starts.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="postConditions" minOccurs="0" maxOccurs="1" type="markdown">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Description of final status after the process ends.</xs:documentation>
+              <xs:documentation xml:lang="en">Description of the final state of the actors, environment and data after the process has been successfully completed.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="step" type="ExampleScenario.Step" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Each step of the process.</xs:documentation>
+              <xs:documentation xml:lang="en">A significant action that occurs as part of the process.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -315,24 +354,34 @@
     <xs:complexContent>
       <xs:extension base="BackboneElement">
         <xs:sequence>
-          <xs:element name="process" type="ExampleScenario.Process" minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="number" minOccurs="0" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Nested process.</xs:documentation>
+              <xs:documentation xml:lang="en">The sequential number of the step, e.g. 1.2.5.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="pause" minOccurs="0" maxOccurs="1" type="boolean">
+          <xs:element name="process" type="ExampleScenario.Process" minOccurs="0" maxOccurs="1">
             <xs:annotation>
-              <xs:documentation xml:lang="en">If there is a pause in the flow.</xs:documentation>
+              <xs:documentation xml:lang="en">Indicates that the step is a complex sub-process with its own steps.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="workflow" minOccurs="0" maxOccurs="1" type="canonical">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Indicates that the step is defined by a seaparate scenario instance.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="operation" type="ExampleScenario.Operation" minOccurs="0" maxOccurs="1">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Each interaction or action.</xs:documentation>
+              <xs:documentation xml:lang="en">The step represents a single operation invoked on receiver by sender.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="alternative" type="ExampleScenario.Alternative" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Indicates an alternative step that can be taken instead of the operations on the base step in exceptional/atypical circumstances.</xs:documentation>
+              <xs:documentation xml:lang="en">Indicates an alternative step that can be taken instead of the sub-process, scenario or operation.  E.g. to represent non-happy-path/exceptional/atypical circumstances.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="pause" minOccurs="0" maxOccurs="1" type="boolean">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">If true, indicates that, following this step, there is a pause in the flow and the subsequent step will occur at some later time (triggered by some event).</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -346,54 +395,49 @@
     <xs:complexContent>
       <xs:extension base="BackboneElement">
         <xs:sequence>
-          <xs:element name="number" minOccurs="1" maxOccurs="1" type="string">
+          <xs:element name="type" minOccurs="0" maxOccurs="1" type="Coding">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The sequential number of the interaction, e.g. 1.2.5.</xs:documentation>
+              <xs:documentation xml:lang="en">The standardized type of action (FHIR or otherwise).</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="type" minOccurs="0" maxOccurs="1" type="string">
+          <xs:element name="title" minOccurs="1" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The type of operation - CRUD.</xs:documentation>
-           </xs:annotation>
-          </xs:element>
-          <xs:element name="name" minOccurs="0" maxOccurs="1" type="string">
-            <xs:annotation>
-              <xs:documentation xml:lang="en">The human-friendly name of the interaction.</xs:documentation>
+              <xs:documentation xml:lang="en">A short descriptive label the step to be used in tables or diagrams.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="initiator" minOccurs="0" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Who starts the transaction.</xs:documentation>
+              <xs:documentation xml:lang="en">The system that invokes the action/transmits the data.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="receiver" minOccurs="0" maxOccurs="1" type="string">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Who receives the transaction.</xs:documentation>
+              <xs:documentation xml:lang="en">The system on which the action is invoked/receives the data.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="description" minOccurs="0" maxOccurs="1" type="markdown">
             <xs:annotation>
-              <xs:documentation xml:lang="en">A comment to be inserted in the diagram.</xs:documentation>
+              <xs:documentation xml:lang="en">An explanation of what the operation represents and what it does.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="initiatorActive" minOccurs="0" maxOccurs="1" type="boolean">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Whether the initiator is deactivated right after the transaction.</xs:documentation>
+              <xs:documentation xml:lang="en">If false, the initiator is deactivated right after the operation.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="receiverActive" minOccurs="0" maxOccurs="1" type="boolean">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Whether the receiver is deactivated right after the transaction.</xs:documentation>
+              <xs:documentation xml:lang="en">If false, the receiver is deactivated right after the operation.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="request" type="ExampleScenario.ContainedInstance" minOccurs="0" maxOccurs="1">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Each resource instance used by the initiator.</xs:documentation>
+              <xs:documentation xml:lang="en">A reference to the instance that is transmitted from requester to receiver as part of the invocation of the operation.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="response" type="ExampleScenario.ContainedInstance" minOccurs="0" maxOccurs="1">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Each resource instance used by the responder.</xs:documentation>
+              <xs:documentation xml:lang="en">A reference to the instance that is transmitted from receiver to requester as part of the operation's synchronous response (if any).</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -419,35 +463,10 @@
           </xs:element>
           <xs:element name="step" type="ExampleScenario.Step" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
-              <xs:documentation xml:lang="en">What happens in each alternative option.</xs:documentation>
+              <xs:documentation xml:lang="en">Indicates the operation, sub-process or scenario that happens if the alternative option is selected.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:simpleType name="ExampleScenarioActorTypeEnum">
-    <xs:restriction base="code-primitive">
-      <xs:enumeration value="person">
-        <xs:annotation>
-          <xs:documentation xml:lang="en">Person</xs:documentation>
-        </xs:annotation>
-      </xs:enumeration>
-      <xs:enumeration value="entity">
-        <xs:annotation>
-          <xs:documentation xml:lang="en">System</xs:documentation>
-        </xs:annotation>
-      </xs:enumeration>
-    </xs:restriction>
-  </xs:simpleType>
-  <xs:complexType name="ExampleScenarioActorType">
-    <xs:annotation>
-      <xs:documentation xml:lang="en"></xs:documentation>
-      <xs:documentation xml:lang="en">If the element is present, it must have either a @value, an @id, or extensions</xs:documentation>
-    </xs:annotation>
-    <xs:complexContent>
-      <xs:extension base="Element">
-        <xs:attribute name="value" type="ExampleScenarioActorTypeEnum" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

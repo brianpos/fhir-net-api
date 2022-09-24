@@ -202,6 +202,60 @@
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
+    <sch:title>ValueSet.approvalDate</sch:title>
+    <sch:rule context="f:ValueSet/f:approvalDate">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.lastReviewDate</sch:title>
+    <sch:rule context="f:ValueSet/f:lastReviewDate">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.effectivePeriod</sch:title>
+    <sch:rule context="f:ValueSet/f:effectivePeriod">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.topic</sch:title>
+    <sch:rule context="f:ValueSet/f:topic">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.author</sch:title>
+    <sch:rule context="f:ValueSet/f:author">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.editor</sch:title>
+    <sch:rule context="f:ValueSet/f:editor">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.reviewer</sch:title>
+    <sch:rule context="f:ValueSet/f:reviewer">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.endorser</sch:title>
+    <sch:rule context="f:ValueSet/f:endorser">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.relatedArtifact</sch:title>
+    <sch:rule context="f:ValueSet/f:relatedArtifact">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
     <sch:title>f:ValueSet/f:compose</sch:title>
     <sch:rule context="f:ValueSet/f:compose">
       <sch:assert test="count(f:extension[@url = 'http://hl7.org/fhir/StructureDefinition/valueset-compose-creationDate']) &lt;= 1">extension with URL = 'http://hl7.org/fhir/StructureDefinition/valueset-compose-creationDate': maximum cardinality of 'extension' is 1</sch:assert>
@@ -249,8 +303,6 @@
     <sch:rule context="f:ValueSet/f:compose/f:include">
       <sch:assert test="count(f:extension[@url = 'http://hl7.org/fhir/StructureDefinition/valueset-compose-include-valueSetTitle']) &lt;= 1">extension with URL = 'http://hl7.org/fhir/StructureDefinition/valueset-compose-include-valueSetTitle': maximum cardinality of 'extension' is 1</sch:assert>
       <sch:assert test="count(f:extension[@url = 'http://hl7.org/fhir/StructureDefinition/valueset-systemTitle']) &lt;= 1">extension with URL = 'http://hl7.org/fhir/StructureDefinition/valueset-systemTitle': maximum cardinality of 'extension' is 1</sch:assert>
-      <sch:assert test="count(f:extension[@url = 'http://hl7.org/fhir/StructureDefinition/valueset-compose-include-minimumMultiplicity']) &lt;= 1">extension with URL = 'http://hl7.org/fhir/StructureDefinition/valueset-compose-include-minimumMultiplicity': maximum cardinality of 'extension' is 1</sch:assert>
-      <sch:assert test="count(f:extension[@url = 'http://hl7.org/fhir/StructureDefinition/valueset-compose-include-maximumMultiplicity']) &lt;= 1">extension with URL = 'http://hl7.org/fhir/StructureDefinition/valueset-compose-include-maximumMultiplicity': maximum cardinality of 'extension' is 1</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
@@ -267,10 +319,6 @@
     <sch:rule context="f:ValueSet/f:compose/f:include/f:extension">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
       <sch:assert test="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &quot;value&quot;)])">Must have either extensions or value[x], not both (inherited)</sch:assert>
-      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
-      <sch:assert test="exists(f:extension)!=exists(f:*[starts-with(local-name(.), 'value')])">Must have either extensions or value[x], not both (inherited)</sch:assert>
-      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
-      <sch:assert test="exists(f:extension)!=exists(f:*[starts-with(local-name(.), 'value')])">Must have either extensions or value[x], not both (inherited)</sch:assert>
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
       <sch:assert test="exists(f:extension)!=exists(f:*[starts-with(local-name(.), 'value')])">Must have either extensions or value[x], not both (inherited)</sch:assert>
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
@@ -541,8 +589,8 @@
     <sch:rule context="f:ValueSet/f:expansion/f:contains">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
       <sch:assert test="exists(f:code) or exists(f:display)">SHALL have a code or a display (inherited)</sch:assert>
-      <sch:assert test="exists(f:code) or (f:abstract/@value = true())">Must have a code if not abstract (inherited)</sch:assert>
-      <sch:assert test="exists(f:system) or not(exists(f:code))">Must have a system if a code is present (inherited)</sch:assert>
+      <sch:assert test="exists(f:code) or (f:abstract/@value = true())">SHALL have a code if not abstract (inherited)</sch:assert>
+      <sch:assert test="exists(f:system) or not(exists(f:code))">SHALL have a system if a code is present (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
@@ -634,6 +682,38 @@
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
+    <sch:title>ValueSet.expansion.contains.property.subProperty</sch:title>
+    <sch:rule context="f:ValueSet/f:expansion/f:contains/f:property/f:subProperty">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.expansion.contains.property.subProperty.extension</sch:title>
+    <sch:rule context="f:ValueSet/f:expansion/f:contains/f:property/f:subProperty/f:extension">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+      <sch:assert test="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &quot;value&quot;)])">Must have either extensions or value[x], not both (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.expansion.contains.property.subProperty.modifierExtension</sch:title>
+    <sch:rule context="f:ValueSet/f:expansion/f:contains/f:property/f:subProperty/f:modifierExtension">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+      <sch:assert test="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &quot;value&quot;)])">Must have either extensions or value[x], not both (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.expansion.contains.property.subProperty.code</sch:title>
+    <sch:rule context="f:ValueSet/f:expansion/f:contains/f:property/f:subProperty/f:code">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>ValueSet.expansion.contains.property.subProperty.value[x] 1</sch:title>
+    <sch:rule context="f:ValueSet/f:expansion/f:contains/f:property/f:subProperty/f:value[x]">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
     <sch:title>ValueSet.expansion.contains.contains</sch:title>
     <sch:rule context="f:ValueSet/f:expansion/f:contains/f:contains">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
@@ -657,12 +737,6 @@
     <sch:rule context="f:ValueSet/f:scope/f:modifierExtension">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
       <sch:assert test="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &quot;value&quot;)])">Must have either extensions or value[x], not both (inherited)</sch:assert>
-    </sch:rule>
-  </sch:pattern>
-  <sch:pattern>
-    <sch:title>ValueSet.scope.focus</sch:title>
-    <sch:rule context="f:ValueSet/f:scope/f:focus">
-      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>

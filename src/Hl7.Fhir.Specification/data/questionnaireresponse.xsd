@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -84,7 +84,7 @@
               <xs:documentation xml:lang="en">A procedure or observation that this questionnaire was performed as part of the execution of.  For example, the surgery a checklist was executed as part of.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="questionnaire" minOccurs="0" maxOccurs="1" type="canonical">
+          <xs:element name="questionnaire" minOccurs="1" maxOccurs="1" type="canonical">
             <xs:annotation>
               <xs:documentation xml:lang="en">The Questionnaire that defines and organizes the questions for which answers are being provided.</xs:documentation>
            </xs:annotation>

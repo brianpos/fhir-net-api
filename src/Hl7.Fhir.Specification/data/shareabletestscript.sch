@@ -22,7 +22,7 @@
   <sch:pattern>
     <sch:title>TestScript</sch:title>
     <sch:rule context="f:TestScript">
-      <sch:assert test="not(exists(f:name/@value)) or matches(f:name/@value, '[A-Z]([A-Za-z0-9_]){0,254}')">Name should be usable as an identifier for the module by machine processing applications such as code generation (inherited)</sch:assert>
+      <sch:assert test="not(exists(f:name/@value)) or matches(f:name/@value, '[A-Z]([A-Za-z0-9_]){1,254}')">Name should be usable as an identifier for the module by machine processing applications such as code generation (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
@@ -66,6 +66,7 @@
   <sch:pattern>
     <sch:title>TestScript.url</sch:title>
     <sch:rule context="f:TestScript/f:url">
+      <sch:assert test="not(exists(@value)) or matches(@value, '([^|#])*')">URL should not contain | or # - these characters make processing canonical references problematic (inherited)</sch:assert>
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
@@ -78,6 +79,12 @@
   <sch:pattern>
     <sch:title>TestScript.version</sch:title>
     <sch:rule context="f:TestScript/f:version">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>TestScript.versionAlgorithm[x] 1</sch:title>
+    <sch:rule context="f:TestScript/f:versionAlgorithm[x]">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
@@ -150,6 +157,12 @@
   <sch:pattern>
     <sch:title>TestScript.copyright</sch:title>
     <sch:rule context="f:TestScript/f:copyright">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>TestScript.copyrightLabel</sch:title>
+    <sch:rule context="f:TestScript/f:copyrightLabel">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
@@ -677,7 +690,7 @@
     <sch:title>TestScript.setup.action.assert</sch:title>
     <sch:rule context="f:TestScript/f:setup/f:action/f:assert">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
-      <sch:assert test="count(f:contentType) + count(f:expression) + count(f:headerField) + count(f:minimumId) + count(f:navigationLinks) + count(f:path) + count(f:requestMethod) + count(f:resource) + count(f:responseCode) + count(f:response) + count(f:rule) + count(f:ruleset) + count(f:validateProfileId)  &lt;=1">Only a single assertion SHALL be present within setup action assert element. (inherited)</sch:assert>
+      <sch:assert test="(count(f:contentType) + count(f:expression) + count(f:headerField) + count(f:minimumId) + count(f:navigationLinks) + count(f:path) + count(f:requestMethod) + count(f:resource) + count(f:responseCode) + count(f:response) + count(f:rule) + count(f:ruleset) + count(f:validateProfileId) &lt;=1) or (((count(f:expression) + count(f:minimumId) &lt;=2) or (count(f:expression) + count(f:validateProfileId) &lt;=2)) and (count(f:expression) + count(f:path) &lt;=1) and (count(f:minimumId) + count(f:validateProfileId) &lt;=1)) or (((count(f:path) + count(f:minimumId) &lt;=2) or (count(f:path) + count(f:validateProfileId) &lt;=2)) and (count(f:expression) + count(f:path) &lt;=1) and (count(f:minimumId) + count(f:validateProfileId) &lt;=1))">Only a single assertion SHALL be present within setup action assert element. (inherited)</sch:assert>
       <sch:assert test="(f:compareToSourceId and f:compareToSourceExpression) or (f:compareToSourceId and f:compareToSourcePath) or not(f:compareToSourceId or f:compareToSourceExpression or f:compareToSourcePath)">Setup action assert SHALL contain either compareToSourceId and compareToSourceExpression, compareToSourceId and compareToSourcePath or neither. (inherited)</sch:assert>
       <sch:assert test="((count(f:response) + count(f:responseCode)) = 0 and (f:direction/@value='request')) or (count(f:direction) = 0) or (f:direction/@value='response')">Setup action assert response and responseCode SHALL be empty when direction equals request (inherited)</sch:assert>
     </sch:rule>
@@ -898,7 +911,7 @@
     <sch:title>TestScript.test.action.assert</sch:title>
     <sch:rule context="f:TestScript/f:test/f:action/f:assert">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
-      <sch:assert test="count(f:contentType) + count(f:expression) + count(f:headerField) + count(f:minimumId) + count(f:navigationLinks) + count(f:path) + count(f:requestMethod) + count(f:resource) + count(f:responseCode) + count(f:response) + count(f:rule) + count(f:ruleset) + count(f:validateProfileId)  &lt;=1">Only a single assertion SHALL be present within test action assert element. (inherited)</sch:assert>
+      <sch:assert test="(count(f:contentType) + count(f:expression) + count(f:headerField) + count(f:minimumId) + count(f:navigationLinks) + count(f:path) + count(f:requestMethod) + count(f:resource) + count(f:responseCode) + count(f:response) + count(f:rule) + count(f:ruleset) + count(f:validateProfileId) &lt;=1) or (((count(f:expression) + count(f:minimumId) &lt;=2) or (count(f:expression) + count(f:validateProfileId) &lt;=2)) and (count(f:expression) + count(f:path) &lt;=1) and (count(f:minimumId) + count(f:validateProfileId) &lt;=1)) or (((count(f:path) + count(f:minimumId) &lt;=2) or (count(f:path) + count(f:validateProfileId) &lt;=2)) and (count(f:expression) + count(f:path) &lt;=1) and (count(f:minimumId) + count(f:validateProfileId) &lt;=1))">Only a single assertion SHALL be present within test action assert element. (inherited)</sch:assert>
       <sch:assert test="(f:compareToSourceId and f:compareToSourceExpression) or (f:compareToSourceId and f:compareToSourcePath) or not(f:compareToSourceId or f:compareToSourceExpression or f:compareToSourcePath)">Test action assert SHALL contain either compareToSourceId and compareToSourceExpression, compareToSourceId and compareToSourcePath or neither. (inherited)</sch:assert>
       <sch:assert test="((count(f:response) + count(f:responseCode)) = 0 and (f:direction/@value='request')) or (count(f:direction) = 0) or (f:direction/@value='response')">Test action assert response and response and responseCode SHALL be empty when direction equals request (inherited)</sch:assert>
     </sch:rule>

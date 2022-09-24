@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -58,12 +58,12 @@
   <xs:include schemaLocation="fhir-base.xsd"/>
   <xs:element name="Endpoint" type="Endpoint">
     <xs:annotation>
-      <xs:documentation xml:lang="en">The technical details of an endpoint that can be used for electronic services, such as for web services providing XDS.b or a REST endpoint for another FHIR server. This may include any security context information.</xs:documentation>
+      <xs:documentation xml:lang="en">The technical details of an endpoint that can be used for electronic services, such as for web services providing XDS.b, a REST endpoint for another FHIR server, or a s/Mime email address. This may include any security context information.</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:complexType name="Endpoint">
     <xs:annotation>
-      <xs:documentation xml:lang="en">The technical details of an endpoint that can be used for electronic services, such as for web services providing XDS.b or a REST endpoint for another FHIR server. This may include any security context information.</xs:documentation>
+      <xs:documentation xml:lang="en">The technical details of an endpoint that can be used for electronic services, such as for web services providing XDS.b, a REST endpoint for another FHIR server, or a s/Mime email address. This may include any security context information.</xs:documentation>
       <xs:documentation xml:lang="en">If the element is present, it must have either a @value, an @id, or extensions</xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -76,10 +76,10 @@
           </xs:element>
           <xs:element name="status" minOccurs="1" maxOccurs="1" type="EndpointStatus">
             <xs:annotation>
-              <xs:documentation xml:lang="en">active | suspended | error | off | test.</xs:documentation>
+              <xs:documentation xml:lang="en">The endpoint status represents the general expected availability of an endpoint.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="connectionType" minOccurs="1" maxOccurs="1" type="Coding">
+          <xs:element name="connectionType" minOccurs="1" maxOccurs="unbounded" type="CodeableConcept">
             <xs:annotation>
               <xs:documentation xml:lang="en">A coded value that represents the technical details of the usage of this endpoint, such as what WSDLs should be used in what way. (e.g. XDS.b/DICOM/cds-hook).</xs:documentation>
            </xs:annotation>
@@ -89,6 +89,16 @@
               <xs:documentation xml:lang="en">A friendly name that this endpoint can be referred to with.</xs:documentation>
            </xs:annotation>
           </xs:element>
+          <xs:element name="description" minOccurs="0" maxOccurs="1" type="string">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The description of the endpoint and what it is for (typically used as supplemental information in an endpoint directory describing it's usage/purpose).</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="environmentType" minOccurs="0" maxOccurs="unbounded" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The type of environment(s) exposed at this endpoint (dev, prod, test, etc).</xs:documentation>
+           </xs:annotation>
+          </xs:element>
           <xs:element name="managingOrganization" minOccurs="0" maxOccurs="1" type="Reference">
             <xs:annotation>
               <xs:documentation xml:lang="en">The organization that manages this endpoint (even if technically another organization is hosting this in the cloud, it is the organization associated with the data).</xs:documentation>
@@ -96,7 +106,7 @@
           </xs:element>
           <xs:element name="contact" minOccurs="0" maxOccurs="unbounded" type="ContactPoint">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Contact details for a human to contact about the subscription. The primary use of this for system administrator troubleshooting.</xs:documentation>
+              <xs:documentation xml:lang="en">Contact details for a human to contact about the endpoint. The primary use of this for system administrator troubleshooting.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="period" minOccurs="0" maxOccurs="1" type="Period">
@@ -104,7 +114,7 @@
               <xs:documentation xml:lang="en">The interval during which the endpoint is expected to be operational.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="payloadType" minOccurs="1" maxOccurs="unbounded" type="CodeableConcept">
+          <xs:element name="payloadType" minOccurs="0" maxOccurs="unbounded" type="CodeableConcept">
             <xs:annotation>
               <xs:documentation xml:lang="en">The payload type describes the acceptable content that can be communicated on the endpoint.</xs:documentation>
            </xs:annotation>
@@ -153,11 +163,6 @@
       <xs:enumeration value="entered-in-error">
         <xs:annotation>
           <xs:documentation xml:lang="en">Entered in error</xs:documentation>
-        </xs:annotation>
-      </xs:enumeration>
-      <xs:enumeration value="test">
-        <xs:annotation>
-          <xs:documentation xml:lang="en">Test</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
     </xs:restriction>

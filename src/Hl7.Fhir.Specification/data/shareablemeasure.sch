@@ -23,7 +23,7 @@
   <sch:pattern>
     <sch:title>Measure</sch:title>
     <sch:rule context="f:Measure">
-      <sch:assert test="not(exists(f:name/@value)) or matches(f:name/@value, '[A-Z]([A-Za-z0-9_]){0,254}')">Name should be usable as an identifier for the module by machine processing applications such as code generation (inherited)</sch:assert>
+      <sch:assert test="not(exists(f:name/@value)) or matches(f:name/@value, '[A-Z]([A-Za-z0-9_]){1,254}')">Name should be usable as an identifier for the module by machine processing applications such as code generation (inherited)</sch:assert>
       <sch:assert test="exists(f:group/stratifier/code) or exists(f:group/stratifier/component)">Stratifier SHALL be either a single criteria or a set of criteria components (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
@@ -68,6 +68,7 @@
   <sch:pattern>
     <sch:title>Measure.url</sch:title>
     <sch:rule context="f:Measure/f:url">
+      <sch:assert test="not(exists(@value)) or matches(@value, '([^|#])*')">URL should not contain | or # - these characters make processing canonical references problematic (inherited)</sch:assert>
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
@@ -300,8 +301,34 @@
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
-    <sch:title>Measure.definition</sch:title>
-    <sch:rule context="f:Measure/f:definition">
+    <sch:title>Measure.term</sch:title>
+    <sch:rule context="f:Measure/f:term">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>Measure.term.extension</sch:title>
+    <sch:rule context="f:Measure/f:term/f:extension">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+      <sch:assert test="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &quot;value&quot;)])">Must have either extensions or value[x], not both (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>Measure.term.modifierExtension</sch:title>
+    <sch:rule context="f:Measure/f:term/f:modifierExtension">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+      <sch:assert test="exists(f:extension)!=exists(f:*[starts-with(local-name(.), &quot;value&quot;)])">Must have either extensions or value[x], not both (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>Measure.term.code</sch:title>
+    <sch:rule context="f:Measure/f:term/f:code">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>Measure.term.definition</sch:title>
+    <sch:rule context="f:Measure/f:term/f:definition">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>

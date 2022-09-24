@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -89,7 +89,7 @@
               <xs:documentation xml:lang="en">Indicates whether the data submitted in an data-exchange report represents a snapshot or incremental update. A snapshot update replaces all previously submitted data for the receiver, whereas an incremental update represents only updated and/or changed data and should be applied as a differential update to the existing submitted data for the receiver.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="measure" minOccurs="1" maxOccurs="1" type="canonical">
+          <xs:element name="measure" minOccurs="0" maxOccurs="1" type="canonical">
             <xs:annotation>
               <xs:documentation xml:lang="en">A reference to the Measure that was calculated to produce this report.</xs:documentation>
            </xs:annotation>
@@ -106,7 +106,7 @@
           </xs:element>
           <xs:element name="reporter" minOccurs="0" maxOccurs="1" type="Reference">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The individual, location, or organization that is reporting the data.</xs:documentation>
+              <xs:documentation xml:lang="en">The individual or organization that is reporting the data.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="reportingVendor" minOccurs="0" maxOccurs="1" type="Reference">
@@ -114,9 +114,19 @@
               <xs:documentation xml:lang="en">A reference to the vendor who queried the data, calculated results and/or generated the report. The ‘reporting vendor’ is intended to represent the submitting entity when it is not the same as the reporting entity. This extension is used when the Receiver is interested in getting vendor information in the report.</xs:documentation>
            </xs:annotation>
           </xs:element>
+          <xs:element name="location" minOccurs="0" maxOccurs="1" type="Reference">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">A reference to the location for which the data is being reported.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
           <xs:element name="period" minOccurs="1" maxOccurs="1" type="Period">
             <xs:annotation>
               <xs:documentation xml:lang="en">The reporting period for which the report was calculated.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="inputParameters" minOccurs="0" maxOccurs="1" type="Reference">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">A reference to a Parameters resource (typically represented using a contained resource) that represents any input parameters that were provided to the operation that generated the report.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="scoring" minOccurs="0" maxOccurs="1" type="CodeableConcept">
@@ -136,7 +146,7 @@
           </xs:element>
           <xs:element name="evaluatedResource" minOccurs="0" maxOccurs="unbounded" type="Reference">
             <xs:annotation>
-              <xs:documentation xml:lang="en">A reference to a Bundle containing the Resources that were used in the calculation of this measure.</xs:documentation>
+              <xs:documentation xml:lang="en">A reference to a Resource that was used in the calculation of this measure.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -213,7 +223,7 @@
     <xs:complexContent>
       <xs:extension base="BackboneElement">
         <xs:sequence>
-          <xs:element name="code" minOccurs="0" maxOccurs="unbounded" type="CodeableConcept">
+          <xs:element name="code" minOccurs="0" maxOccurs="1" type="CodeableConcept">
             <xs:annotation>
               <xs:documentation xml:lang="en">The meaning of this stratifier, as defined in the measure definition.</xs:documentation>
            </xs:annotation>
@@ -393,9 +403,9 @@
           <xs:documentation xml:lang="en">Summary</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      <xs:enumeration value="data-collection">
+      <xs:enumeration value="data-exchange">
         <xs:annotation>
-          <xs:documentation xml:lang="en">Data Collection</xs:documentation>
+          <xs:documentation xml:lang="en">Data Exchange</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
     </xs:restriction>

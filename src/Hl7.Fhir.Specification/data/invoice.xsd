@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -101,9 +101,21 @@
           </xs:element>
           <xs:element name="date" minOccurs="0" maxOccurs="1" type="dateTime">
             <xs:annotation>
+              <xs:documentation xml:lang="en">Depricared by the element below.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="creation" minOccurs="0" maxOccurs="1" type="dateTime">
+            <xs:annotation>
               <xs:documentation xml:lang="en">Date/time(s) of when this Invoice was posted.</xs:documentation>
            </xs:annotation>
           </xs:element>
+          <xs:choice minOccurs="0" maxOccurs="1" >
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Date/time(s) range of services included in this invoice.</xs:documentation>
+            </xs:annotation>
+            <xs:element name="periodDate" type="date"/>
+            <xs:element name="periodPeriod" type="Period"/>
+          </xs:choice>
           <xs:element name="participant" type="Invoice.Participant" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
               <xs:documentation xml:lang="en">Indicates who or what performed or participated in the charged service.</xs:documentation>
@@ -124,7 +136,7 @@
               <xs:documentation xml:lang="en">Each line item represents one charge for goods and services rendered. Details such as date, code and amount are found in the referenced ChargeItem resource.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="totalPriceComponent" type="Invoice.PriceComponent" minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="totalPriceComponent" minOccurs="0" maxOccurs="unbounded" type="MonetaryComponent">
             <xs:annotation>
               <xs:documentation xml:lang="en">The total amount for the Invoice may be calculated as the sum of the line items with surcharges/deductions that apply in certain conditions.  The priceComponent element can be used to offer transparency to the recipient of the Invoice of how the total price was calculated.</xs:documentation>
            </xs:annotation>
@@ -186,6 +198,13 @@
               <xs:documentation xml:lang="en">Sequence in which the items appear on the invoice.</xs:documentation>
            </xs:annotation>
           </xs:element>
+          <xs:choice minOccurs="0" maxOccurs="1" >
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Date/time(s) range when this service was delivered or completed.</xs:documentation>
+            </xs:annotation>
+            <xs:element name="servicedDate" type="date"/>
+            <xs:element name="servicedPeriod" type="Period"/>
+          </xs:choice>
           <xs:choice minOccurs="1" maxOccurs="1" >
             <xs:annotation>
               <xs:documentation xml:lang="en">The ChargeItem contains information such as the billing code, date, amount etc. If no further details are required for the lineItem, inline billing codes can be added using the CodeableConcept data type instead of the Reference.</xs:documentation>
@@ -193,40 +212,9 @@
             <xs:element name="chargeItemReference" type="Reference"/>
             <xs:element name="chargeItemCodeableConcept" type="CodeableConcept"/>
           </xs:choice>
-          <xs:element name="priceComponent" type="Invoice.PriceComponent" minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="priceComponent" minOccurs="0" maxOccurs="unbounded" type="MonetaryComponent">
             <xs:annotation>
               <xs:documentation xml:lang="en">The price for a ChargeItem may be calculated as a base price with surcharges/deductions that apply in certain conditions. A ChargeItemDefinition resource that defines the prices, factors and conditions that apply to a billing code is currently under development. The priceComponent element can be used to offer transparency to the recipient of the Invoice as to how the prices have been calculated.</xs:documentation>
-           </xs:annotation>
-          </xs:element>
-        </xs:sequence>
-      </xs:extension>
-    </xs:complexContent>
-  </xs:complexType>
-  <xs:complexType name="Invoice.PriceComponent">
-    <xs:annotation>
-      <xs:documentation xml:lang="en">Invoice containing collected ChargeItems from an Account with calculated individual and total price for Billing purpose.</xs:documentation>
-    </xs:annotation>
-    <xs:complexContent>
-      <xs:extension base="BackboneElement">
-        <xs:sequence>
-          <xs:element name="type" minOccurs="1" maxOccurs="1" type="InvoicePriceComponentType">
-            <xs:annotation>
-              <xs:documentation xml:lang="en">This code identifies the type of the component.</xs:documentation>
-           </xs:annotation>
-          </xs:element>
-          <xs:element name="code" minOccurs="0" maxOccurs="1" type="CodeableConcept">
-            <xs:annotation>
-              <xs:documentation xml:lang="en">A code that identifies the component. Codes may be used to differentiate between kinds of taxes, surcharges, discounts etc.</xs:documentation>
-           </xs:annotation>
-          </xs:element>
-          <xs:element name="factor" minOccurs="0" maxOccurs="1" type="decimal">
-            <xs:annotation>
-              <xs:documentation xml:lang="en">The factor that has been applied on the base price for calculating this component.</xs:documentation>
-           </xs:annotation>
-          </xs:element>
-          <xs:element name="amount" minOccurs="0" maxOccurs="1" type="Money">
-            <xs:annotation>
-              <xs:documentation xml:lang="en">The amount calculated for this component.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>

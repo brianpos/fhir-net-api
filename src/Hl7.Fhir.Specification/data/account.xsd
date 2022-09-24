@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -124,9 +124,24 @@
               <xs:documentation xml:lang="en">The parties responsible for balancing the account if other payment options fall short.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="partOf" minOccurs="0" maxOccurs="1" type="Reference">
+          <xs:element name="relatedAccount" type="Account.RelatedAccount" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Reference to a parent Account.</xs:documentation>
+              <xs:documentation xml:lang="en">Other associated accounts related to this account.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="currency" minOccurs="0" maxOccurs="1" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The default currency for the account.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="balance" type="Account.Balance" minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The calculated account balances - these are calculated and processed by the finance system.The balances with a `term` that is not current are usually generated/updated by an invoicing or similar process.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="calculatedAt" minOccurs="0" maxOccurs="1" type="instant">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Time the balance amount was calculated.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -176,6 +191,58 @@ A coverage may only be responsible for specific types of charges, and the sequen
           <xs:element name="period" minOccurs="0" maxOccurs="1" type="Period">
             <xs:annotation>
               <xs:documentation xml:lang="en">The timeframe during which the guarantor accepts responsibility for the account.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Account.RelatedAccount">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">A financial tool for tracking value accrued for a particular purpose.  In the healthcare field, used to track charges for a patient, cost centers, etc.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="BackboneElement">
+        <xs:sequence>
+          <xs:element name="relationship" minOccurs="0" maxOccurs="1" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Relationship of the associated Account.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="account" minOccurs="1" maxOccurs="1" type="Reference">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Reference to an associated Account.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="Account.Balance">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">A financial tool for tracking value accrued for a particular purpose.  In the healthcare field, used to track charges for a patient, cost centers, etc.</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="BackboneElement">
+        <xs:sequence>
+          <xs:element name="aggregate" minOccurs="0" maxOccurs="1" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Who is expected to pay this part of the balance.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="term" minOccurs="0" maxOccurs="1" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The term of the account balances - The balance value is the amount that was outstanding for this age.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="estimate" minOccurs="0" maxOccurs="1" type="boolean">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The amount is only an estimated value - this is likely common for `current` term balances, but not with known terms (that were generated by a backend process).</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="amount" minOccurs="1" maxOccurs="1" type="Money">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The actual balance value calculated for the age defined in the term property.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>

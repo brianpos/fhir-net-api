@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -74,14 +74,19 @@
               <xs:documentation xml:lang="en">Business identifier associated with the detected issue record.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="status" minOccurs="1" maxOccurs="1" type="ObservationStatus">
+          <xs:element name="status" minOccurs="1" maxOccurs="1" type="DetectedIssueStatus">
             <xs:annotation>
               <xs:documentation xml:lang="en">Indicates the status of the detected issue.</xs:documentation>
            </xs:annotation>
           </xs:element>
+          <xs:element name="category" minOccurs="0" maxOccurs="unbounded" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">A code that classifies the general type of detected issue.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
           <xs:element name="code" minOccurs="0" maxOccurs="1" type="CodeableConcept">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Identifies the general type of issue identified.</xs:documentation>
+              <xs:documentation xml:lang="en">Identifies the specific type of issue identified.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="severity" minOccurs="0" maxOccurs="1" type="DetectedIssueSeverity">
@@ -89,9 +94,9 @@
               <xs:documentation xml:lang="en">Indicates the degree of importance associated with the identified issue based on the potential impact on the patient.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="patient" minOccurs="0" maxOccurs="1" type="Reference">
+          <xs:element name="subject" minOccurs="0" maxOccurs="1" type="Reference">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Indicates the patient whose record the detected issue is associated with.</xs:documentation>
+              <xs:documentation xml:lang="en">Indicates the subject whose record the detected issue is associated with.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:choice minOccurs="0" maxOccurs="1" >
@@ -182,13 +187,8 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:simpleType name="ObservationStatusEnum">
+  <xs:simpleType name="DetectedIssueStatusEnum">
     <xs:restriction base="code-primitive">
-      <xs:enumeration value="registered">
-        <xs:annotation>
-          <xs:documentation xml:lang="en">Registered</xs:documentation>
-        </xs:annotation>
-      </xs:enumeration>
       <xs:enumeration value="preliminary">
         <xs:annotation>
           <xs:documentation xml:lang="en">Preliminary</xs:documentation>
@@ -199,41 +199,26 @@
           <xs:documentation xml:lang="en">Final</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      <xs:enumeration value="amended">
-        <xs:annotation>
-          <xs:documentation xml:lang="en">Amended</xs:documentation>
-        </xs:annotation>
-      </xs:enumeration>
-      <xs:enumeration value="corrected">
-        <xs:annotation>
-          <xs:documentation xml:lang="en">Corrected</xs:documentation>
-        </xs:annotation>
-      </xs:enumeration>
-      <xs:enumeration value="cancelled">
-        <xs:annotation>
-          <xs:documentation xml:lang="en">Cancelled</xs:documentation>
-        </xs:annotation>
-      </xs:enumeration>
       <xs:enumeration value="entered-in-error">
         <xs:annotation>
           <xs:documentation xml:lang="en">Entered in Error</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      <xs:enumeration value="unknown">
+      <xs:enumeration value="mitigated">
         <xs:annotation>
-          <xs:documentation xml:lang="en">Unknown</xs:documentation>
+          <xs:documentation xml:lang="en">Mitigated</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
     </xs:restriction>
   </xs:simpleType>
-  <xs:complexType name="ObservationStatus">
+  <xs:complexType name="DetectedIssueStatus">
     <xs:annotation>
       <xs:documentation xml:lang="en"></xs:documentation>
       <xs:documentation xml:lang="en">If the element is present, it must have either a @value, an @id, or extensions</xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="Element">
-        <xs:attribute name="value" type="ObservationStatusEnum" use="optional"/>
+        <xs:attribute name="value" type="DetectedIssueStatusEnum" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

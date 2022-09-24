@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -84,9 +84,12 @@
               <xs:documentation xml:lang="en">Identifies the broad classification of the kind of resources the group includes.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="actual" minOccurs="1" maxOccurs="1" type="boolean">
+          <xs:element name="membership" minOccurs="1" maxOccurs="1" type="GroupMembershipBasis">
             <xs:annotation>
-              <xs:documentation xml:lang="en">If true, indicates that the resource refers to a specific group of real individuals.  If false, the group defines a set of intended individuals.</xs:documentation>
+              <xs:documentation xml:lang="en">Basis for membership in the Group:
+
+* 'definitional': The Group.characteristics specified are both necessary and sufficient to determine membership. All entities that meet the criteria are considered to be members of the group, whether referenced by the group or not. If members are present, they are individuals that happen to be known as meeting the Group.characteristics. The list cannot be presumed to be complete.
+* 'enumerated': The Group.characteristics are necessary but not sufficient to determine membership. Membership is determined by being listed as one of the Group.member.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="code" minOccurs="0" maxOccurs="1" type="CodeableConcept">
@@ -97,6 +100,11 @@
           <xs:element name="name" minOccurs="0" maxOccurs="1" type="string">
             <xs:annotation>
               <xs:documentation xml:lang="en">A label assigned to the group for human identification and communication.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="description" minOccurs="0" maxOccurs="1" type="markdown">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Explanation of what the group represents and how it is intended to be used.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="quantity" minOccurs="0" maxOccurs="1" type="unsignedInt">
@@ -207,14 +215,34 @@
           <xs:documentation xml:lang="en">Device</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      <xs:enumeration value="medication">
+      <xs:enumeration value="careteam">
         <xs:annotation>
-          <xs:documentation xml:lang="en">Medication</xs:documentation>
+          <xs:documentation xml:lang="en">CareTeam</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      <xs:enumeration value="substance">
+      <xs:enumeration value="healthcareservice">
         <xs:annotation>
-          <xs:documentation xml:lang="en">Substance</xs:documentation>
+          <xs:documentation xml:lang="en">HealthcareService</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="location">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Location</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="organization">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Organization</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="relatedperson">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">RelatedPerson</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="specimen">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Specimen</xs:documentation>
         </xs:annotation>
       </xs:enumeration>
     </xs:restriction>
@@ -227,6 +255,31 @@
     <xs:complexContent>
       <xs:extension base="Element">
         <xs:attribute name="value" type="GroupTypeEnum" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="GroupMembershipBasisEnum">
+    <xs:restriction base="code-primitive">
+      <xs:enumeration value="definitional">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Definitional</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="enumerated">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Enumerated</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="GroupMembershipBasis">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"></xs:documentation>
+      <xs:documentation xml:lang="en">If the element is present, it must have either a @value, an @id, or extensions</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Element">
+        <xs:attribute name="value" type="GroupMembershipBasisEnum" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>

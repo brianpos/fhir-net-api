@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -74,9 +74,19 @@
               <xs:documentation xml:lang="en">A unique identifier assigned to this payment reconciliation.</xs:documentation>
            </xs:annotation>
           </xs:element>
+          <xs:element name="type" minOccurs="1" maxOccurs="1" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Code to indicate the nature of the payment such as payment, adjustment.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
           <xs:element name="status" minOccurs="1" maxOccurs="1" type="FinancialResourceStatusCodes">
             <xs:annotation>
               <xs:documentation xml:lang="en">The status of the resource instance.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="kind" minOccurs="0" maxOccurs="1" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The workflow or activity which gave rise to or during which the payment ocurred such as a kiosk, deposit on account, periodic payment etc.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="period" minOccurs="0" maxOccurs="1" type="Period">
@@ -87,6 +97,16 @@
           <xs:element name="created" minOccurs="1" maxOccurs="1" type="dateTime">
             <xs:annotation>
               <xs:documentation xml:lang="en">The date when the resource was created.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="enterer" minOccurs="0" maxOccurs="1" type="Reference">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Payment enterer if not the actual payment issuer.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="issuerType" minOccurs="0" maxOccurs="1" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The type of the source such as patient or insurance.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="paymentIssuer" minOccurs="0" maxOccurs="1" type="Reference">
@@ -114,12 +134,62 @@
               <xs:documentation xml:lang="en">A human readable description of the status of the request for the reconciliation.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="paymentDate" minOccurs="1" maxOccurs="1" type="date">
+          <xs:element name="date" minOccurs="1" maxOccurs="1" type="date">
             <xs:annotation>
               <xs:documentation xml:lang="en">The date of payment as indicated on the financial instrument.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="paymentAmount" minOccurs="1" maxOccurs="1" type="Money">
+          <xs:element name="location" minOccurs="0" maxOccurs="1" type="Reference">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The location of the site or device for electronic transfers or physical location for cash payments.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="method" minOccurs="0" maxOccurs="1" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The means of payment such as check, card cash, or electronic funds transfer.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="cardBrand" minOccurs="0" maxOccurs="1" type="string">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The card brand such as debit, Visa, Amex etc. used if a card is the method of payment.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="accountNumber" minOccurs="0" maxOccurs="1" type="string">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">A portion of the account number, often the last 4 digits, used for verification not charging purposes.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="expirationDate" minOccurs="0" maxOccurs="1" type="date">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The year and month (YYYY-MM) when the instrument, typically card, expires.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="processor" minOccurs="0" maxOccurs="1" type="string">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The name of the card processor, etf processor, bank for checks.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="referenceNumber" minOccurs="0" maxOccurs="1" type="string">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The check number, eft reference, car processor reference.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="authorization" minOccurs="0" maxOccurs="1" type="string">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">An alphanumeric issued by the processor to confirm the successful issuance of payment.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="tenderedAmount" minOccurs="0" maxOccurs="1" type="Money">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The amount offered by the issuer, typically applies to cash when the issuer provides an amount in bank note denominations equal to or excess of the amount actually being paid.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="returnedAmount" minOccurs="0" maxOccurs="1" type="Money">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The amount returned by the receiver which is excess to the amount payable, often referred to as 'change'.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="amount" minOccurs="1" maxOccurs="1" type="Money">
             <xs:annotation>
               <xs:documentation xml:lang="en">Total payment amount as indicated on the financial instrument.</xs:documentation>
            </xs:annotation>
@@ -129,7 +199,7 @@
               <xs:documentation xml:lang="en">Issuer's unique identifier for the payment instrument.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="detail" type="PaymentReconciliation.Detail" minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="allocation" type="PaymentReconciliation.Allocation" minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
               <xs:documentation xml:lang="en">Distribution of the payment amount for a previously acknowledged payable.</xs:documentation>
            </xs:annotation>
@@ -148,7 +218,7 @@
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-  <xs:complexType name="PaymentReconciliation.Detail">
+  <xs:complexType name="PaymentReconciliation.Allocation">
     <xs:annotation>
       <xs:documentation xml:lang="en">This resource provides the details including amount of a payment and allocates the payment items being paid.</xs:documentation>
     </xs:annotation>
@@ -165,14 +235,32 @@
               <xs:documentation xml:lang="en">Unique identifier for the prior payment item for the referenced payable.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="type" minOccurs="1" maxOccurs="1" type="CodeableConcept">
+          <xs:element name="target" minOccurs="0" maxOccurs="1" type="Reference">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Code to indicate the nature of the payment.</xs:documentation>
+              <xs:documentation xml:lang="en">Specific resource to which the payment/adjustment/advance applies.</xs:documentation>
            </xs:annotation>
           </xs:element>
-          <xs:element name="request" minOccurs="0" maxOccurs="1" type="Reference">
+          <xs:choice minOccurs="0" maxOccurs="1" >
             <xs:annotation>
-              <xs:documentation xml:lang="en">A resource, such as a Claim, the evaluation of which could lead to payment.</xs:documentation>
+              <xs:documentation xml:lang="en"> Identifies the claim line item, encounter or other sub-element being paid. Note payment may be partial, that is not match the then outstanding balance or amount incurred.</xs:documentation>
+            </xs:annotation>
+            <xs:element name="targetItemString" type="string"/>
+            <xs:element name="targetItemIdentifier" type="Identifier"/>
+            <xs:element name="targetItemPositiveInt" type="positiveInt"/>
+          </xs:choice>
+          <xs:element name="encounter" minOccurs="0" maxOccurs="1" type="Reference">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The Encounter to which this payment applies, may be completed by the receiver, used for search.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="account" minOccurs="0" maxOccurs="1" type="Reference">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">The Account to which this payment applies, may be completed by the receiver, used for search.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="type" minOccurs="0" maxOccurs="1" type="CodeableConcept">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Code to indicate the nature of the payment.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="submitter" minOccurs="0" maxOccurs="1" type="Reference">

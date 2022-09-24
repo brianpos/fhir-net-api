@@ -12,7 +12,7 @@
   <sch:pattern>
     <sch:title>Library</sch:title>
     <sch:rule context="f:Library">
-      <sch:assert test="not(exists(f:name/@value)) or matches(f:name/@value, '[A-Z]([A-Za-z0-9_]){0,254}')">Name should be usable as an identifier for the module by machine processing applications such as code generation (inherited)</sch:assert>
+      <sch:assert test="not(exists(f:name/@value)) or matches(f:name/@value, '[A-Z]([A-Za-z0-9_]){1,254}')">Name should be usable as an identifier for the module by machine processing applications such as code generation (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
   <sch:pattern>
@@ -64,6 +64,7 @@
   <sch:pattern>
     <sch:title>Library.url</sch:title>
     <sch:rule context="f:Library/f:url">
+      <sch:assert test="not(exists(@value)) or matches(@value, '([^|#])*')">URL should not contain | or # - these characters make processing canonical references problematic (inherited)</sch:assert>
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children (inherited)</sch:assert>
     </sch:rule>
   </sch:pattern>
@@ -282,6 +283,18 @@
   <sch:pattern>
     <sch:title>Library.relatedArtifact.resourceReference</sch:title>
     <sch:rule context="f:Library/f:relatedArtifact/f:resourceReference">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>Library.relatedArtifact.publicationStatus</sch:title>
+    <sch:rule context="f:Library/f:relatedArtifact/f:publicationStatus">
+      <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children</sch:assert>
+    </sch:rule>
+  </sch:pattern>
+  <sch:pattern>
+    <sch:title>Library.relatedArtifact.publicationDate</sch:title>
+    <sch:rule context="f:Library/f:relatedArtifact/f:publicationDate">
       <sch:assert test="@value|f:*|h:div">All FHIR elements must have a @value or children</sch:assert>
     </sch:rule>
   </sch:pattern>

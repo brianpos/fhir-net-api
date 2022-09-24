@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -58,12 +58,12 @@
   <xs:include schemaLocation="fhir-base.xsd"/>
   <xs:element name="Parameters" type="Parameters">
     <xs:annotation>
-      <xs:documentation xml:lang="en">This resource is a non-persisted resource used to pass information into and back from an [operation](operations.html). It has no other use, and there is no RESTful endpoint associated with it.</xs:documentation>
+      <xs:documentation xml:lang="en">This resource is used to pass information into and back from an operation (whether invoked directly from REST or within a messaging environment).  It is not persisted or allowed to be referenced by other resources.</xs:documentation>
     </xs:annotation>
   </xs:element>
   <xs:complexType name="Parameters">
     <xs:annotation>
-      <xs:documentation xml:lang="en">This resource is a non-persisted resource used to pass information into and back from an [operation](operations.html). It has no other use, and there is no RESTful endpoint associated with it.</xs:documentation>
+      <xs:documentation xml:lang="en">This resource is used to pass information into and back from an operation (whether invoked directly from REST or within a messaging environment).  It is not persisted or allowed to be referenced by other resources.</xs:documentation>
       <xs:documentation xml:lang="en">If the element is present, it must have either a @value, an @id, or extensions</xs:documentation>
     </xs:annotation>
     <xs:complexContent>
@@ -80,7 +80,7 @@
   </xs:complexType>
   <xs:complexType name="Parameters.Parameter">
     <xs:annotation>
-      <xs:documentation xml:lang="en">This resource is a non-persisted resource used to pass information into and back from an [operation](operations.html). It has no other use, and there is no RESTful endpoint associated with it.</xs:documentation>
+      <xs:documentation xml:lang="en">This resource is used to pass information into and back from an operation (whether invoked directly from REST or within a messaging environment).  It is not persisted or allowed to be referenced by other resources.</xs:documentation>
     </xs:annotation>
     <xs:complexContent>
       <xs:extension base="BackboneElement">
@@ -138,13 +138,14 @@
             <xs:element name="valueSignature" type="Signature"/>
             <xs:element name="valueTiming" type="Timing"/>
             <xs:element name="valueContactDetail" type="ContactDetail"/>
-            <xs:element name="valueContributor" type="Contributor"/>
             <xs:element name="valueDataRequirement" type="DataRequirement"/>
             <xs:element name="valueExpression" type="Expression"/>
             <xs:element name="valueParameterDefinition" type="ParameterDefinition"/>
             <xs:element name="valueRelatedArtifact" type="RelatedArtifact"/>
             <xs:element name="valueTriggerDefinition" type="TriggerDefinition"/>
             <xs:element name="valueUsageContext" type="UsageContext"/>
+            <xs:element name="valueAvailability" type="Availability"/>
+            <xs:element name="valueExtendedContactDetail" type="ExtendedContactDetail"/>
             <xs:element name="valueDosage" type="Dosage"/>
             <xs:element name="valueMeta" type="Meta"/>
           </xs:choice>

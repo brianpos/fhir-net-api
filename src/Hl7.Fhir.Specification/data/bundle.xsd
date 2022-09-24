@@ -47,7 +47,7 @@
   POSSIBILITY OF SUCH DAMAGE.
   
 
-  Generated on Sun, Dec 19, 2021 08:15+1100 for FHIR v5.0.0-snapshot1 
+  Generated on Sat, Sep 10, 2022 04:52+1000 for FHIR v5.0.0-ballot 
 
   Note: the schemas &amp; schematrons do not contain all of the rules about what makes resources
   valid. Implementers will still need to be familiar with the content of the specification and with
@@ -86,7 +86,7 @@
           </xs:element>
           <xs:element name="total" minOccurs="0" maxOccurs="1" type="unsignedInt">
             <xs:annotation>
-              <xs:documentation xml:lang="en">If a set of search matches, this is the total number of entries of type 'match' across all pages in the search.  It does not include search.mode = 'include' or 'outcome' entries and it does not provide a count of the number of entries in the Bundle.</xs:documentation>
+              <xs:documentation xml:lang="en">If a set of search matches, this is the (potentially estimated) total number of entries of type 'match' across all pages in the search.  It does not include search.mode = 'include' or 'outcome' entries and it does not provide a count of the number of entries in the Bundle.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="link" type="Bundle.Link" minOccurs="0" maxOccurs="unbounded">
@@ -101,7 +101,12 @@
           </xs:element>
           <xs:element name="signature" minOccurs="0" maxOccurs="1" type="Signature">
             <xs:annotation>
-              <xs:documentation xml:lang="en">Digital Signature - base64 encoded. XML-DSig or a JWT.</xs:documentation>
+              <xs:documentation xml:lang="en">Digital Signature - base64 encoded. XML-DSig or a JWS.</xs:documentation>
+           </xs:annotation>
+          </xs:element>
+          <xs:element name="issues" minOccurs="0" maxOccurs="1" type="ResourceContainer">
+            <xs:annotation>
+              <xs:documentation xml:lang="en">Captures issues and warnings that relate to the construction of the Bundle and the content within it.</xs:documentation>
            </xs:annotation>
           </xs:element>
         </xs:sequence>
@@ -115,7 +120,7 @@
     <xs:complexContent>
       <xs:extension base="BackboneElement">
         <xs:sequence>
-          <xs:element name="relation" minOccurs="1" maxOccurs="1" type="string">
+          <xs:element name="relation" minOccurs="1" maxOccurs="1" type="LinkRelationTypes">
             <xs:annotation>
               <xs:documentation xml:lang="en">A name which details the functional use for this link - see [http://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1](http://www.iana.org/assignments/link-relations/link-relations.xhtml#link-relations-1).</xs:documentation>
            </xs:annotation>
@@ -143,14 +148,15 @@
           </xs:element>
           <xs:element name="fullUrl" minOccurs="0" maxOccurs="1" type="uri">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The Absolute URL for the resource.  The fullUrl SHALL NOT disagree with the id in the resource - i.e. if the fullUrl is not a urn:uuid, the URL shall be version-independent URL consistent with the Resource.id. The fullUrl is a version independent reference to the resource. The fullUrl element SHALL have a value except that: 
-* fullUrl can be empty on a POST (although it does not need to when specifying a temporary id for reference in the bundle)
-* Results from operations might involve resources that are not identified.</xs:documentation>
+              <xs:documentation xml:lang="en">The Absolute URL for the resource.  The fullUrl SHALL NOT disagree with the id in the resource - i.e. if the fullUrl is not a urn:uuid, the URL shall be version-independent URL consistent with the Resource.id. The fullUrl is a version independent reference to the resource. Even when not required, fullUrl MAY be set to a urn:uuid to allow referencing entries in a transaction. The fullUrl can be an arbitrary URI and is not limited to urn:uuid, urn:oid, http, and https. The fullUrl element SHALL have a value except when: 
+* invoking a create
+* invoking or responding to an operation where the body is not a single identified resource
+* invoking or returning the results of a search or history operation.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="resource" minOccurs="0" maxOccurs="1" type="ResourceContainer">
             <xs:annotation>
-              <xs:documentation xml:lang="en">The Resource for the entry. The purpose/meaning of the resource is determined by the Bundle.type.</xs:documentation>
+              <xs:documentation xml:lang="en">The Resource for the entry. The purpose/meaning of the resource is determined by the Bundle.type. This is allowed to be a Parameters resource if and only if it is referenced by something else within the Bundle that provides context/meaning.</xs:documentation>
            </xs:annotation>
           </xs:element>
           <xs:element name="search" type="Bundle.Search" minOccurs="0" maxOccurs="1">
@@ -407,6 +413,715 @@
     <xs:complexContent>
       <xs:extension base="Element">
         <xs:attribute name="value" type="SearchEntryModeEnum" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:simpleType name="LinkRelationTypesEnum">
+    <xs:restriction base="code-primitive">
+      <xs:enumeration value="about">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that is the subject of the link's context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="acl">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Asserts that the link target provides an access control description for the link context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="alternate">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a substitute for this context</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="amphtml">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Used to reference alternative content that uses the AMP profile of the HTML format.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="appendix">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to an appendix.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="apple-touch-icon">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to an icon for the context. Synonym for icon.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="apple-touch-startup-image">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a launch screen for the context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="archives">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a collection of records, documents, or other
+      materials of historical interest.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="author">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to the context's author.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="blocked-by">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies the entity that blocks access to a resource
+      following receipt of a legal demand.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="bookmark">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Gives a permanent link to use for bookmarking purposes.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="canonical">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Designates the preferred version of a resource (the IRI and its contents).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="chapter">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a chapter in a collection of resources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="cite-as">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Indicates that the link target is preferred over the link context for the purpose of permanent citation.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="collection">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The target IRI points to a resource which represents the collection resource for the context IRI.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="contents">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a table of contents.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="convertedFrom">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The document linked to was later converted to the
+      document that contains this link relation.  For example, an RFC can
+      have a link to the Internet-Draft that became the RFC; in that case,
+      the link relation would be &quot;convertedFrom&quot;.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="copyright">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a copyright statement that applies to the
+    link's context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="create-form">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The target IRI points to a resource where a submission form can be obtained.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="current">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource containing the most recent
+      item(s) in a collection of resources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="describedby">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource providing information about the
+      link's context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="describes">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The relationship A 'describes' B asserts that
+      resource A provides a description of resource B. There are no
+      constraints on the format or representation of either A or B,
+      neither are there any further constraints on either resource.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="disclosure">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a list of patent disclosures made with respect to 
+      material for which 'disclosure' relation is specified.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="dns-prefetch">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Used to indicate an origin that will be used to fetch required 
+      resources for the link context, and that the user agent ought to resolve 
+      as early as possible.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="duplicate">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource whose available representations
+      are byte-for-byte identical with the corresponding representations of
+      the context IRI.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="edit">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that can be used to edit the
+      link's context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="edit-form">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The target IRI points to a resource where a submission form for
+      editing associated resource can be obtained.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="edit-media">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that can be used to edit media
+      associated with the link's context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="enclosure">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies a related resource that is potentially
+      large and might require special handling.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="external">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that is not part of the same site as the current context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="first">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">An IRI that refers to the furthest preceding resource
+    in a series of resources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="glossary">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a glossary of terms.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="help">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to context-sensitive help.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="hosts">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource hosted by the server indicated by
+      the link context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="hub">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a hub that enables registration for
+    notification of updates to the context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="icon">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to an icon representing the link's context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="index">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to an index.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalAfter">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval that ends before the beginning of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalBefore">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval that begins after the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalContains">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval that begins after the beginning of the time interval associated with the context resource, and ends before the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalDisjoint">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval that begins after the end of the time interval associated with the context resource, or ends before the beginning of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalDuring">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval that begins before the beginning of the time interval associated with the context resource, and ends after the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalEquals">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval whose beginning coincides with the beginning of the time interval associated with the context resource, and whose end coincides with the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalFinishedBy">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval that begins after the beginning of the time interval associated with the context resource, and whose end coincides with the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalFinishes">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval that begins before the beginning of the time interval associated with the context resource, and whose end coincides with the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalIn">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval that begins before or is coincident with the beginning of the time interval associated with the context resource, and ends after or is coincident with the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalMeets">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval whose beginning coincides with the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalMetBy">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval whose end coincides with the beginning of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalOverlappedBy">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval that begins before the beginning of the time interval associated with the context resource, and ends after the beginning of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalOverlaps">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval that begins before the end of the time interval associated with the context resource, and ends after the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalStartedBy">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval whose beginning coincides with the beginning of the time interval associated with the context resource, and ends before the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="intervalStarts">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">refers to a resource associated with a time interval whose beginning coincides with the beginning of the time interval associated with the context resource, and ends after the end of the time interval associated with the context resource</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="item">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The target IRI points to a resource that is a member of the collection represented by the context IRI.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="last">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">An IRI that refers to the furthest following resource
+      in a series of resources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="latest-version">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Points to a resource containing the latest (e.g.,
+      current) version of the context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="license">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a license associated with this context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="linkset">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The link target of a link with the &quot;linkset&quot; relation
+      type provides a set of links, including links in which the link
+      context of the link participates.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="lrdd">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to further information about the link's context,
+      expressed as a LRDD (&quot;Link-based Resource Descriptor Document&quot;)
+      resource.  See  for information about
+      processing this relation type in host-meta documents. When used
+      elsewhere, it refers to additional links and other metadata.
+      Multiple instances indicate additional LRDD resources. LRDD
+      resources MUST have an &quot;application/xrd+xml&quot; representation, and
+      MAY have others.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="manifest">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Links to a manifest file for the context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="mask-icon">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a mask that can be applied to the icon for the context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="media-feed">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a feed of personalised media recommendations relevant to the link context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="memento">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The Target IRI points to a Memento, a fixed resource that will not change state anymore.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="micropub">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Links to the context's Micropub endpoint.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="modulepreload">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a module that the user agent is to preemptively fetch and store for use in the current context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="monitor">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that can be used to monitor changes in an HTTP resource.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="monitor-group">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that can be used to monitor changes in a specified group of HTTP resources.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="next">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Indicates that the link's context is a part of a series, and
+      that the next in the series is the link target.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="next-archive">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to the immediately following archive resource.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="nofollow">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Indicates that the context’s original author or publisher does not endorse the link target.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="noopener">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Indicates that any newly created top-level browsing context which results from following the link will not be an auxiliary browsing context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="noreferrer">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Indicates that no referrer information is to be leaked when following the link.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="opener">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Indicates that any newly created top-level browsing context which results from following the link will be an auxiliary browsing context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="openid2.local_id">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to an OpenID Authentication server on which the context relies for an assertion that the end user controls an Identifier.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="openid2.provider">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource which accepts OpenID Authentication protocol messages for the context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="original">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The Target IRI points to an Original Resource.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="P3Pv1">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a P3P privacy policy for the context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="payment">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Indicates a resource where payment is accepted.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="pingback">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Gives the address of the pingback resource for the link context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="preconnect">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Used to indicate an origin that will be used to fetch required 
+      resources for the link context. Initiating an early connection, which 
+      includes the DNS lookup, TCP handshake, and optional TLS negotiation, 
+      allows the user agent to mask the high latency costs of establishing a 
+      connection.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="predecessor-version">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Points to a resource containing the predecessor
+      version in the version history.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="prefetch">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The prefetch link relation type is used to identify a resource 
+      that might be required by the next navigation from the link context, and 
+      that the user agent ought to fetch, such that the user agent can deliver a 
+      faster response once the resource is requested in the future.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="preload">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that should be loaded early in the 
+      processing of the link's context, without blocking rendering.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="prerender">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Used to identify a resource that might be required by the next 
+      navigation from the link context, and that the user agent ought to fetch 
+      and execute, such that the user agent can deliver a faster response once 
+      the resource is requested in the future.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="prev">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Indicates that the link's context is a part of a series, and
+      that the previous in the series is the link target.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="preview">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that provides a preview of the link's context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="previous">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to the previous resource in an ordered series
+      of resources.  Synonym for &quot;prev&quot;.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="prev-archive">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to the immediately preceding archive resource.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="privacy-policy">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a privacy policy associated with the link's context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="profile">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifying that a resource representation conforms
+to a certain profile, without affecting the non-profile semantics
+of the resource representation.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="publication">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Links to a publication manifest. A manifest represents 
+      structured information about a publication, such as informative metadata, 
+      a list of resources, and a default reading order.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="related">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies a related resource.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="restconf">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies the root of RESTCONF API as configured on this HTTP server.
+      The &quot;restconf&quot; relation defines the root of the API defined in RFC8040.
+      Subsequent revisions of RESTCONF will use alternate relation values to support 
+      protocol versioning.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="replies">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies a resource that is a reply to the context
+      of the link.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ruleinput">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The resource identified by the link target provides an input value to an 
+    instance of a rule, where the resource which represents the rule instance is 
+    identified by the link context.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="search">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that can be used to search through
+      the link's context and related resources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="section">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a section in a collection of resources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="self">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Conveys an identifier for the link's context.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="service">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Indicates a URI that can be used to retrieve a
+      service document.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="service-desc">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies service description for the context that
+      is primarily intended for consumption by machines.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="service-doc">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies service documentation for the context that
+      is primarily intended for human consumption.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="service-meta">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies general metadata for the context that is
+      primarily intended for consumption by machines.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="sponsored">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that is within a context that is 
+		sponsored (such as advertising or another compensation agreement).</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="start">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to the first resource in a collection of
+      resources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="status">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies a resource that represents the context's
+      status.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="stylesheet">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a stylesheet.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="subsection">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource serving as a subsection in a
+      collection of resources.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="successor-version">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Points to a resource containing the successor version
+      in the version history.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="sunset">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies a resource that provides information about
+      the context's retirement policy.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="tag">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Gives a tag (identified by the given address) that applies to
+      the current document.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="terms-of-service">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to the terms of service associated with the link's context.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="timegate">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The Target IRI points to a TimeGate for an Original Resource.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="timemap">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">The Target IRI points to a TimeMap for an Original Resource.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="type">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource identifying the abstract semantic type of which the link's context is considered to be an instance.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="ugc">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a resource that is within a context that is User Generated Content.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="up">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Refers to a parent document in a hierarchy of
+      documents.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="version-history">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Points to a resource containing the version history
+      for the context.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="via">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies a resource that is the source of the
+      information in the link's context.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="webmention">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Identifies a target URI that supports the Webmention protocol.
+    This allows clients that mention a resource in some form of publishing process
+    to contact that endpoint and inform it that this resource has been mentioned.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="working-copy">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Points to a working copy for this resource.</xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      <xs:enumeration value="working-copy-of">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">Points to the versioned resource from which this
+      working copy was obtained.
+    </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="LinkRelationTypes">
+    <xs:annotation>
+      <xs:documentation xml:lang="en"></xs:documentation>
+      <xs:documentation xml:lang="en">If the element is present, it must have either a @value, an @id, or extensions</xs:documentation>
+    </xs:annotation>
+    <xs:complexContent>
+      <xs:extension base="Element">
+        <xs:attribute name="value" type="LinkRelationTypesEnum" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
