@@ -15,7 +15,7 @@ namespace Hl7.Fhir.Specification.Tests.Validation
     public class CustomResourceValidationTests
     {
         private static readonly string _custom1 = "{\"resourceType\":\"CustomBasic\", \"id\": \"custom1\"}"; //, \"meta\":{\"profile\": [\"http://fire.ly/fhir/StructureDefinition/CustomBasic\"]}}";
-        private static readonly string _bundleWithCustom1 = "{\"resourceType\": \"Bundle\", \"type\": \"collection\", \"entry\": [{\"resource\": " + _custom1 + "}]}";
+        private static readonly string _bundleWithCustom1 = "{\"resourceType\": \"Bundle\", \"type\": \"collection\", \"entry\": [{\"resource\": " + _custom1 + ", \"fullUrl\":\"http://exampleorg/example\"}]}";
 
         [Fact]
         public async T.Task CustomResourceCanBeValidated()

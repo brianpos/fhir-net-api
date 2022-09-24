@@ -741,10 +741,10 @@ namespace Hl7.Fhir.Specification.Tests
                     Reference = "Patient/23"
                 },
 
-                Author = new ResourceReference
+                Contributor = { new ResourceReference
                 {
                     Reference = "Patient/23"
-                }
+                }}
             };
 
             var source =
@@ -1170,7 +1170,7 @@ namespace Hl7.Fhir.Specification.Tests
                 System = "http://unitsofmeasure.org"
             };
 
-            var sqSd = await _asyncSource.FindStructureDefinitionForCoreTypeAsync(FHIRAllTypes.SimpleQuantity);
+            var sqSd = await _asyncSource.FindStructureDefinitionForCoreTypeAsync(FHIRAllTypes.Quantity);
             sqSd.Snapshot = null;
             var result = _validator.Validate(sq, sqSd);
             Assert.True(result.Success);

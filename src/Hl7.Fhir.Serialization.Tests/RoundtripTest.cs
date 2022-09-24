@@ -292,6 +292,18 @@ namespace Hl7.Fhir.Serialization.Tests
                 return true;
             if (file.EndsWith("-questionnaire.json") && !file.EndsWith("operation-structuredefinition-questionnaire.json"))  // version 4.6.0: 'choice' is not a valid Questionnaire.Item.Type anymore
                 return true; //
+
+            // some R5 ballot specific skips
+            if (file.Contains("requestgroup") // invalid resource type (shouldn't be in the examples file)
+                || file.Contains("Requirements-") // invalid resource content
+                || file.Contains("operation-resource") // resourceType code 'Resource' is not valid in R5 ballot
+                || file.Contains("notification-empty") || file.Contains("notification-error") // timestamp serialization issues
+                )
+                return true; //
+
+            if (file.Contains("valueset-consent-content-class.json") || file.Contains("valueset-examplescenario-instance-type.json"))
+                return true; //
+
             return false;
         }
 

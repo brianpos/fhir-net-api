@@ -15,13 +15,13 @@ namespace Hl7.Fhir.Core.Tests.Model
             var conceptMap = new ConceptMap
             {
                 Status = PublicationStatus.Draft,
-                Source = new FhirUri("http://ValueSet.fhir.org/test"),
+                SourceScope = new FhirUri("http://ValueSet.fhir.org/test"),
             };
-            var values = conceptMap.Select("ConceptMap.source.as(uri)");
+            var values = conceptMap.Select("ConceptMap.sourceScope.as(uri)");
             var value = values.FirstOrDefault();
             Assert.AreEqual("uri", value.TypeName);
 
-            var values2 = conceptMap.Select("(ConceptMap.source as uri)");
+            var values2 = conceptMap.Select("(ConceptMap.sourceScope as uri)");
             var value2 = values2.FirstOrDefault();
             Assert.AreEqual("uri", value2.TypeName);
         }
@@ -32,7 +32,7 @@ namespace Hl7.Fhir.Core.Tests.Model
             var poco = new ConceptMap
             {
                 Identifier = new List<Identifier> { new Identifier("system", "value") },
-                Source = new FhirUri("http://example.com"),
+                SourceScope = new FhirUri("http://example.com"),
                 DateElement = FhirDateTime.Now()
             };
 
@@ -42,8 +42,8 @@ namespace Hl7.Fhir.Core.Tests.Model
             Assert.AreEqual("dateTime", poco.Select("ConceptMap.date").First().TypeName);
             Assert.AreEqual("dateTime", poco.Select("ConceptMap.date as dateTime").First().TypeName);
 
-            Assert.AreEqual("uri", poco.Select("ConceptMap.source").First().TypeName);
-            Assert.AreEqual("uri", poco.Select("ConceptMap.source as uri").First().TypeName);
+            Assert.AreEqual("uri", poco.Select("ConceptMap.sourceScope").First().TypeName);
+            Assert.AreEqual("uri", poco.Select("ConceptMap.sourceScope as uri").First().TypeName);
         }
     }
 }

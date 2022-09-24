@@ -28,6 +28,7 @@
 
 */
 
+using Hl7.Fhir.Utility;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -110,8 +111,10 @@ namespace Hl7.Fhir.Model
         private Uri? getLink(string rel)
         {
             if (Link is null) return null;
+            Bundle.LinkRelationTypes? relation = EnumUtility.ParseLiteral<Bundle.LinkRelationTypes>(rel);
+            if (!relation.HasValue) throw new ArgumentException($"{rel} is not a value LinkRelationType");
 
-            var entry = Link.FirstOrDefault(e => rel.Equals(e.Relation, StringComparison.OrdinalIgnoreCase));
+            var entry = Link.FirstOrDefault(e => e.Relation == relation);
 
             return entry != null ? new Uri(entry.Url, UriKind.RelativeOrAbsolute) : null;
         }
@@ -119,10 +122,12 @@ namespace Hl7.Fhir.Model
         private void setLink(string rel, Uri? uri)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
+            Bundle.LinkRelationTypes? relation = EnumUtility.ParseLiteral<Bundle.LinkRelationTypes>(rel);
+            if (!relation.HasValue) throw new ArgumentException($"{rel} is not a value LinkRelationType");
 
             if (Link == null) Link = new List<LinkComponent>();
 
-            var entry = Link.FirstOrDefault(e => rel.Equals(e.Relation, StringComparison.OrdinalIgnoreCase));
+            var entry = Link.FirstOrDefault(e => e.Relation == relation);
 
             // Setting the link to null removes the entry
             if (uri is null)
@@ -137,7 +142,7 @@ namespace Hl7.Fhir.Model
             if (entry != null)
                 entry.Url = uriString;
             else
-                Link.Add(new LinkComponent() { Relation = rel, Url = uriString });
+                Link.Add(new LinkComponent() { Relation = relation, Url = uriString });
         }
     }
 }

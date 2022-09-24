@@ -384,7 +384,7 @@ namespace Hl7.Fhir.Tests.Serialization
 
             (i.Substance.Strength[0].Presentation as Quantity).Value.Should().Be(1);
             (i.Substance.Strength[0].Concentration as CodeableConcept).Text.Should().Be("text");
-            i.Substance.Strength[0].ConcentrationText.Should().Be("Another text");
+            i.Substance.Strength[0].TextConcentration.Should().Be("Another text");
         }
     }
 }

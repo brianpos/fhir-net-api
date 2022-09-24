@@ -34,6 +34,7 @@ namespace Hl7.Fhir.Test.Validation
             string examplesZip = @"TestData\examples.zip";
 
             FhirXmlParser parser = new FhirXmlParser();
+            parser.Settings.AllowUnrecognizedEnums = true; // OperationDefinition resources don't serialize properly due to the new definition of the valueset.
             int errorCount = 0;
             int parserErrorCount = 0;
             int testFileCount = 0;
@@ -56,6 +57,10 @@ namespace Hl7.Fhir.Test.Validation
                     if (entry.Name == "citation-example(example).xml")
                         continue; // resource Citation is not generated because of generator errors
 
+                    if (entry.Name == "Requirements-client(client).xml")
+                        continue; // unknown `type` property
+                    if (entry.Name == "Requirements-server(server).xml")
+                        continue; // unknown `type` property
 
                     testFileCount++;
 

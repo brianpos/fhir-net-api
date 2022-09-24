@@ -15,7 +15,7 @@ namespace Hl7.Fhir.Specification.Tests
     public class TerminologyTests : IClassFixture<ValidationFixture>
     {
         private readonly IAsyncResourceResolver _resolver;
-        private static Uri _externalTerminologyServerEndpoint = new("https://ontoserver.csiro.au/stu3-latest");
+        private static Uri _externalTerminologyServerEndpoint = new("https://ontoserver-r5.australiaeast.cloudapp.azure.com/fhir");
 
         public TerminologyTests(ValidationFixture fixture, Xunit.Abstractions.ITestOutputHelper _)
         {
@@ -87,7 +87,7 @@ namespace Hl7.Fhir.Specification.Tests
 
             expander.Settings.MaxExpansionSize = 50;
             await expander.ExpandAsync(testVs);
-            Assert.Equal(32, testVs.Expansion.Total); // since R5 +5 Fhir-versions introduced, +1 for 4.6.0, +4 for 5.0.0-snapshot1
+            Assert.Equal(53, testVs.Expansion.Total); // since R5 +5 Fhir-versions introduced, +1 for 4.6.0, +4 for 5.0.0-snapshot1
         }
 
         [Fact]
@@ -604,7 +604,7 @@ namespace Hl7.Fhir.Specification.Tests
             var svc = new ExternalTerminologyService(client);
 
             var parameters = new SubsumesParameters()
-                .WithCode(codeA: "235856003", codeB: "3738000", system: "http://snomed.info/sct", version: "http://snomed.info/sct/32506021000036107/version/20160430")
+                .WithCode(codeA: "235856003", codeB: "3738000", system: "http://snomed.info/sct")//, version: "http://snomed.info/sct/32506021000036107/version/20160430")
                 .Build();
 
             var result = await svc.Subsumes(parameters);
@@ -980,7 +980,7 @@ namespace Hl7.Fhir.Specification.Tests
                 {
                     Url = csUrl,
                     Status = PublicationStatus.Unknown,
-                    Content = CodeSystem.CodeSystemContentMode.Example,
+                    Content = CodeSystemContentMode.Example,
                     Concept = new()
                     {
                         new()

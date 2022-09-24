@@ -32,7 +32,7 @@ namespace Hl7.Fhir.Validation
             if (uri == null)
                 throw new IncorrectElementDefinitionException($"Encountered a binding element without either a ValueSet reference or uri");
 
-            return new Binding(uri, binding.Strength.Value.ToSchemaBindingStrength(), abstractAllowed: true, binding.Description, context);
+            return new Binding(uri, binding.Strength.Value.ToSchemaBindingStrength(), abstractAllowed: true, binding.Description.Value, context);
         }
     }
 
