@@ -56,6 +56,58 @@ namespace Hl7.Fhir.Model
     public override string TypeName { get { return "Timing"; } }
 
     /// <summary>
+    /// A unit of time (units from UCUM).
+    /// (url: http://hl7.org/fhir/ValueSet/units-of-time)
+    /// (systems: 0)
+    /// </summary>
+    [FhirEnumeration("UnitsOfTime")]
+    public enum UnitsOfTime
+    {
+      /// <summary>
+      /// MISSING DESCRIPTION
+      /// (system: http://unitsofmeasure.org)
+      /// </summary>
+      [EnumLiteral("s", "http://unitsofmeasure.org"), Description("second")]
+      S,
+      /// <summary>
+      /// MISSING DESCRIPTION
+      /// (system: http://unitsofmeasure.org)
+      /// </summary>
+      [EnumLiteral("min", "http://unitsofmeasure.org"), Description("minute")]
+      Min,
+      /// <summary>
+      /// MISSING DESCRIPTION
+      /// (system: http://unitsofmeasure.org)
+      /// </summary>
+      [EnumLiteral("h", "http://unitsofmeasure.org"), Description("hour")]
+      H,
+      /// <summary>
+      /// MISSING DESCRIPTION
+      /// (system: http://unitsofmeasure.org)
+      /// </summary>
+      [EnumLiteral("d", "http://unitsofmeasure.org"), Description("day")]
+      D,
+      /// <summary>
+      /// MISSING DESCRIPTION
+      /// (system: http://unitsofmeasure.org)
+      /// </summary>
+      [EnumLiteral("wk", "http://unitsofmeasure.org"), Description("week")]
+      Wk,
+      /// <summary>
+      /// MISSING DESCRIPTION
+      /// (system: http://unitsofmeasure.org)
+      /// </summary>
+      [EnumLiteral("mo", "http://unitsofmeasure.org"), Description("month")]
+      Mo,
+      /// <summary>
+      /// MISSING DESCRIPTION
+      /// (system: http://unitsofmeasure.org)
+      /// </summary>
+      [EnumLiteral("a", "http://unitsofmeasure.org"), Description("year")]
+      A,
+    }
+
+    /// <summary>
     /// Real world event relating to the schedule.
     /// (url: http://hl7.org/fhir/ValueSet/event-timing)
     /// (system: http://hl7.org/fhir/event-timing)
@@ -385,20 +437,20 @@ namespace Hl7.Fhir.Model
       [FhirElement("durationUnit", InSummary=true, Order=80)]
       [DeclaredType(Type = typeof(Code))]
       [DataMember]
-      public Code<Hl7.Fhir.Model.UnitsOfTime> DurationUnitElement
+      public Code<Hl7.Fhir.Model.Timing.UnitsOfTime> DurationUnitElement
       {
         get { return _DurationUnitElement; }
         set { _DurationUnitElement = value; OnPropertyChanged("DurationUnitElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.UnitsOfTime> _DurationUnitElement;
+      private Code<Hl7.Fhir.Model.Timing.UnitsOfTime> _DurationUnitElement;
 
       /// <summary>
       /// s | min | h | d | wk | mo | a - unit of time (UCUM)
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.UnitsOfTime? DurationUnit
+      public Hl7.Fhir.Model.Timing.UnitsOfTime? DurationUnit
       {
         get { return DurationUnitElement != null ? DurationUnitElement.Value : null; }
         set
@@ -406,7 +458,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             DurationUnitElement = null;
           else
-            DurationUnitElement = new Code<Hl7.Fhir.Model.UnitsOfTime>(value);
+            DurationUnitElement = new Code<Hl7.Fhir.Model.Timing.UnitsOfTime>(value);
           OnPropertyChanged("DurationUnit");
         }
       }
@@ -541,20 +593,20 @@ namespace Hl7.Fhir.Model
       [FhirElement("periodUnit", InSummary=true, Order=130)]
       [DeclaredType(Type = typeof(Code))]
       [DataMember]
-      public Code<Hl7.Fhir.Model.UnitsOfTime> PeriodUnitElement
+      public Code<Hl7.Fhir.Model.Timing.UnitsOfTime> PeriodUnitElement
       {
         get { return _PeriodUnitElement; }
         set { _PeriodUnitElement = value; OnPropertyChanged("PeriodUnitElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.UnitsOfTime> _PeriodUnitElement;
+      private Code<Hl7.Fhir.Model.Timing.UnitsOfTime> _PeriodUnitElement;
 
       /// <summary>
       /// s | min | h | d | wk | mo | a - unit of time (UCUM)
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.UnitsOfTime? PeriodUnit
+      public Hl7.Fhir.Model.Timing.UnitsOfTime? PeriodUnit
       {
         get { return PeriodUnitElement != null ? PeriodUnitElement.Value : null; }
         set
@@ -562,7 +614,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             PeriodUnitElement = null;
           else
-            PeriodUnitElement = new Code<Hl7.Fhir.Model.UnitsOfTime>(value);
+            PeriodUnitElement = new Code<Hl7.Fhir.Model.Timing.UnitsOfTime>(value);
           OnPropertyChanged("PeriodUnit");
         }
       }
@@ -711,12 +763,12 @@ namespace Hl7.Fhir.Model
         if(CountMaxElement != null) dest.CountMaxElement = (Hl7.Fhir.Model.PositiveInt)CountMaxElement.DeepCopy();
         if(DurationElement != null) dest.DurationElement = (Hl7.Fhir.Model.FhirDecimal)DurationElement.DeepCopy();
         if(DurationMaxElement != null) dest.DurationMaxElement = (Hl7.Fhir.Model.FhirDecimal)DurationMaxElement.DeepCopy();
-        if(DurationUnitElement != null) dest.DurationUnitElement = (Code<Hl7.Fhir.Model.UnitsOfTime>)DurationUnitElement.DeepCopy();
+        if(DurationUnitElement != null) dest.DurationUnitElement = (Code<Hl7.Fhir.Model.Timing.UnitsOfTime>)DurationUnitElement.DeepCopy();
         if(FrequencyElement != null) dest.FrequencyElement = (Hl7.Fhir.Model.PositiveInt)FrequencyElement.DeepCopy();
         if(FrequencyMaxElement != null) dest.FrequencyMaxElement = (Hl7.Fhir.Model.PositiveInt)FrequencyMaxElement.DeepCopy();
         if(PeriodElement != null) dest.PeriodElement = (Hl7.Fhir.Model.FhirDecimal)PeriodElement.DeepCopy();
         if(PeriodMaxElement != null) dest.PeriodMaxElement = (Hl7.Fhir.Model.FhirDecimal)PeriodMaxElement.DeepCopy();
-        if(PeriodUnitElement != null) dest.PeriodUnitElement = (Code<Hl7.Fhir.Model.UnitsOfTime>)PeriodUnitElement.DeepCopy();
+        if(PeriodUnitElement != null) dest.PeriodUnitElement = (Code<Hl7.Fhir.Model.Timing.UnitsOfTime>)PeriodUnitElement.DeepCopy();
         if(DayOfWeekElement != null) dest.DayOfWeekElement = new List<Code<Hl7.Fhir.Model.DaysOfWeek>>(DayOfWeekElement.DeepCopy());
         if(TimeOfDayElement != null) dest.TimeOfDayElement = new List<Hl7.Fhir.Model.Time>(TimeOfDayElement.DeepCopy());
         if(WhenElement != null) dest.WhenElement = new List<Code<Hl7.Fhir.Model.Timing.EventTiming>>(WhenElement.DeepCopy());

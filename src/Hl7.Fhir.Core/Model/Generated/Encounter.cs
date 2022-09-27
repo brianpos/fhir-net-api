@@ -56,6 +56,70 @@ namespace Hl7.Fhir.Model
     public override string TypeName { get { return "Encounter"; } }
 
     /// <summary>
+    /// Current state of the encounter.
+    /// (url: http://hl7.org/fhir/ValueSet/encounter-status)
+    /// (system: http://hl7.org/fhir/encounter-status)
+    /// </summary>
+    [FhirEnumeration("EncounterStatus")]
+    public enum EncounterStatus
+    {
+      /// <summary>
+      /// The Encounter has not yet started.
+      /// (system: http://hl7.org/fhir/encounter-status)
+      /// </summary>
+      [EnumLiteral("planned", "http://hl7.org/fhir/encounter-status"), Description("Planned")]
+      Planned,
+      /// <summary>
+      /// The Encounter has begun and the patient is present / the practitioner and the patient are meeting.
+      /// (system: http://hl7.org/fhir/encounter-status)
+      /// </summary>
+      [EnumLiteral("in-progress", "http://hl7.org/fhir/encounter-status"), Description("In Progress")]
+      InProgress,
+      /// <summary>
+      /// The Encounter has begun, but is currently on hold, e.g. because the patient is temporarily on leave.
+      /// (system: http://hl7.org/fhir/encounter-status)
+      /// </summary>
+      [EnumLiteral("onhold", "http://hl7.org/fhir/encounter-status"), Description("On Hold")]
+      Onhold,
+      /// <summary>
+      /// The Encounter has been clinically completed, the patient has been discharged from the facility or the visit has ended, and the patient may have departed (refer to subjectStatus). While the encounter is in this status, administrative activities are usually performed, collating all required documentation and charge information before being released for billing, at which point the status will move to completed.
+      /// (system: http://hl7.org/fhir/encounter-status)
+      /// </summary>
+      [EnumLiteral("discharged", "http://hl7.org/fhir/encounter-status"), Description("Discharged")]
+      Discharged,
+      /// <summary>
+      /// The Encounter has ended.
+      /// (system: http://hl7.org/fhir/encounter-status)
+      /// </summary>
+      [EnumLiteral("completed", "http://hl7.org/fhir/encounter-status"), Description("Completed")]
+      Completed,
+      /// <summary>
+      /// The Encounter has ended before it has begun.
+      /// (system: http://hl7.org/fhir/encounter-status)
+      /// </summary>
+      [EnumLiteral("cancelled", "http://hl7.org/fhir/encounter-status"), Description("Cancelled")]
+      Cancelled,
+      /// <summary>
+      /// The Encounter has started, but was not able to be completed. Further action may need to be performed, such as rescheduling appointments related to this encounter.
+      /// (system: http://hl7.org/fhir/encounter-status)
+      /// </summary>
+      [EnumLiteral("discontinued", "http://hl7.org/fhir/encounter-status"), Description("Discontinued")]
+      Discontinued,
+      /// <summary>
+      /// This instance should not have been part of this patient's medical record.
+      /// (system: http://hl7.org/fhir/encounter-status)
+      /// </summary>
+      [EnumLiteral("entered-in-error", "http://hl7.org/fhir/encounter-status"), Description("Entered in Error")]
+      EnteredInError,
+      /// <summary>
+      /// The encounter status is unknown. Note that "unknown" is a value of last resort and every attempt should be made to provide a meaningful value other than "unknown".
+      /// (system: http://hl7.org/fhir/encounter-status)
+      /// </summary>
+      [EnumLiteral("unknown", "http://hl7.org/fhir/encounter-status"), Description("Unknown")]
+      Unknown,
+    }
+
+    /// <summary>
     /// The status of the location.
     /// (url: http://hl7.org/fhir/ValueSet/encounter-location-status)
     /// (system: http://hl7.org/fhir/encounter-location-status)
@@ -111,20 +175,20 @@ namespace Hl7.Fhir.Model
       [DeclaredType(Type = typeof(Code))]
       [Cardinality(Min=1,Max=1)]
       [DataMember]
-      public Code<Hl7.Fhir.Model.EncounterStatus> StatusElement
+      public Code<Hl7.Fhir.Model.Encounter.EncounterStatus> StatusElement
       {
         get { return _StatusElement; }
         set { _StatusElement = value; OnPropertyChanged("StatusElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.EncounterStatus> _StatusElement;
+      private Code<Hl7.Fhir.Model.Encounter.EncounterStatus> _StatusElement;
 
       /// <summary>
       /// planned | in-progress | onhold | discharged | completed | cancelled | discontinued | entered-in-error | unknown
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.EncounterStatus? Status
+      public Hl7.Fhir.Model.Encounter.EncounterStatus? Status
       {
         get { return StatusElement != null ? StatusElement.Value : null; }
         set
@@ -132,7 +196,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             StatusElement = null;
           else
-            StatusElement = new Code<Hl7.Fhir.Model.EncounterStatus>(value);
+            StatusElement = new Code<Hl7.Fhir.Model.Encounter.EncounterStatus>(value);
           OnPropertyChanged("Status");
         }
       }
@@ -161,7 +225,7 @@ namespace Hl7.Fhir.Model
         }
 
         base.CopyTo(dest);
-        if(StatusElement != null) dest.StatusElement = (Code<Hl7.Fhir.Model.EncounterStatus>)StatusElement.DeepCopy();
+        if(StatusElement != null) dest.StatusElement = (Code<Hl7.Fhir.Model.Encounter.EncounterStatus>)StatusElement.DeepCopy();
         if(Period != null) dest.Period = (Hl7.Fhir.Model.Period)Period.DeepCopy();
         return dest;
       }
@@ -1216,20 +1280,20 @@ namespace Hl7.Fhir.Model
     [DeclaredType(Type = typeof(Code))]
     [Cardinality(Min=1,Max=1)]
     [DataMember]
-    public Code<Hl7.Fhir.Model.EncounterStatus> StatusElement
+    public Code<Hl7.Fhir.Model.Encounter.EncounterStatus> StatusElement
     {
       get { return _StatusElement; }
       set { _StatusElement = value; OnPropertyChanged("StatusElement"); }
     }
 
-    private Code<Hl7.Fhir.Model.EncounterStatus> _StatusElement;
+    private Code<Hl7.Fhir.Model.Encounter.EncounterStatus> _StatusElement;
 
     /// <summary>
     /// planned | in-progress | onhold | discharged | completed | cancelled | discontinued | entered-in-error | unknown
     /// </summary>
     /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
     [IgnoreDataMember]
-    public Hl7.Fhir.Model.EncounterStatus? Status
+    public Hl7.Fhir.Model.Encounter.EncounterStatus? Status
     {
       get { return StatusElement != null ? StatusElement.Value : null; }
       set
@@ -1237,7 +1301,7 @@ namespace Hl7.Fhir.Model
         if (value == null)
           StatusElement = null;
         else
-          StatusElement = new Code<Hl7.Fhir.Model.EncounterStatus>(value);
+          StatusElement = new Code<Hl7.Fhir.Model.Encounter.EncounterStatus>(value);
         OnPropertyChanged("Status");
       }
     }
@@ -1645,7 +1709,7 @@ namespace Hl7.Fhir.Model
 
       base.CopyTo(dest);
       if(Identifier != null) dest.Identifier = new List<Hl7.Fhir.Model.Identifier>(Identifier.DeepCopy());
-      if(StatusElement != null) dest.StatusElement = (Code<Hl7.Fhir.Model.EncounterStatus>)StatusElement.DeepCopy();
+      if(StatusElement != null) dest.StatusElement = (Code<Hl7.Fhir.Model.Encounter.EncounterStatus>)StatusElement.DeepCopy();
       if(StatusHistory != null) dest.StatusHistory = new List<Hl7.Fhir.Model.Encounter.StatusHistoryComponent>(StatusHistory.DeepCopy());
       if(Class != null) dest.Class = new List<Hl7.Fhir.Model.CodeableConcept>(Class.DeepCopy());
       if(ClassHistory != null) dest.ClassHistory = new List<Hl7.Fhir.Model.Encounter.ClassHistoryComponent>(ClassHistory.DeepCopy());

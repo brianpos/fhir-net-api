@@ -56,6 +56,58 @@ namespace Hl7.Fhir.Model
     public override string TypeName { get { return "TestScript"; } }
 
     /// <summary>
+    /// The allowable request method or HTTP operation codes.
+    /// (url: http://hl7.org/fhir/ValueSet/http-operations)
+    /// (system: http://hl7.org/fhir/http-operations)
+    /// </summary>
+    [FhirEnumeration("TestScriptRequestMethodCode")]
+    public enum TestScriptRequestMethodCode
+    {
+      /// <summary>
+      /// HTTP DELETE operation.
+      /// (system: http://hl7.org/fhir/http-operations)
+      /// </summary>
+      [EnumLiteral("delete", "http://hl7.org/fhir/http-operations"), Description("DELETE")]
+      Delete,
+      /// <summary>
+      /// HTTP GET operation.
+      /// (system: http://hl7.org/fhir/http-operations)
+      /// </summary>
+      [EnumLiteral("get", "http://hl7.org/fhir/http-operations"), Description("GET")]
+      Get,
+      /// <summary>
+      /// HTTP OPTIONS operation.
+      /// (system: http://hl7.org/fhir/http-operations)
+      /// </summary>
+      [EnumLiteral("options", "http://hl7.org/fhir/http-operations"), Description("OPTIONS")]
+      Options,
+      /// <summary>
+      /// HTTP PATCH operation.
+      /// (system: http://hl7.org/fhir/http-operations)
+      /// </summary>
+      [EnumLiteral("patch", "http://hl7.org/fhir/http-operations"), Description("PATCH")]
+      Patch,
+      /// <summary>
+      /// HTTP POST operation.
+      /// (system: http://hl7.org/fhir/http-operations)
+      /// </summary>
+      [EnumLiteral("post", "http://hl7.org/fhir/http-operations"), Description("POST")]
+      Post,
+      /// <summary>
+      /// HTTP PUT operation.
+      /// (system: http://hl7.org/fhir/http-operations)
+      /// </summary>
+      [EnumLiteral("put", "http://hl7.org/fhir/http-operations"), Description("PUT")]
+      Put,
+      /// <summary>
+      /// HTTP HEAD operation.
+      /// (system: http://hl7.org/fhir/http-operations)
+      /// </summary>
+      [EnumLiteral("head", "http://hl7.org/fhir/http-operations"), Description("HEAD")]
+      Head,
+    }
+
+    /// <summary>
     /// The type of direction to use for assertion.
     /// (url: http://hl7.org/fhir/ValueSet/assert-direction-codes)
     /// (system: http://hl7.org/fhir/assert-direction-codes)
@@ -2474,20 +2526,20 @@ namespace Hl7.Fhir.Model
       [FhirElement("method", Order=120)]
       [DeclaredType(Type = typeof(Code))]
       [DataMember]
-      public Code<Hl7.Fhir.Model.TestScriptRequestMethodCode> MethodElement
+      public Code<Hl7.Fhir.Model.TestScript.TestScriptRequestMethodCode> MethodElement
       {
         get { return _MethodElement; }
         set { _MethodElement = value; OnPropertyChanged("MethodElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.TestScriptRequestMethodCode> _MethodElement;
+      private Code<Hl7.Fhir.Model.TestScript.TestScriptRequestMethodCode> _MethodElement;
 
       /// <summary>
       /// delete | get | options | patch | post | put | head
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.TestScriptRequestMethodCode? Method
+      public Hl7.Fhir.Model.TestScript.TestScriptRequestMethodCode? Method
       {
         get { return MethodElement != null ? MethodElement.Value : null; }
         set
@@ -2495,7 +2547,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             MethodElement = null;
           else
-            MethodElement = new Code<Hl7.Fhir.Model.TestScriptRequestMethodCode>(value);
+            MethodElement = new Code<Hl7.Fhir.Model.TestScript.TestScriptRequestMethodCode>(value);
           OnPropertyChanged("Method");
         }
       }
@@ -2749,7 +2801,7 @@ namespace Hl7.Fhir.Model
         if(ContentTypeElement != null) dest.ContentTypeElement = (Hl7.Fhir.Model.Code)ContentTypeElement.DeepCopy();
         if(DestinationElement != null) dest.DestinationElement = (Hl7.Fhir.Model.Integer)DestinationElement.DeepCopy();
         if(EncodeRequestUrlElement != null) dest.EncodeRequestUrlElement = (Hl7.Fhir.Model.FhirBoolean)EncodeRequestUrlElement.DeepCopy();
-        if(MethodElement != null) dest.MethodElement = (Code<Hl7.Fhir.Model.TestScriptRequestMethodCode>)MethodElement.DeepCopy();
+        if(MethodElement != null) dest.MethodElement = (Code<Hl7.Fhir.Model.TestScript.TestScriptRequestMethodCode>)MethodElement.DeepCopy();
         if(OriginElement != null) dest.OriginElement = (Hl7.Fhir.Model.Integer)OriginElement.DeepCopy();
         if(ParamsElement != null) dest.ParamsElement = (Hl7.Fhir.Model.FhirString)ParamsElement.DeepCopy();
         if(RequestHeader != null) dest.RequestHeader = new List<Hl7.Fhir.Model.TestScript.RequestHeaderComponent>(RequestHeader.DeepCopy());
@@ -3551,20 +3603,20 @@ namespace Hl7.Fhir.Model
       [FhirElement("requestMethod", Order=170)]
       [DeclaredType(Type = typeof(Code))]
       [DataMember]
-      public Code<Hl7.Fhir.Model.TestScriptRequestMethodCode> RequestMethodElement
+      public Code<Hl7.Fhir.Model.TestScript.TestScriptRequestMethodCode> RequestMethodElement
       {
         get { return _RequestMethodElement; }
         set { _RequestMethodElement = value; OnPropertyChanged("RequestMethodElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.TestScriptRequestMethodCode> _RequestMethodElement;
+      private Code<Hl7.Fhir.Model.TestScript.TestScriptRequestMethodCode> _RequestMethodElement;
 
       /// <summary>
       /// delete | get | options | patch | post | put | head
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.TestScriptRequestMethodCode? RequestMethod
+      public Hl7.Fhir.Model.TestScript.TestScriptRequestMethodCode? RequestMethod
       {
         get { return RequestMethodElement != null ? RequestMethodElement.Value : null; }
         set
@@ -3572,7 +3624,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             RequestMethodElement = null;
           else
-            RequestMethodElement = new Code<Hl7.Fhir.Model.TestScriptRequestMethodCode>(value);
+            RequestMethodElement = new Code<Hl7.Fhir.Model.TestScript.TestScriptRequestMethodCode>(value);
           OnPropertyChanged("RequestMethod");
         }
       }
@@ -3882,7 +3934,7 @@ namespace Hl7.Fhir.Model
         if(NavigationLinksElement != null) dest.NavigationLinksElement = (Hl7.Fhir.Model.FhirBoolean)NavigationLinksElement.DeepCopy();
         if(OperatorElement != null) dest.OperatorElement = (Code<Hl7.Fhir.Model.TestScript.AssertionOperatorType>)OperatorElement.DeepCopy();
         if(PathElement != null) dest.PathElement = (Hl7.Fhir.Model.FhirString)PathElement.DeepCopy();
-        if(RequestMethodElement != null) dest.RequestMethodElement = (Code<Hl7.Fhir.Model.TestScriptRequestMethodCode>)RequestMethodElement.DeepCopy();
+        if(RequestMethodElement != null) dest.RequestMethodElement = (Code<Hl7.Fhir.Model.TestScript.TestScriptRequestMethodCode>)RequestMethodElement.DeepCopy();
         if(RequestURLElement != null) dest.RequestURLElement = (Hl7.Fhir.Model.FhirString)RequestURLElement.DeepCopy();
         if(ResourceElement != null) dest.ResourceElement = (Hl7.Fhir.Model.FhirUri)ResourceElement.DeepCopy();
         if(ResponseElement != null) dest.ResponseElement = (Code<Hl7.Fhir.Model.TestScript.AssertionResponseTypes>)ResponseElement.DeepCopy();

@@ -88,10 +88,6 @@
   // Used in model class (resource): Composition.status
   // Used in model class (resource): DocumentReference.docStatus
 
-// Generated Shared Enumeration: ConceptMapRelationship (http://hl7.org/fhir/ValueSet/concept-map-relationship)
-  // Used in model class (resource): ConceptMap.group.element.target.relationship
-  // Used in model class (resource): ConceptMap.group.unmapped.relationship
-
 // Generated Shared Enumeration: ConsentDataMeaning (http://hl7.org/fhir/ValueSet/consent-data-meaning)
   // Used in model class (resource): Consent.provision.data.meaning
   // Used in model class (resource): Permission.rule.data.resource.meaning
@@ -112,14 +108,6 @@
 // Generated Shared Enumeration: DocumentReferenceStatus (http://hl7.org/fhir/ValueSet/document-reference-status)
   // Used in model class (resource): DocumentManifest.status
   // Used in model class (resource): DocumentReference.status
-
-// Generated Shared Enumeration: EncounterStatus (http://hl7.org/fhir/ValueSet/encounter-status)
-  // Used in model class (resource): Encounter.status
-  // Used in model class (resource): Encounter.statusHistory.status
-
-// Generated Shared Enumeration: EpisodeOfCareStatus (http://hl7.org/fhir/ValueSet/episode-of-care-status)
-  // Used in model class (resource): EpisodeOfCare.status
-  // Used in model class (resource): EpisodeOfCare.statusHistory.status
 
 // Generated Shared Enumeration: EventStatus (http://hl7.org/fhir/ValueSet/event-status)
   // Used in model class (resource): ClinicalImpression.status
@@ -169,10 +157,6 @@
   // Used in model class (resource): PaymentReconciliation.status
   // Used in model class (resource): VisionPrescription.status
 
-// Generated Shared Enumeration: TestScriptRequestMethodCode (http://hl7.org/fhir/ValueSet/http-operations)
-  // Used in model class (resource): TestScript.setup.action.operation.method
-  // Used in model class (resource): TestScript.setup.action.assert.requestMethod
-
 // Generated Shared Enumeration: ListMode (http://hl7.org/fhir/ValueSet/list-mode)
   // Used in model class (resource): Composition.section.mode
   // Used in model class (resource): EvidenceReport.section.mode
@@ -194,10 +178,6 @@
 // Generated Shared Enumeration: ParticipationStatus (http://hl7.org/fhir/ValueSet/participationstatus)
   // Used in model class (resource): Appointment.participant.status
   // Used in model class (resource): AppointmentResponse.participantStatus
-
-// Generated Shared Enumeration: ObservationDataType (http://hl7.org/fhir/ValueSet/permitted-data-type)
-  // Used in model class (resource): ObservationDefinition.permittedDataType
-  // Used in model class (resource): ObservationDefinition.component.permittedDataType
 
 // Deferred generation of Shared Enumeration (will be generated in common): PublicationStatus (http://hl7.org/fhir/ValueSet/publication-status)
   // Used in model class (type): RelatedArtifact.publicationStatus
@@ -254,10 +234,6 @@
   // Used in model class (resource): Definition.status
   // Used in model class (resource): Shareable.status
   // Used in model class (type): Extension.value[x]
-
-// Generated Shared Enumeration: TestReportActionResult (http://hl7.org/fhir/ValueSet/report-action-result-codes)
-  // Used in model class (resource): TestReport.setup.action.operation.result
-  // Used in model class (resource): TestReport.setup.action.assert.result
 
 // Generated Shared Enumeration: RequestIntent (http://hl7.org/fhir/ValueSet/request-intent)
   // Used in model class (resource): ActivityDefinition.intent
@@ -321,14 +297,6 @@
 // Generated Shared Enumeration: SubscriptionStatusCodes (http://hl7.org/fhir/ValueSet/subscription-status)
   // Used in model class (resource): Subscription.status
   // Used in model class (resource): SubscriptionStatus.status
-
-// Generated Shared Enumeration: CriteriaNotExistsBehavior (http://hl7.org/fhir/ValueSet/subscriptiontopic-cr-behavior)
-  // Used in model class (resource): SubscriptionTopic.resourceTrigger.queryCriteria.resultForCreate
-  // Used in model class (resource): SubscriptionTopic.resourceTrigger.queryCriteria.resultForDelete
-
-// Generated Shared Enumeration: UnitsOfTime (http://hl7.org/fhir/ValueSet/units-of-time)
-  // Used in model class (type): Timing.repeat.durationUnit
-  // Used in model class (type): Timing.repeat.periodUnit
 
 // Generated Shared Enumeration: EvidenceVariableHandling (http://hl7.org/fhir/ValueSet/variable-handling)
   // Used in model class (resource): Evidence.statistic.modelCharacteristic.variable.handling

@@ -56,6 +56,46 @@ namespace Hl7.Fhir.Model
     public override string TypeName { get { return "ConceptMap"; } }
 
     /// <summary>
+    /// The relationship between concepts.
+    /// (url: http://hl7.org/fhir/ValueSet/concept-map-relationship)
+    /// (system: http://hl7.org/fhir/concept-map-relationship)
+    /// </summary>
+    [FhirEnumeration("ConceptMapRelationship")]
+    public enum ConceptMapRelationship
+    {
+      /// <summary>
+      /// The concepts are related to each other, but the exact relationship is not known.
+      /// (system: http://hl7.org/fhir/concept-map-relationship)
+      /// </summary>
+      [EnumLiteral("related-to", "http://hl7.org/fhir/concept-map-relationship"), Description("Related To")]
+      RelatedTo,
+      /// <summary>
+      /// The definitions of the concepts mean the same thing.
+      /// (system: http://hl7.org/fhir/concept-map-relationship)
+      /// </summary>
+      [EnumLiteral("equivalent", "http://hl7.org/fhir/concept-map-relationship"), Description("Equivalent")]
+      Equivalent,
+      /// <summary>
+      /// The source concept is narrower in meaning than the target concept.
+      /// (system: http://hl7.org/fhir/concept-map-relationship)
+      /// </summary>
+      [EnumLiteral("source-is-narrower-than-target", "http://hl7.org/fhir/concept-map-relationship"), Description("Source Is Narrower Than Target")]
+      SourceIsNarrowerThanTarget,
+      /// <summary>
+      /// The source concept is broader in meaning than the target concept.
+      /// (system: http://hl7.org/fhir/concept-map-relationship)
+      /// </summary>
+      [EnumLiteral("source-is-broader-than-target", "http://hl7.org/fhir/concept-map-relationship"), Description("Source Is Broader Than Target")]
+      SourceIsBroaderThanTarget,
+      /// <summary>
+      /// This is an explicit assertion that the target concept is not related to the source concept.
+      /// (system: http://hl7.org/fhir/concept-map-relationship)
+      /// </summary>
+      [EnumLiteral("not-related-to", "http://hl7.org/fhir/concept-map-relationship"), Description("Not Related To")]
+      NotRelatedTo,
+    }
+
+    /// <summary>
     /// Defines which action to take if there is no match in the group.
     /// (url: http://hl7.org/fhir/ValueSet/conceptmap-unmapped-mode)
     /// (system: http://hl7.org/fhir/conceptmap-unmapped-mode)
@@ -678,20 +718,20 @@ namespace Hl7.Fhir.Model
       [DeclaredType(Type = typeof(Code))]
       [Cardinality(Min=1,Max=1)]
       [DataMember]
-      public Code<Hl7.Fhir.Model.ConceptMapRelationship> RelationshipElement
+      public Code<Hl7.Fhir.Model.ConceptMap.ConceptMapRelationship> RelationshipElement
       {
         get { return _RelationshipElement; }
         set { _RelationshipElement = value; OnPropertyChanged("RelationshipElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.ConceptMapRelationship> _RelationshipElement;
+      private Code<Hl7.Fhir.Model.ConceptMap.ConceptMapRelationship> _RelationshipElement;
 
       /// <summary>
       /// related-to | equivalent | source-is-narrower-than-target | source-is-broader-than-target | not-related-to
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.ConceptMapRelationship? Relationship
+      public Hl7.Fhir.Model.ConceptMap.ConceptMapRelationship? Relationship
       {
         get { return RelationshipElement != null ? RelationshipElement.Value : null; }
         set
@@ -699,7 +739,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             RelationshipElement = null;
           else
-            RelationshipElement = new Code<Hl7.Fhir.Model.ConceptMapRelationship>(value);
+            RelationshipElement = new Code<Hl7.Fhir.Model.ConceptMap.ConceptMapRelationship>(value);
           OnPropertyChanged("Relationship");
         }
       }
@@ -776,7 +816,7 @@ namespace Hl7.Fhir.Model
         if(CodeElement != null) dest.CodeElement = (Hl7.Fhir.Model.Code)CodeElement.DeepCopy();
         if(DisplayElement != null) dest.DisplayElement = (Hl7.Fhir.Model.FhirString)DisplayElement.DeepCopy();
         if(ValueSetElement != null) dest.ValueSetElement = (Hl7.Fhir.Model.Canonical)ValueSetElement.DeepCopy();
-        if(RelationshipElement != null) dest.RelationshipElement = (Code<Hl7.Fhir.Model.ConceptMapRelationship>)RelationshipElement.DeepCopy();
+        if(RelationshipElement != null) dest.RelationshipElement = (Code<Hl7.Fhir.Model.ConceptMap.ConceptMapRelationship>)RelationshipElement.DeepCopy();
         if(CommentElement != null) dest.CommentElement = (Hl7.Fhir.Model.FhirString)CommentElement.DeepCopy();
         if(DependsOn != null) dest.DependsOn = new List<Hl7.Fhir.Model.ConceptMap.OtherElementComponent>(DependsOn.DeepCopy());
         if(Product != null) dest.Product = new List<Hl7.Fhir.Model.ConceptMap.OtherElementComponent>(Product.DeepCopy());
@@ -1237,20 +1277,20 @@ namespace Hl7.Fhir.Model
       [FhirElement("relationship", IsModifier=true, Order=80)]
       [DeclaredType(Type = typeof(Code))]
       [DataMember]
-      public Code<Hl7.Fhir.Model.ConceptMapRelationship> RelationshipElement
+      public Code<Hl7.Fhir.Model.ConceptMap.ConceptMapRelationship> RelationshipElement
       {
         get { return _RelationshipElement; }
         set { _RelationshipElement = value; OnPropertyChanged("RelationshipElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.ConceptMapRelationship> _RelationshipElement;
+      private Code<Hl7.Fhir.Model.ConceptMap.ConceptMapRelationship> _RelationshipElement;
 
       /// <summary>
       /// related-to | equivalent | source-is-narrower-than-target | source-is-broader-than-target | not-related-to
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.ConceptMapRelationship? Relationship
+      public Hl7.Fhir.Model.ConceptMap.ConceptMapRelationship? Relationship
       {
         get { return RelationshipElement != null ? RelationshipElement.Value : null; }
         set
@@ -1258,7 +1298,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             RelationshipElement = null;
           else
-            RelationshipElement = new Code<Hl7.Fhir.Model.ConceptMapRelationship>(value);
+            RelationshipElement = new Code<Hl7.Fhir.Model.ConceptMap.ConceptMapRelationship>(value);
           OnPropertyChanged("Relationship");
         }
       }
@@ -1308,7 +1348,7 @@ namespace Hl7.Fhir.Model
         if(CodeElement != null) dest.CodeElement = (Hl7.Fhir.Model.Code)CodeElement.DeepCopy();
         if(DisplayElement != null) dest.DisplayElement = (Hl7.Fhir.Model.FhirString)DisplayElement.DeepCopy();
         if(ValueSetElement != null) dest.ValueSetElement = (Hl7.Fhir.Model.Canonical)ValueSetElement.DeepCopy();
-        if(RelationshipElement != null) dest.RelationshipElement = (Code<Hl7.Fhir.Model.ConceptMapRelationship>)RelationshipElement.DeepCopy();
+        if(RelationshipElement != null) dest.RelationshipElement = (Code<Hl7.Fhir.Model.ConceptMap.ConceptMapRelationship>)RelationshipElement.DeepCopy();
         if(OtherMapElement != null) dest.OtherMapElement = (Hl7.Fhir.Model.Canonical)OtherMapElement.DeepCopy();
         return dest;
       }

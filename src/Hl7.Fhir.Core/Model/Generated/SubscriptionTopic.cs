@@ -84,6 +84,28 @@ namespace Hl7.Fhir.Model
     }
 
     /// <summary>
+    /// Behavior a server can exhibit when a criteria state does not exist (e.g., state prior to a create or after a delete).
+    /// (url: http://hl7.org/fhir/ValueSet/subscriptiontopic-cr-behavior)
+    /// (system: http://hl7.org/fhir/subscriptiontopic-cr-behavior)
+    /// </summary>
+    [FhirEnumeration("CriteriaNotExistsBehavior")]
+    public enum CriteriaNotExistsBehavior
+    {
+      /// <summary>
+      /// The requested conditional statement will pass if a matching state does not exist (e.g., previous state during create).
+      /// (system: http://hl7.org/fhir/subscriptiontopic-cr-behavior)
+      /// </summary>
+      [EnumLiteral("test-passes", "http://hl7.org/fhir/subscriptiontopic-cr-behavior"), Description("test passes")]
+      TestPasses,
+      /// <summary>
+      /// The requested conditional statement will fail if a matching state does not exist (e.g., previous state during create).
+      /// (system: http://hl7.org/fhir/subscriptiontopic-cr-behavior)
+      /// </summary>
+      [EnumLiteral("test-fails", "http://hl7.org/fhir/subscriptiontopic-cr-behavior"), Description("test fails")]
+      TestFails,
+    }
+
+    /// <summary>
     /// Definition of a resource-based trigger for the subscription topic
     /// </summary>
     [Serializable]
@@ -387,20 +409,20 @@ namespace Hl7.Fhir.Model
       [FhirElement("resultForCreate", InSummary=true, Order=50)]
       [DeclaredType(Type = typeof(Code))]
       [DataMember]
-      public Code<Hl7.Fhir.Model.CriteriaNotExistsBehavior> ResultForCreateElement
+      public Code<Hl7.Fhir.Model.SubscriptionTopic.CriteriaNotExistsBehavior> ResultForCreateElement
       {
         get { return _ResultForCreateElement; }
         set { _ResultForCreateElement = value; OnPropertyChanged("ResultForCreateElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.CriteriaNotExistsBehavior> _ResultForCreateElement;
+      private Code<Hl7.Fhir.Model.SubscriptionTopic.CriteriaNotExistsBehavior> _ResultForCreateElement;
 
       /// <summary>
       /// test-passes | test-fails
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.CriteriaNotExistsBehavior? ResultForCreate
+      public Hl7.Fhir.Model.SubscriptionTopic.CriteriaNotExistsBehavior? ResultForCreate
       {
         get { return ResultForCreateElement != null ? ResultForCreateElement.Value : null; }
         set
@@ -408,7 +430,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             ResultForCreateElement = null;
           else
-            ResultForCreateElement = new Code<Hl7.Fhir.Model.CriteriaNotExistsBehavior>(value);
+            ResultForCreateElement = new Code<Hl7.Fhir.Model.SubscriptionTopic.CriteriaNotExistsBehavior>(value);
           OnPropertyChanged("ResultForCreate");
         }
       }
@@ -450,20 +472,20 @@ namespace Hl7.Fhir.Model
       [FhirElement("resultForDelete", InSummary=true, Order=70)]
       [DeclaredType(Type = typeof(Code))]
       [DataMember]
-      public Code<Hl7.Fhir.Model.CriteriaNotExistsBehavior> ResultForDeleteElement
+      public Code<Hl7.Fhir.Model.SubscriptionTopic.CriteriaNotExistsBehavior> ResultForDeleteElement
       {
         get { return _ResultForDeleteElement; }
         set { _ResultForDeleteElement = value; OnPropertyChanged("ResultForDeleteElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.CriteriaNotExistsBehavior> _ResultForDeleteElement;
+      private Code<Hl7.Fhir.Model.SubscriptionTopic.CriteriaNotExistsBehavior> _ResultForDeleteElement;
 
       /// <summary>
       /// test-passes | test-fails
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.CriteriaNotExistsBehavior? ResultForDelete
+      public Hl7.Fhir.Model.SubscriptionTopic.CriteriaNotExistsBehavior? ResultForDelete
       {
         get { return ResultForDeleteElement != null ? ResultForDeleteElement.Value : null; }
         set
@@ -471,7 +493,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             ResultForDeleteElement = null;
           else
-            ResultForDeleteElement = new Code<Hl7.Fhir.Model.CriteriaNotExistsBehavior>(value);
+            ResultForDeleteElement = new Code<Hl7.Fhir.Model.SubscriptionTopic.CriteriaNotExistsBehavior>(value);
           OnPropertyChanged("ResultForDelete");
         }
       }
@@ -518,9 +540,9 @@ namespace Hl7.Fhir.Model
 
         base.CopyTo(dest);
         if(PreviousElement != null) dest.PreviousElement = (Hl7.Fhir.Model.FhirString)PreviousElement.DeepCopy();
-        if(ResultForCreateElement != null) dest.ResultForCreateElement = (Code<Hl7.Fhir.Model.CriteriaNotExistsBehavior>)ResultForCreateElement.DeepCopy();
+        if(ResultForCreateElement != null) dest.ResultForCreateElement = (Code<Hl7.Fhir.Model.SubscriptionTopic.CriteriaNotExistsBehavior>)ResultForCreateElement.DeepCopy();
         if(CurrentElement != null) dest.CurrentElement = (Hl7.Fhir.Model.FhirString)CurrentElement.DeepCopy();
-        if(ResultForDeleteElement != null) dest.ResultForDeleteElement = (Code<Hl7.Fhir.Model.CriteriaNotExistsBehavior>)ResultForDeleteElement.DeepCopy();
+        if(ResultForDeleteElement != null) dest.ResultForDeleteElement = (Code<Hl7.Fhir.Model.SubscriptionTopic.CriteriaNotExistsBehavior>)ResultForDeleteElement.DeepCopy();
         if(RequireBothElement != null) dest.RequireBothElement = (Hl7.Fhir.Model.FhirBoolean)RequireBothElement.DeepCopy();
         return dest;
       }

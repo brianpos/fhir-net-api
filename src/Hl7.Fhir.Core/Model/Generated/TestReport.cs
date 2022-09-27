@@ -152,6 +152,46 @@ namespace Hl7.Fhir.Model
     }
 
     /// <summary>
+    /// The results of executing an action.
+    /// (url: http://hl7.org/fhir/ValueSet/report-action-result-codes)
+    /// (system: http://hl7.org/fhir/report-action-result-codes)
+    /// </summary>
+    [FhirEnumeration("TestReportActionResult")]
+    public enum TestReportActionResult
+    {
+      /// <summary>
+      /// The action was successful.
+      /// (system: http://hl7.org/fhir/report-action-result-codes)
+      /// </summary>
+      [EnumLiteral("pass", "http://hl7.org/fhir/report-action-result-codes"), Description("Pass")]
+      Pass,
+      /// <summary>
+      /// The action was skipped.
+      /// (system: http://hl7.org/fhir/report-action-result-codes)
+      /// </summary>
+      [EnumLiteral("skip", "http://hl7.org/fhir/report-action-result-codes"), Description("Skip")]
+      Skip,
+      /// <summary>
+      /// The action failed.
+      /// (system: http://hl7.org/fhir/report-action-result-codes)
+      /// </summary>
+      [EnumLiteral("fail", "http://hl7.org/fhir/report-action-result-codes"), Description("Fail")]
+      Fail,
+      /// <summary>
+      /// The action passed but with warnings.
+      /// (system: http://hl7.org/fhir/report-action-result-codes)
+      /// </summary>
+      [EnumLiteral("warning", "http://hl7.org/fhir/report-action-result-codes"), Description("Warning")]
+      Warning,
+      /// <summary>
+      /// The action encountered a fatal error and the engine was unable to process.
+      /// (system: http://hl7.org/fhir/report-action-result-codes)
+      /// </summary>
+      [EnumLiteral("error", "http://hl7.org/fhir/report-action-result-codes"), Description("Error")]
+      Error,
+    }
+
+    /// <summary>
     /// A participant in the test execution, either the execution engine, a client, or a server
     /// </summary>
     [Serializable]
@@ -622,20 +662,20 @@ namespace Hl7.Fhir.Model
       [DeclaredType(Type = typeof(Code))]
       [Cardinality(Min=1,Max=1)]
       [DataMember]
-      public Code<Hl7.Fhir.Model.TestReportActionResult> ResultElement
+      public Code<Hl7.Fhir.Model.TestReport.TestReportActionResult> ResultElement
       {
         get { return _ResultElement; }
         set { _ResultElement = value; OnPropertyChanged("ResultElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.TestReportActionResult> _ResultElement;
+      private Code<Hl7.Fhir.Model.TestReport.TestReportActionResult> _ResultElement;
 
       /// <summary>
       /// pass | skip | fail | warning | error
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.TestReportActionResult? Result
+      public Hl7.Fhir.Model.TestReport.TestReportActionResult? Result
       {
         get { return ResultElement != null ? ResultElement.Value : null; }
         set
@@ -643,7 +683,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             ResultElement = null;
           else
-            ResultElement = new Code<Hl7.Fhir.Model.TestReportActionResult>(value);
+            ResultElement = new Code<Hl7.Fhir.Model.TestReport.TestReportActionResult>(value);
           OnPropertyChanged("Result");
         }
       }
@@ -702,7 +742,7 @@ namespace Hl7.Fhir.Model
         }
 
         base.CopyTo(dest);
-        if(ResultElement != null) dest.ResultElement = (Code<Hl7.Fhir.Model.TestReportActionResult>)ResultElement.DeepCopy();
+        if(ResultElement != null) dest.ResultElement = (Code<Hl7.Fhir.Model.TestReport.TestReportActionResult>)ResultElement.DeepCopy();
         if(Message != null) dest.Message = (Hl7.Fhir.Model.Markdown)Message.DeepCopy();
         if(DetailElement != null) dest.DetailElement = (Hl7.Fhir.Model.FhirUri)DetailElement.DeepCopy();
         return dest;
@@ -813,20 +853,20 @@ namespace Hl7.Fhir.Model
       [DeclaredType(Type = typeof(Code))]
       [Cardinality(Min=1,Max=1)]
       [DataMember]
-      public Code<Hl7.Fhir.Model.TestReportActionResult> ResultElement
+      public Code<Hl7.Fhir.Model.TestReport.TestReportActionResult> ResultElement
       {
         get { return _ResultElement; }
         set { _ResultElement = value; OnPropertyChanged("ResultElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.TestReportActionResult> _ResultElement;
+      private Code<Hl7.Fhir.Model.TestReport.TestReportActionResult> _ResultElement;
 
       /// <summary>
       /// pass | skip | fail | warning | error
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.TestReportActionResult? Result
+      public Hl7.Fhir.Model.TestReport.TestReportActionResult? Result
       {
         get { return ResultElement != null ? ResultElement.Value : null; }
         set
@@ -834,7 +874,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             ResultElement = null;
           else
-            ResultElement = new Code<Hl7.Fhir.Model.TestReportActionResult>(value);
+            ResultElement = new Code<Hl7.Fhir.Model.TestReport.TestReportActionResult>(value);
           OnPropertyChanged("Result");
         }
       }
@@ -893,7 +933,7 @@ namespace Hl7.Fhir.Model
         }
 
         base.CopyTo(dest);
-        if(ResultElement != null) dest.ResultElement = (Code<Hl7.Fhir.Model.TestReportActionResult>)ResultElement.DeepCopy();
+        if(ResultElement != null) dest.ResultElement = (Code<Hl7.Fhir.Model.TestReport.TestReportActionResult>)ResultElement.DeepCopy();
         if(Message != null) dest.Message = (Hl7.Fhir.Model.Markdown)Message.DeepCopy();
         if(DetailElement != null) dest.DetailElement = (Hl7.Fhir.Model.FhirString)DetailElement.DeepCopy();
         return dest;

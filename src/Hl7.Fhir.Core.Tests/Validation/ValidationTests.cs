@@ -203,7 +203,7 @@ namespace Hl7.Fhir.Tests.Validation
             validateErrorOrFail(enc, membername: "StatusElement");
             validateErrorOrFail(enc, true);  // recursive checking shouldn't matter
 
-            enc.Status = EncounterStatus.Planned;
+            enc.Status = Encounter.EncounterStatus.Planned;
             enc.Class.Add(new CodeableConcept("http://terminology.hl7.org/CodeSystem/v3-ActCode", "IMP", "inpatient encounter"));
 
             // Now, it should work

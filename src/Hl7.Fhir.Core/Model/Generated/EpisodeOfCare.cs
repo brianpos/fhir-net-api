@@ -56,6 +56,58 @@ namespace Hl7.Fhir.Model
     public override string TypeName { get { return "EpisodeOfCare"; } }
 
     /// <summary>
+    /// The status of the episode of care.
+    /// (url: http://hl7.org/fhir/ValueSet/episode-of-care-status)
+    /// (system: http://hl7.org/fhir/episode-of-care-status)
+    /// </summary>
+    [FhirEnumeration("EpisodeOfCareStatus")]
+    public enum EpisodeOfCareStatus
+    {
+      /// <summary>
+      /// This episode of care is planned to start at the date specified in the period.start. During this status, an organization may perform assessments to determine if the patient is eligible to receive services, or be organizing to make resources available to provide care services.
+      /// (system: http://hl7.org/fhir/episode-of-care-status)
+      /// </summary>
+      [EnumLiteral("planned", "http://hl7.org/fhir/episode-of-care-status"), Description("Planned")]
+      Planned,
+      /// <summary>
+      /// This episode has been placed on a waitlist, pending the episode being made active (or cancelled).
+      /// (system: http://hl7.org/fhir/episode-of-care-status)
+      /// </summary>
+      [EnumLiteral("waitlist", "http://hl7.org/fhir/episode-of-care-status"), Description("Waitlist")]
+      Waitlist,
+      /// <summary>
+      /// This episode of care is current.
+      /// (system: http://hl7.org/fhir/episode-of-care-status)
+      /// </summary>
+      [EnumLiteral("active", "http://hl7.org/fhir/episode-of-care-status"), Description("Active")]
+      Active,
+      /// <summary>
+      /// This episode of care is on hold; the organization has limited responsibility for the patient (such as while on respite).
+      /// (system: http://hl7.org/fhir/episode-of-care-status)
+      /// </summary>
+      [EnumLiteral("onhold", "http://hl7.org/fhir/episode-of-care-status"), Description("On Hold")]
+      Onhold,
+      /// <summary>
+      /// This episode of care is finished and the organization is not expecting to be providing further care to the patient. Can also be known as "closed", "completed" or other similar terms.
+      /// (system: http://hl7.org/fhir/episode-of-care-status)
+      /// </summary>
+      [EnumLiteral("finished", "http://hl7.org/fhir/episode-of-care-status"), Description("Finished")]
+      Finished,
+      /// <summary>
+      /// The episode of care was cancelled, or withdrawn from service, often selected during the planned stage as the patient may have gone elsewhere, or the circumstances have changed and the organization is unable to provide the care. It indicates that services terminated outside the planned/expected workflow.
+      /// (system: http://hl7.org/fhir/episode-of-care-status)
+      /// </summary>
+      [EnumLiteral("cancelled", "http://hl7.org/fhir/episode-of-care-status"), Description("Cancelled")]
+      Cancelled,
+      /// <summary>
+      /// This instance should not have been part of this patient's medical record.
+      /// (system: http://hl7.org/fhir/episode-of-care-status)
+      /// </summary>
+      [EnumLiteral("entered-in-error", "http://hl7.org/fhir/episode-of-care-status"), Description("Entered in Error")]
+      EnteredInError,
+    }
+
+    /// <summary>
     /// Past list of status codes (the current status may be included to cover the start date of the status)
     /// </summary>
     [Serializable]
@@ -75,20 +127,20 @@ namespace Hl7.Fhir.Model
       [DeclaredType(Type = typeof(Code))]
       [Cardinality(Min=1,Max=1)]
       [DataMember]
-      public Code<Hl7.Fhir.Model.EpisodeOfCareStatus> StatusElement
+      public Code<Hl7.Fhir.Model.EpisodeOfCare.EpisodeOfCareStatus> StatusElement
       {
         get { return _StatusElement; }
         set { _StatusElement = value; OnPropertyChanged("StatusElement"); }
       }
 
-      private Code<Hl7.Fhir.Model.EpisodeOfCareStatus> _StatusElement;
+      private Code<Hl7.Fhir.Model.EpisodeOfCare.EpisodeOfCareStatus> _StatusElement;
 
       /// <summary>
       /// planned | waitlist | active | onhold | finished | cancelled | entered-in-error
       /// </summary>
       /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
       [IgnoreDataMember]
-      public Hl7.Fhir.Model.EpisodeOfCareStatus? Status
+      public Hl7.Fhir.Model.EpisodeOfCare.EpisodeOfCareStatus? Status
       {
         get { return StatusElement != null ? StatusElement.Value : null; }
         set
@@ -96,7 +148,7 @@ namespace Hl7.Fhir.Model
           if (value == null)
             StatusElement = null;
           else
-            StatusElement = new Code<Hl7.Fhir.Model.EpisodeOfCareStatus>(value);
+            StatusElement = new Code<Hl7.Fhir.Model.EpisodeOfCare.EpisodeOfCareStatus>(value);
           OnPropertyChanged("Status");
         }
       }
@@ -125,7 +177,7 @@ namespace Hl7.Fhir.Model
         }
 
         base.CopyTo(dest);
-        if(StatusElement != null) dest.StatusElement = (Code<Hl7.Fhir.Model.EpisodeOfCareStatus>)StatusElement.DeepCopy();
+        if(StatusElement != null) dest.StatusElement = (Code<Hl7.Fhir.Model.EpisodeOfCare.EpisodeOfCareStatus>)StatusElement.DeepCopy();
         if(Period != null) dest.Period = (Hl7.Fhir.Model.Period)Period.DeepCopy();
         return dest;
       }
@@ -400,20 +452,20 @@ namespace Hl7.Fhir.Model
     [DeclaredType(Type = typeof(Code))]
     [Cardinality(Min=1,Max=1)]
     [DataMember]
-    public Code<Hl7.Fhir.Model.EpisodeOfCareStatus> StatusElement
+    public Code<Hl7.Fhir.Model.EpisodeOfCare.EpisodeOfCareStatus> StatusElement
     {
       get { return _StatusElement; }
       set { _StatusElement = value; OnPropertyChanged("StatusElement"); }
     }
 
-    private Code<Hl7.Fhir.Model.EpisodeOfCareStatus> _StatusElement;
+    private Code<Hl7.Fhir.Model.EpisodeOfCare.EpisodeOfCareStatus> _StatusElement;
 
     /// <summary>
     /// planned | waitlist | active | onhold | finished | cancelled | entered-in-error
     /// </summary>
     /// <remarks>This uses the native .NET datatype, rather than the FHIR equivalent</remarks>
     [IgnoreDataMember]
-    public Hl7.Fhir.Model.EpisodeOfCareStatus? Status
+    public Hl7.Fhir.Model.EpisodeOfCare.EpisodeOfCareStatus? Status
     {
       get { return StatusElement != null ? StatusElement.Value : null; }
       set
@@ -421,7 +473,7 @@ namespace Hl7.Fhir.Model
         if (value == null)
           StatusElement = null;
         else
-          StatusElement = new Code<Hl7.Fhir.Model.EpisodeOfCareStatus>(value);
+          StatusElement = new Code<Hl7.Fhir.Model.EpisodeOfCare.EpisodeOfCareStatus>(value);
         OnPropertyChanged("Status");
       }
     }
@@ -586,7 +638,7 @@ namespace Hl7.Fhir.Model
 
       base.CopyTo(dest);
       if(Identifier != null) dest.Identifier = new List<Hl7.Fhir.Model.Identifier>(Identifier.DeepCopy());
-      if(StatusElement != null) dest.StatusElement = (Code<Hl7.Fhir.Model.EpisodeOfCareStatus>)StatusElement.DeepCopy();
+      if(StatusElement != null) dest.StatusElement = (Code<Hl7.Fhir.Model.EpisodeOfCare.EpisodeOfCareStatus>)StatusElement.DeepCopy();
       if(StatusHistory != null) dest.StatusHistory = new List<Hl7.Fhir.Model.EpisodeOfCare.StatusHistoryComponent>(StatusHistory.DeepCopy());
       if(Type != null) dest.Type = new List<Hl7.Fhir.Model.CodeableConcept>(Type.DeepCopy());
       if(Diagnosis != null) dest.Diagnosis = new List<Hl7.Fhir.Model.EpisodeOfCare.DiagnosisComponent>(Diagnosis.DeepCopy());
