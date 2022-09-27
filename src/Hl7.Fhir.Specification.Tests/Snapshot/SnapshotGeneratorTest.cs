@@ -4994,7 +4994,7 @@ namespace Hl7.Fhir.Specification.Tests
                                 // Code = FHIRDefinedType.Quantity,
                                 // Profile = new string[] { ModelInfo.CanonicalUriForFhirCoreType(FHIRDefinedType.SimpleQuantity) }
 
-                                Code = FHIRAllTypes.SimpleQuantity.GetLiteral()
+                                Code = FHIRAllTypes.Quantity.GetLiteral()
                             },
                         }
                     }
@@ -5053,7 +5053,7 @@ namespace Hl7.Fhir.Specification.Tests
 
             Assert.IsNotNull(nav.Current.Type);
             Assert.AreEqual(1, nav.Current.Type.Count);
-            Assert.AreEqual(FHIRAllTypes.SimpleQuantity.GetLiteral(), nav.Current.Type[0].Code);
+            Assert.AreEqual(FHIRAllTypes.Quantity.GetLiteral(), nav.Current.Type[0].Code);
 
             var type = nav.Current.Type.First();
             Debug.Print($"{nav.Path} : {type.Code} - '{type.Profile}'");
@@ -5063,7 +5063,7 @@ namespace Hl7.Fhir.Specification.Tests
         [TestMethod]
         public async T.Task TestSimpleQuantity()
         {
-            var resource = await _testResolver.FindStructureDefinitionAsync(ModelInfo.CanonicalUriForFhirCoreType(FHIRAllTypes.SimpleQuantity));
+            var resource = await _testResolver.FindStructureDefinitionAsync(ModelInfo.CanonicalUriForFhirCoreType(FHIRAllTypes.Quantity));
             _generator = new SnapshotGenerator(_testResolver);
             var snapshot = await _generator.GenerateAsync(resource);
             Assert.IsNotNull(snapshot);
@@ -6225,7 +6225,7 @@ namespace Hl7.Fhir.Specification.Tests
             }
 
             // Also verify the expanded snapshot of the referenced SimpleQuantity profile
-            sd = await _testResolver.FindStructureDefinitionForCoreTypeAsync(FHIRAllTypes.SimpleQuantity);
+            sd = await _testResolver.FindStructureDefinitionForCoreTypeAsync(FHIRAllTypes.Quantity);
             Assert.IsNotNull(sd);
             Assert.IsTrue(sd.HasSnapshot);
             Assert.IsNull(sd.Differential.GetRootElement()?.SliceName);
@@ -6266,7 +6266,7 @@ namespace Hl7.Fhir.Specification.Tests
                             new ElementDefinition.TypeRefComponent()
                             {
                                 Code = FHIRAllTypes.Quantity.GetLiteral(),
-                                Profile = new string[] { ModelInfo.CanonicalUriForFhirCoreType(FHIRAllTypes.SimpleQuantity) }
+                                Profile = new string[] { ModelInfo.CanonicalUriForFhirCoreType(FHIRAllTypes.Quantity) }
                             }
                         }
                     },
