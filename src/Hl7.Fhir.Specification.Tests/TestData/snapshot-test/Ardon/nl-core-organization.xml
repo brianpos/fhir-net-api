@@ -200,11 +200,11 @@
         <map value="NL-CM:0.1.5" />
       </mapping>
     </element>
-    <element id="Organization.telecom.system">
-      <path value="Organization.telecom.system" />
+    <element id="Organization.contact.telecom.system">
+      <path value="Organization.contact.telecom.system" />
       <min value="1" />
     </element>
-    <element id="Organization.telecom.value">
+    <element id="Organization.contact.telecom.value">
       <path value="Organization.telecom.value" />
       <short value="TelephoneNumber / E-mailAddress" />
       <alias value="Telefoonnummer" />
@@ -219,7 +219,7 @@
         <map value="NL-CM:0.1.20" />
       </mapping>
     </element>
-    <element id="Organization.telecom.use">
+    <element id="Organization.contact.telecom.use">
       <path value="Organization.telecom.use" />
       <short value="NumberType / E-mailAddressType" />
       <alias value="NummerSoort" />
@@ -233,8 +233,8 @@
         <map value="NL-CM:0.1.19" />
       </mapping>
     </element>
-    <element id="Organization.address">
-      <path value="Organization.address" />
+    <element id="Organization.contact.address">
+      <path value="Organization.contact.address" />
       <short value="AddressInformation" />
       <alias value="Adresgegevens" />
       <type>

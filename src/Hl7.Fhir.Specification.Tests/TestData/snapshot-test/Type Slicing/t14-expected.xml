@@ -1345,14 +1345,14 @@
     </element>
   </snapshot>
   <differential>
-    <element id="Organization.address">
-      <path value="Organization.address"/>
+    <element id="Organization.contact.address">
+      <path value="Organization.contact.address"/>
       <min value="1"/>
       <max value="1"/>
       <mustSupport value="true"/>
     </element>
-    <element id="Organization.address.extension:USLabCountycodes">
-      <path value="Organization.address.extension"/>
+    <element id="Organization.contact.address.extension:USLabCountycodes">
+      <path value="Organization.contact.address.extension"/>
       <sliceName value="USLabCountycodes"/>
       <short value="County/Parish FIPS codes"/>
       <definition value="County/Parish FIPS codes"/>
