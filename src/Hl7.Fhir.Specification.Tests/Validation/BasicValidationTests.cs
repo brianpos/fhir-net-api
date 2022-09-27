@@ -973,7 +973,7 @@ namespace Hl7.Fhir.Specification.Tests
             public Resource ResolveByUri(string uri)
             {
                 ResourceIdentity reference = new ResourceIdentity(uri);
-                var filename = $"{reference.Id}.{reference.ResourceType.ToLower()}.xml";
+                var filename = $"{reference.Id}.{reference.ResourceType?.ToLower()}.xml";
                 var path = Path.Combine(_path, filename);
 
                 if (File.Exists(path))
